@@ -14,6 +14,10 @@
         <style>
             nav {
                 position: sticky;
+                top: 0;
+                z-index: 1000;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                background-color: #dc3545; 
             }
             .logo img {
                 height: 100px;
@@ -25,7 +29,7 @@
                 height: 500px;
                 object-fit: cover;
             }
-            .card {
+            .flightSearch {
                 margin: 0px 100px ;
                 padding: 20px;
                 box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -49,6 +53,30 @@
                 max-height: 300px;
                 overflow-y: auto;
             }
+            h3 {
+                font-weight: bold;
+                color: #dc3545;
+            }
+            #benefits h5 {
+                font-weight: bold;
+                color: #dc3545;
+            }
+            #benefits p {
+                color: #555;
+            }
+            #benefits .col-md-4 {
+                border-right: 1px solid #ddd;
+            }
+            #benefits .col-md-4:last-child {
+                border-right: none;
+            }
+            .card {
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                border: none;
+                border-radius: 10px;
+                width: 18rem;
+            }
+           
         </style>
 
         <script>
@@ -58,7 +86,15 @@
                     interval: 3000, // Change slide every 3 seconds
                 });
             
+                $('#departureDate, #returnDate').on('focus', function() {
+                    $(this).attr('type', 'date');
+                });
                 
+                $('#departureDate, #returnDate').on('blur', function() {
+                    if (!$(this).val()) {
+                        $(this).attr('type', 'text');
+                    }
+                });
 
             });
         </script>
@@ -80,7 +116,6 @@
                             <a href="#" class="text-white text-decoration-none mx-2">Bookings</a>
                             <a href="#" class="text-white text-decoration-none mx-2">Contact</a>
                         </div>
-                    </div>
                 </div>
             </nav>
         </header>
@@ -106,7 +141,7 @@
             </div>
 
             <div>
-                <div class="card">
+                <div class="flightSearch">
                     <form id="flightSearch">
                         <div class="row g-3">
                             <div class="col-md-6">
@@ -117,7 +152,7 @@
 
                                     <ul class="dropdown-menu">
                                         <li><button class="dropdown-item" type="button">One Way</button></li>
-                                        <li><button class="dropdown-item" type="button">Round action</button></li>
+                                        <li><button class="dropdown-item" type="button">Round Trip</button></li>
                                         <li><button class="dropdown-item" type="button">Multi-City</button></li>
                                     </ul>
                                 </div>
@@ -280,21 +315,125 @@
                                 </div>
                             </div>
                             <div class="col">
-                                <label for="departureDate" class="form-label">Departure Date</label>
-                                <input type="date" class="form-control" id="departureDate" name="departureDate" required>
+                                <input type="text" class="form-control border-danger" id="departureDate" name="departureDate" required placeholder="Select Departure Date">
                             </div>
                             <div class="col">
-                                <label for="returnDate" class="form-label">Return Date</label>
-                                <input type="date" class="form-control" id="returnDate" name="returnDate">
+                                <input type="text" class="form-control border-danger" id="returnDate" name="returnDate" placeholder="Select Return Date" >
+                            </div>
+                            <div class="col-12 d-grid">
+                                <button type="submit" class="btn btn-danger">Search Flights</button>
                             </div>
                             
                         </div>
                     </form>
                 </div>
             </div>
+
+            <div class="my-5 text-center">
+                <h3>Popular Destinations</h3>
+                <p>Explore our most popular flight destinations around the world.</p>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div>
+                        <img src="Logo/g250.png" class="d-block w-100" alt="...">
+                        <h5 class="text-center mt-2">Tokyo, Japan</h5>
+                    </div>
+                </div>
+                <div class="col">
+                    <div>
+                        <img src="Logo/g250.png" class="d-block w-100" alt="...">
+                        <h5 class="text-center mt-2">Seoul, South Korea</h5>
+                    </div>
+                </div>
+                <div class="col">
+                    <div>
+                        <img src="Logo/g250.png" class="d-block w-100" alt="...">
+                        <h5 class="text-center mt-2">Beijing, China</h5>
+                    </div>
+                </div>
+                <div class="col">
+                    <div>
+                        <img src="Logo/g250.png" class="d-block w-100" alt="...">
+                        <h5 class="text-center mt-2">Sydney, Australia</h5>
+                    </div>
+                </div>
+            </div>
+
+            <br><br>
+            <div id="benefits">
+                <div class="my-5 text-center">
+                    <h3>Why Book with Archers Airline?</h3>
+                    <p>Experience the best in comfort, service, and value when you fly with us.</p>
+                </div>
+
+                <div class="container">
+                    <div class="row text-center">
+                        <div class="col-md-4 mb-4">
+                            <h5>Best Price Guarantee</h5>
+                            <p>We offer competitive prices and the best deals on flights.</p>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <h5>24/7 Customer Support</h5>
+                            <p>Our support team is available around the clock to assist you.</p>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <h5>Extensive Network</h5>
+                            <p>Fly to over 100 destinations worldwide with our extensive route network.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="my-5 text-center">
+                <h3>Ready to Book Your Flight?</h3>
+                <p>Start your journey with Archers Airline today!</p>
+                <button class="btn btn-danger btn-lg">Book Now</button>
+            </div>
+
+            <div class="mb-5">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <img src="Logo/1.svg" class="card-img-top" alt="...">
+                            <div class="card-body">
+                              <h5 class="card-title">Manila (MNL)to
+                                Hong Kong (HKG)</h5>
+                              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card’s content.</p>
+                              <a href="#" class="btn btn-danger">Book Now</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card">
+                            <img src="Logo/2.svg" class="card-img-top" alt="...">
+                            <div class="card-body">
+                              <h5 class="card-title">Manila (MNL)to
+                                Kuala Lumpur (KUL)</h5>
+                              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card’s content.</p>
+                              <a href="#" class="btn btn-danger">Book Now</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card">
+                            <img src="Logo/1.svg" class="card-img-top" alt="...">
+                            <div class="card-body">
+                              <h5 class="card-title">Manila (MNL)to
+                                Singapore (SIN)</h5>
+                              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card’s content.</p>
+                              <a href="#" class="btn btn-danger">Book Now</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
         </main>
 
-        
+        <footer class="bg-danger text-white text-center p-3">
+            &copy; 2025 Archers Airline. All rights reserved.
+        </footer>
     </body>
 </html>
 

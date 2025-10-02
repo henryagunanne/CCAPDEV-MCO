@@ -3,6 +3,10 @@ jQuery(function() {
     $("#locationCarousel").carousel({
         interval: 3000, // Change slide every 3 seconds
     });
+
+    $("#popularDestCarousel").carousel({
+        interval: 3000
+    })
     
     // update departure and return date attribute field on focus to date form text
     $("#departureDate, #returnDate").on("focus", function() {
@@ -22,9 +26,9 @@ jQuery(function() {
         let tripType = $("#tripDropdown .dropdown-toggle").text().trim();
 
         if(tripType === "One Way"){
-        returnDate.prop("disabled", true) // disable
+        returnDate.prop("disabled", true); // disable
         } else {
-        returnDate.prop("disabled", false)
+        returnDate.prop("disabled", false);
         }
     }
 

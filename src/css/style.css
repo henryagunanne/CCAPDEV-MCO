@@ -1,5 +1,5 @@
 nav {
-    position: fixed;
+    position: sticky;
     top: 0;
     left: 0;
     width: 100%;
@@ -7,87 +7,95 @@ nav {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     background-color: #dc3545;
 }
-  .logo img {
-      height: 100px;
-  }
-  .nav-links a {
-      
-  }
-  .carousel-item img {
-      height: 500px;
-      object-fit: cover;
-  }
-  hr {
-      border: 0px;
-      border-top: 1px solid #818181; 
-      margin: 1rem 0; 
-  }
-  #search {
-    background-image: url("../../out/cities/thailand.png");
-  }
-  .flightSearch {
-      margin: 0px 100px ;
-      padding: 20px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      border-radius: 10px;
-      background-color: #ffffff;
-  }
-  .menu-left {
-      border-right: 1px solid #ddd;
-      max-height: 300px;
-      overflow-y: auto;
-  }
-  .menu-left li {
-      cursor: pointer;
-      padding: 5px 10px;
-      width: 400px;
-  }
-  .menu-left li.active {
-      background: #f0f0f0;
-      font-weight: bold;
-  }
-  .menu-right {
-      max-height: 300px;
-      overflow-y: auto;
-  }
-  h3 {
-      font-weight: bold;
-      color: #dc3545;
-  }
-  #benefits h5 {
-      font-weight: bold;
-      color: #dc3545;
-  }
-  #benefits p {
-      color: #555;
-  }
-  #benefits .col-md-4 {
-      border-right: 1px solid #d4d4d4;
-  }
-  #benefits .col-md-4:last-child {
-      border-right: none;
-  }
-  .card {
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      border: none;
-      border-radius: 10px;
-      width: 16rem;
-  }
-  .card img {
-    height: 200px;
-  }
-  #popularDestCarousel {
-    width: 90%;
-    margin: auto;
+.logo{
+    width: 50%;
+}
+.logo img {
+    height: 100px;
+}
+nav .navbar-nav {
+    width: 70%
+}
+nav .dropdown {
+   
+}
+.nav-links a {
+    
+}
+.carousel-item img {
+    height: 500px;
+    object-fit: cover;
+}
+hr {
+    border: 0px;
+    border-top: 1px solid #818181; 
+    margin: 1rem 0; 
+}
+#search {
+background-image: url("../../out/cities/thailand.png");
+}
+.flightSearch {
+    margin: 0px 100px ;
     padding: 20px;
-  }
-  .carousel-indicators .btn {
-    background-color: red;
-    border-radius: 50%;
-    width: 10px;
-    height: 10px;
-  }
-  .carousel-controls span {
-    background-color: #dc3545;
-  }
- 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    background-color: #ffffff;
+}
+.menu-left {
+    border-right: 1px solid #ddd;
+    max-height: 300px;
+    overflow-y: auto;
+}
+.menu-left li {
+    cursor: pointer;
+    padding: 5px 10px;
+    width: 400px;
+}
+.menu-left li.active {
+    background: #f0f0f0;
+    font-weight: bold;
+}
+.menu-right {
+    max-height: 300px;
+    overflow-y: auto;
+}
+h3 {
+    font-weight: bold;
+    color: #dc3545;
+}
+#benefits h5 {
+    font-weight: bold;
+    color: #dc3545;
+}
+#benefits p {
+    color: #555;
+}
+#benefits .col-md-4 {
+    border-right: 1px solid #d4d4d4;
+}
+#benefits .col-md-4:last-child {
+    border-right: none;
+}
+.card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 10px;
+    width: 16rem;
+}
+.card img {
+height: 200px;
+}
+#popularDestCarousel {
+width: 90%;
+margin: auto;
+padding: 20px;
+}
+.carousel-indicators .btn {
+background-color: red;
+border-radius: 50%;
+width: 10px;
+height: 10px;
+}
+.carousel-controls span {
+background-color: #dc3545;
+}

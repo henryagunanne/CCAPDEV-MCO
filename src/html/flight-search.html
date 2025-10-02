@@ -4,42 +4,59 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Home - Archers Airline</title>
+        <link rel="icon" type="image/x-icon" href="../../out/Logo/favicon.ico">
 
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
         <link href="../css/style.css" rel="stylesheet" type="text/css" media="all">
-
         
         <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
         <script src="../javascript/flight.js"></script>
 
-        <style>
-            
-        </style>
+        <style></style>
 
-        <script>
-            
-
-        </script>
-
+        <script></script>
     </head>
-
 
     <body>
         <header>
-            <nav>
-                <div class="container-fluid bg-danger text-white p-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div class="logo">
-                            <img src="../../out/Logo/logo-white.png" >
-                        </div>
-                        <div class="nav-links">
-                            <a href="#" class="text-white text-decoration-none mx-2">Home</a>
-                            <a href="#" class="text-white text-decoration-none mx-2">Flights</a>
-                            <a href="#" class="text-white text-decoration-none mx-2">Bookings</a>
-                            <a href="#" class="text-white text-decoration-none mx-2">Contact</a>
-                        </div>
+            <nav class="navbar navbar-expand-lg bg-danger ">
+                <div class="container-fluid">
+
+                  <div class="logo">
+                      <a class="navbar-brand" href="#">
+                        <img src="../../out/Logo/logo-white.png" alt="Logo">
+                      </a>
+                  </div>
+
+                  <!-- Nav Bar toggler -->
+                  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                  </button>
+
+                  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <!-- Nav Links -->
+                    <div class="navbar-nav">
+                        <a href="#" class="nav-link active text-white text-decoration-none mx-2">Home</a>
+                        <a href="#" class="nav-link text-white text-decoration-none mx-2">Flights</a>
+                        <a href="#" class="nav-link text-white text-decoration-none mx-2">Book</a>
+                        <a href="#" class="nav-link text-white text-decoration-none mx-2">Manage</a>
+                        <a href="#" class="nav-link text-white text-decoration-none mx-2">Travel Info</a>
+                    </div>
+
+                    <!-- Profile dropdown -->
+                    <div class="dropdown ms-3">
+                      <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-circle fs-5 me-1"></i>
+                        <span>Account</span>
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Sign In</a></li>
+                        <li><a class="dropdown-item" href="#">Create Account</a></li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
             </nav>
         </header>
@@ -288,7 +305,7 @@
             </div>
           
             <!---------- POPULAR DESTINATION CAROUSEL ---------->
-            <div id="popularDestCarousel" class="carousel slide carousel-fade">
+            <div id="popularDestCarousel" class="carousel slide carousel-fade" data-bs-ride=carousel>
               <div class="carousel-indicators">
                   <button type="button" data-bs-target="#popularDestCarousel" data-bs-slide-to="0" class="active btn" aria-current="true" aria-label="Slide 1"></button>
                   <button type="button" data-bs-target="#popularDestCarousel" data-bs-slide-to="1" class="btn" aria-label="Slide 2"></button>

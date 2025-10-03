@@ -61,7 +61,7 @@ jQuery(function() {
 
         const passengerText = totalPassengers === 1 ? "1 Passenger" : totalPassengers + " Passengers";
 
-        $value.text(`${passengerText}, ${$travelClass.val()}`);
+        $value.text(`${passengerText}, ${$travelClass.find("option:selected").text()}`);
     }
 
     // Handle +/− buttons

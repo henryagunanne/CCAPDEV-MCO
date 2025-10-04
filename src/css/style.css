@@ -1,9 +1,6 @@
 nav {
     position: sticky;
-    top: 0;
-    left: 0;
     width: 100%;
-    z-index: 1000;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     background-color: #dc3545;
 }
@@ -14,17 +11,26 @@ nav {
     height: 100px;
 }
 nav .navbar-nav {
-    width: 70%
+    width: 70%;
 }
-nav .dropdown {
-   
-}
-.nav-links a {
-    
+.nav-link a:hover {
+    color:#a0a0a0;
 }
 .carousel-item img {
     height: 500px;
     object-fit: cover;
+}
+.modal-body {
+    margin: 0px 20px
+}
+.modal-title {
+    color: #dc3545;
+    font-weight: bold;
+}
+#terms-conditions {
+    display: flex;
+    margin: 20px 20px;
+    
 }
 hr {
     border: 0px;

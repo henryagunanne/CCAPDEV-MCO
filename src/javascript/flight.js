@@ -56,7 +56,7 @@ jQuery(function() {
     function updateLabel() {
         let totalPassengers = 0;
         $passenger.find(".counter .value").each(function() {
-        totalPassengers += parseInt($(this).text());
+            totalPassengers += parseInt($(this).text());
         });
 
         const passengerText = totalPassengers === 1 ? "1 Passenger" : totalPassengers + " Passengers";
@@ -136,6 +136,27 @@ jQuery(function() {
     $("#cityList li").on("click", function(){
         const airport = $(this).text();
         $("#destinationDropdown .dropdown-toggle").text(airport);
+    });
+
+    // Handle Sign In click
+    $(".login").on("click", function() {
+        let loginModal = new bootstrap.Modal(document.getElementById("loginModal"));
+        loginModal.show();
+    });
+
+    // Handle Create account click
+    $(".create").on("click", function() {
+        let signUpModal = new bootstrap.Modal(document.getElementById("signUpModal"));
+        signUpModal.show();
+    });
+
+    // Create account form interaction Handling
+    $("#noFirstname").on("change", function() {
+        if ($(this).is(":checked")) {
+          $("#firstname").prop("disabled", true);
+        } else {
+          $("#firstname").prop("disabled", false);
+        }
     });
 
 });

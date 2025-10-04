@@ -52,10 +52,130 @@
                         <span>Account</span>
                       </button>
                       <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Sign In</a></li>
-                        <li><a class="dropdown-item" href="#">Create Account</a></li>
+                        <li class="login"><a class="dropdown-item" href="#">Sign In</a></li>
+                        <li class="create"><a class="dropdown-item" href="#">Create Account</a></li>
                       </ul>
                     </div>
+
+                    <!-- Sign in modal-->
+                    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                              <img class="text-center" src="../../out/Logo/Logo-red.png">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <form>
+                              <header class="text-center">
+                                <h1 class="modal-title fs-5" id="loginModalLabel">Sign In to your Account</h1>
+                              </header>
+                              <br>
+                              <div class="mb-3">
+                                <label for="email" class="form-label">Email address</label>
+                                <input type="email" class="form-control" id="email">
+                              </div>
+                              <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password">
+                                <div id="forgotPassword" class="form-text"><a href="#">Forgot Password?</a></div>
+                              </div>
+                              <div class="mb-3">
+                                <button type="button" class="btn btn-danger float-end">Sign in</button>
+                              </div>
+                            </form>
+
+                            <div id="formMessage"></div>
+
+                          </div>
+                          <div class="modal-footer justify-content-center">
+                            <div id="accountLogin">Not yet a member? <a class="login-link" href="#" data-bs-target="#signUpModal" data-bs-toggle="modal" data-bs-dismiss="modal">Sign up</a></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Sign up modal -->
+                    <div class="modal fade" id="signUpModal" tabindex="-1" aria-labelledby="signUpModalLabel" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                              <img class="text-center" src="../../out/Logo/Logo-red.png">
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <form>
+                              <header class="text-center">
+                                <h1 class="modal-title fs-5" id="signUpModalLabel">Create Your Account</h1>
+                              </header>
+                              <br>
+                              <div class="mb-3">
+                                <label for="firstname" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="firstname">
+                                <input type="checkbox" id="noFirstname">
+                                <label for="noFirstname" class="form-text">I have no First Name</label>
+                              </div>
+                              <div>
+                                <label for="lastname" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="lastname">
+                              </div>
+                              <div>
+                                <label for="email" class="form-label">Email address</label>
+                                <input type="email" class="form-control" id="email" aria-describedby="emailHelp">
+                                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                              </div>
+                              <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password">
+                              </div>
+                              <div class="mb-3">
+                                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                <input type="password" class="form-control" id="confirmPassword">
+                              </div>
+
+                              <div>
+                                <p class="form-text">Password Requirement</p>
+                                <ul class="form-text">
+                                    <li>At least 8 characters</li>
+                                    <li>A lowercase letter</li>
+                                    <li>An uppercase letter</li>
+                                    <li>A number</li>
+                                    <li>A symbol</li>
+                                    <li>No parts of your username</li>
+                                    <li>Does not include your first name</li>
+                                    <li>Does not include your last name</li>
+                                  </ul>
+                              </div>
+                              <div id="terms-conditions">
+                                <div>
+                                  <input type="checkbox" id="termsCheck">
+                                </div>
+        
+                                <div>
+                                  <label for="termsCheck" class="form-text"> I confirm that I have read, understood, and
+                                    agree to the <a id="terms" href="#">Terms and Conditions</a> and the
+                                    updated Archers Airlines <a id="privacyPolicy" href="#">Privacy Policy</a>. I
+                                    consent to the collection, use, processing
+                                    and sharing of my personal information in
+                                    accordance therewith.</label>
+                                </div>
+                                
+                              </div>
+                              <div class="mb-3">
+                                <button type="button" class="btn btn-danger float-end">Proceed</button><br>
+                              </div>
+                            </form>
+
+                            <div id="formMessage"></div>
+                            
+                          </div>
+                          <div class="modal-footer justify-content-center">
+                            <div id="accountLogin">Already a member? <a class="login-link" href="#" data-bs-target="#loginModal" data-bs-toggle="modal" data-bs-dismiss="modal">Sign In</a></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
                   </div>
                 </div>
             </nav>
@@ -98,7 +218,7 @@
                 <!----------- FLIGHT SEARCH ------------>
             <div id="search">
                 <div class="flightSearch">
-                    <form id="flightSearch">
+                    <form id="flightSearch" method="post" action="">
                         <div class="row g-3">
 
                            <!----------- Trip selection dropdown ------------>

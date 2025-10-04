@@ -13,8 +13,12 @@ nav {
 nav .navbar-nav {
     width: 70%;
 }
-.nav-link a:hover {
-    color:#a0a0a0;
+.navbar .nav-link {
+    transition: all 0.2s ease;
+}
+.navbar .nav-link:hover {
+    color: #f6cd2b !important;   
+    font-size: 1.2rem;
 }
 .carousel-item img {
     height: 500px;
@@ -69,6 +73,9 @@ h3 {
     font-weight: bold;
     color: #dc3545;
 }
+#notice {
+    margin: 30px 70px;
+}
 #benefits h5 {
     font-weight: bold;
     color: #dc3545;
@@ -89,19 +96,23 @@ h3 {
     width: 16rem;
 }
 .card img {
-height: 200px;
+    height: 200px;
+}
+.card p {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: smaller;
 }
 #popularDestCarousel {
-width: 90%;
-margin: auto;
-padding: 20px;
+    width: 90%;
+    margin: auto;
+    padding: 20px;
 }
 .carousel-indicators .btn {
-background-color: red;
-border-radius: 50%;
-width: 10px;
-height: 10px;
+    background-color: red;
+    border-radius: 50%;
+    width: 10px;
+    height: 10px;
 }
 .carousel-controls span {
-background-color: #dc3545;
+    background-color: #dc3545;
 }

@@ -1,0 +1,102 @@
+/* ---------- Seat Map Section ---------- */
+#seat-map {
+    display: grid;
+    grid-template-columns: repeat(7, auto);
+    gap: 5px;
+    max-width: 380px;
+    margin: 20px auto;
+  }
+  
+  .seat {
+    width: 45px;
+    height: 45px;
+    margin: 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    line-height: 45px;
+    font-weight: bold;
+    transition: 0.2s ease-in-out;
+    border: 2px solid #000;
+  }
+  
+  .seat:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+  
+  /* Seat States by Class */
+  .first.available {
+    background: #dc3545; /* red for first class */
+    color: white;
+  }
+  
+  .business.available {
+    background: #ffffff; /* white for business */
+    color: black;
+  }
+  
+  .economy.available {
+    background: #0d6efd; /* blue for economy */
+    color: white;
+  }
+  
+  /* Occupied & Selected */
+  .occupied {
+    background: #6c757d; /* gray */
+    color: white;
+    cursor: not-allowed;
+  }
+  
+  .selected {
+    background: #ffc107 !important; /* yellow for selected */
+    color: black !important;
+  }
+  
+  /* Seat Classes (borders for clarity) */
+  .economy {
+    border: 3px solid #007bff;
+  }
+  
+  .business {
+    border: 3px solid #6610f2;
+  }
+  
+  .first {
+    border: 3px solid #d63384;
+  }
+  
+  .aisle {
+    visibility: hidden;
+  }
+  
+  /* ---------- Legend Styling ---------- */
+  .badge.border {
+    background-color: white;
+    font-weight: normal;
+    padding: 6px 10px;
+  }
+  
+  .badge.text-primary {
+    border-color: #007bff;
+  }
+  
+  .badge.text-dark.border-purple {
+    border-color: #6610f2;
+  }
+  
+  .badge.text-dark.border-danger {
+    border-color: #d63384;
+  }
+  
+  /* ---------- Summary Section ---------- */
+  #summary {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  #seatList {
+    max-height: 150px;
+    overflow-y: auto;
+  }
+  

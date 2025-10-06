@@ -66,22 +66,25 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                           </div>
                           <div class="modal-body">
-                            <form>
+                            <form class="needs-validation" novalidate>
                               <header class="text-center">
                                 <h1 class="modal-title fs-5" id="loginModalLabel">Sign In to your Account</h1>
                               </header>
                               <br>
                               <div class="mb-3">
-                                <label for="email" class="form-label">Email address</label>
-                                <input type="email" class="form-control" id="email">
+                                <label for="loginEmail" class="form-label">Email address</label>
+                                <input type="email" class="form-control" id="loginEmail" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required>
+                                <div class="invalid-feedback">
+                                  Enter a valid email address.
+                                </div>
                               </div>
                               <div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password">
+                                <label for="loginPassword" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="loginPassword" required minlength="8">
                                 <div id="forgotPassword" class="form-text"><a href="#">Forgot Password?</a></div>
                               </div>
                               <div class="mb-3">
-                                <button type="button" class="btn btn-danger float-end">Sign in</button>
+                                <button type="submit" class="btn btn-danger float-end">Sign in</button>
                               </div>
                             </form>
 
@@ -104,33 +107,46 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                           </div>
                           <div class="modal-body">
-                            <form>
+                            <form class="needs-validation" novalidate>
                               <header class="text-center">
                                 <h1 class="modal-title fs-5" id="signUpModalLabel">Create Your Account</h1>
                               </header>
                               <br>
                               <div class="mb-3">
                                 <label for="firstname" class="form-label">First Name</label>
-                                <input type="text" class="form-control" id="firstname">
+                                <input type="text" class="form-control" id="firstname" minlength="2" required>
+                                <div class="invalid-feedback">
+                                  Enter a valid First Name or select I have no First Name.
+                                </div>
                                 <input type="checkbox" id="noFirstname">
                                 <label for="noFirstname" class="form-text">I have no First Name</label>
                               </div>
                               <div>
                                 <label for="lastname" class="form-label">Last Name</label>
-                                <input type="text" class="form-control" id="lastname">
+                                <input type="text" class="form-control" id="lastname" minlength="2" required>
+                                <div class="invalid-feedback">
+                                  Enter a valid Last Name.
+                                </div>
                               </div>
                               <div>
                                 <label for="email" class="form-label">Email address</label>
-                                <input type="email" class="form-control" id="email" aria-describedby="emailHelp">
+                                <input type="email" class="form-control" id="email" aria-describedby="emailHelp" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required>
+                                <div class="invalid-feedback">
+                                  Enter a valid email address.
+                                </div>
                                 <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
                               </div>
                               <div class="mb-3">
                                 <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password">
+                                <input type="password" class="form-control" id="password" minlength="8" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$" required>
+                                <div class="invalid-feedback">
+                                  Passwords must follow requirments.
+                                </div>
                               </div>
-                              <div class="mb-3">
+                              <div class="mb-3 confirmPassword">
                                 <label for="confirmPassword" class="form-label">Confirm Password</label>
-                                <input type="password" class="form-control" id="confirmPassword">
+                                <input type="password" class="form-control" id="confirmPassword" minlength="8" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$" required>
+                                <div class="invalid-feedback"></div>
                               </div>
 
                               <div>
@@ -146,28 +162,32 @@
                                     <li>Does not include your last name</li>
                                   </ul>
                               </div>
-                              <div id="terms-conditions">
-                                <div>
-                                  <input type="checkbox" id="termsCheck">
+                              <div class="acceptTerms">
+                                <div id="terms-conditions">
+                                  <div>
+                                    <input type="checkbox" id="termsCheck" required>
+                                    <div class="invalid-feedback">
+                                      You must accept the terms and conditions to proceed.
+                                    </div>
+                                  </div>
+          
+                                  <div>
+                                    <label for="termsCheck" class="form-text"> I confirm that I have read, understood, and
+                                      agree to the <a id="terms" href="#">Terms and Conditions</a> and the
+                                      updated Archers Airlines <a id="privacyPolicy" href="#">Privacy Policy</a>. I
+                                      consent to the collection, use, processing
+                                      and sharing of my personal information in
+                                      accordance therewith.</label>
+                                  </div>
+                                  
                                 </div>
-        
-                                <div>
-                                  <label for="termsCheck" class="form-text"> I confirm that I have read, understood, and
-                                    agree to the <a id="terms" href="#">Terms and Conditions</a> and the
-                                    updated Archers Airlines <a id="privacyPolicy" href="#">Privacy Policy</a>. I
-                                    consent to the collection, use, processing
-                                    and sharing of my personal information in
-                                    accordance therewith.</label>
-                                </div>
-                                
                               </div>
+              
                               <div class="mb-3">
-                                <button type="button" class="btn btn-danger float-end">Proceed</button><br>
+                                <button type="submit" class="btn btn-danger float-end">Proceed</button><br>
                               </div>
                             </form>
 
-                            <div id="formMessage"></div>
-                            
                           </div>
                           <div class="modal-footer justify-content-center">
                             <div id="accountLogin">Already a member? <a class="login-link" href="#" data-bs-target="#loginModal" data-bs-toggle="modal" data-bs-dismiss="modal">Sign In</a></div>
@@ -218,7 +238,7 @@
                 <!----------- FLIGHT SEARCH ------------>
             <div id="search">
                 <div class="flightSearch">
-                    <form id="flightSearch" method="post" action="">
+                    <form id="flightSearch" class="needs-validation" method="post" action="" novalidate>
                         <div class="row g-3">
 
                            <!----------- Trip selection dropdown ------------>
@@ -261,7 +281,7 @@
                                           <option value="first">First</option>
                                         </select>
                                       </div>
-                                      <hr>
+                                      <hr class="dropdown-divider">
                                       <!-- Passengers -->
                                       <div>
                                         <h6 class="mb-2">Passengers</h6>
@@ -405,7 +425,7 @@
                                 <input type="text" class="form-control border-danger" id="departureDate" name="departureDate" required placeholder="Select Departure Date">
                             </div>
                             <div class="col">
-                                <input type="text" class="form-control border-danger" id="returnDate" name="returnDate" placeholder="Select Return Date" >
+                                <input type="text" class="form-control border-danger" id="returnDate" name="returnDate" placeholder="Select Return Date" required>
                             </div>
 
                             <!----------- Search Flight Button ------------>

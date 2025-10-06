@@ -1,4 +1,6 @@
 jQuery(function() {
+    'use strict';
+
     // Initialize the carousel
     $("#locationCarousel").carousel({
         interval: 3000, // Change slide every 3 seconds
@@ -157,6 +159,35 @@ jQuery(function() {
         } else {
           $("#firstname").prop("disabled", false);
         }
+    });
+
+    let password = $("#password").val();
+    let confirmPassword = $("#confirmPassword").val();
+    if (confirmPassword === "") {
+        $(".confirmPassword .invalid-feedback").text("Please confirm your password");
+    } else if (password !== confirmPassword) {
+        $(".confirmPassword .invalid-feedback").text("Passwords do not match");
+    } else {
+        $(".confirmPassword .invalid-feedback").text(""); // Clear feedback if passwords match
+    }
+
+
+    // Select all forms that need validation
+    const $forms = $('.needs-validation');
+
+    // Loop over each form
+    $forms.each(function () {
+        const $form = $(this);
+
+        // On form submission
+        $form.on('submit', function (event) {
+        if (this.checkValidity() === false) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        $form.addClass('was-validated');
+        });
     });
 
 });

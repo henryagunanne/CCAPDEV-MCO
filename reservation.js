@@ -1,0 +1,102 @@
+$(document).ready(function () {
+
+  // Base pricing
+  const baseFare = 1500;
+  const mealPrice = 150;
+  const bagPrice = 50;
+
+  // Seat pricing and classes
+  const seatPricing = { first: 5000, business: 3000, economy: 1500 };
+  const seatClasses = { 1: "first", 2: "first", 3: "business", 4: "business" };
+
+  let selected = [];
+
+  // -------- Generate Seat Map --------
+  for (let row = 1; row <= 10; row++) {
+    ["A", "B", "C", "D", "E", "F"].forEach(function (col) {
+      const seatClass = seatClasses[row] || "economy";
+      const occupied = Math.random() < 0.15;
+
+      const seat = $("<div>")
+        .addClass("seat")
+        .addClass(occupied ? "occupied" : `${seatClass} available`)
+        .text(row + col)
+        .attr("data-id", row + col)
+        .attr("data-price", seatPricing[seatClass])
+        .attr("data-class", seatClass);
+
+      if (col === "C") $("#seat-map").append(seat).append("<div class='aisle'></div>");
+      else $("#seat-map").append(seat);
+    });
+  }
+
+// -------- Seat Selection (Toggle) --------
+$(document).on("click", ".seat", function () {
+  // Skip if occupied
+  if ($(this).hasClass("occupied")) return;
+
+  const seatId = $(this).data("id");
+  const seatPrice = parseInt($(this).data("price"));
+  const seatClass = $(this).data("class");
+
+  // Toggle selection
+  if ($(this).hasClass("selected")) {
+    // Deselect seat
+    $(this).removeClass("selected").addClass("available");
+    selected = selected.filter(s => s.id !== seatId);
+  } else {
+    // Select seat
+    $(this).addClass("selected").removeClass("available");
+    selected.push({ id: seatId, price: seatPrice, seatClass });
+  }
+
+  updateSummary();
+});
+
+
+  // -------- Update Summary --------
+  function updateSummary() {
+    const mealFee = ($("#meal").val() !== "standard") ? mealPrice : 0;
+    const bagFee = ($("#baggage").val() * bagPrice);
+    const seatFee = selected.reduce((sum, s) => sum + s.price, 0);
+    const total = baseFare + seatFee + mealFee + bagFee;
+
+    $("#mealFee").text(mealFee);
+    $("#baggageFee").text(bagFee);
+    $("#seatFee").text(seatFee);
+    $("#totalPrice").text(total);
+  }
+
+  // -------- Event Listeners --------
+  $("#meal, #baggage").on("change input", updateSummary);
+
+  // -------- Booking Confirmation --------
+  $("#confirmBooking").click(function () {
+    const name = $("#name").val().trim();
+    const email = $("#email").val().trim();
+    const passport = $("#passport").val().trim();
+
+    if (!name || !email || !passport) {
+      $("#formMessage").removeClass("text-success").addClass("text-danger").text("Please fill in all passenger details.");
+      return;
+    }
+
+    if (selected.length === 0) {
+      $("#formMessage").removeClass("text-success").addClass("text-danger").text("Please select at least one seat.");
+      return;
+    }
+
+    const total = $("#totalPrice").text();
+    $("#formMessage").removeClass("text-danger").addClass("text-success")
+      .text(`Booking confirmed for ${name}! Total Price: ₱${total}`);
+
+    // Mark selected seats as occupied
+    selected.forEach(s => {
+      $(`.seat[data-id='${s.id}']`).removeClass("selected available").addClass("occupied").off("click");
+    });
+
+    selected = [];
+    updateSummary();
+  });
+
+});

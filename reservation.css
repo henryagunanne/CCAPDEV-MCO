@@ -1,0 +1,84 @@
+body {
+  background-color: #f8f9fa;
+}
+
+/* Seat Map Layout */
+#seat-map {
+  display: grid;
+  grid-template-columns: repeat(7, auto);
+  gap: 5px;
+  max-width: 400px;
+  margin: 20px auto;
+}
+
+.seat {
+  width: 45px;
+  height: 45px;
+  margin: 6px;
+  border-radius: 8px;
+  text-align: center;
+  line-height: 45px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+}
+
+.seat:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+/* Seat States */
+.economy.available {
+  background: #0d6efd;
+  color: white;
+  border: 3px solid #007bff;
+}
+
+.business.available {
+  background: white;
+  color: black;
+  border: 3px solid #6610f2;
+}
+
+.first.available {
+  background: #dc3545;
+  color: white;
+  border: 3px solid #d63384;
+}
+
+.occupied {
+  background: #6c757d;
+  color: white;
+  cursor: not-allowed;
+}
+
+.selected {
+  background: #ffc107 !important;
+  color: black !important;
+}
+
+.aisle {
+  visibility: hidden;
+}
+
+/* Summary & Legend */
+#summary {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+#seatList {
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.badge.border {
+  background-color: white;
+  padding: 6px 10px;
+  font-weight: normal;
+}
+
+footer {
+  margin-top: 60px;
+}

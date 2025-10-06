@@ -155,18 +155,6 @@ jQuery(function() {
         $("#destinationInput").removeClass('is-invalid').addClass('is-valid');
     });
 
-    // Handle Sign In click
-    $(".login").on("click", function() {
-        let loginModal = new bootstrap.Modal(document.getElementById("loginModal"));
-        loginModal.show();
-    });
-
-    // Handle Create account click
-    $(".create").on("click", function() {
-        let signUpModal = new bootstrap.Modal(document.getElementById("signUpModal"));
-        signUpModal.show();
-    });
-
     // Create account form interaction Handling
     $("#noFirstname").on("change", function() {
         if ($(this).is(":checked")) {

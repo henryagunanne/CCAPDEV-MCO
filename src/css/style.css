@@ -1,25 +1,4 @@
-nav {
-    position: sticky;
-    width: 100%;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    background-color: #dc3545;
-}
-.logo{
-    width: 50%;
-}
-.logo img {
-    height: 100px;
-}
-nav .navbar-nav {
-    width: 70%;
-}
-.navbar .nav-link {
-    transition: all 0.2s ease;
-}
-.navbar .nav-link:hover {
-    color: #f6cd2b !important;   
-    font-size: 1.2rem;
-}
+
 .carousel-item img {
     height: 500px;
     object-fit: cover;
@@ -43,7 +22,7 @@ hr {
     margin: 1rem 0; 
 }
 #search {
-background-image: url("../../out/cities/thailand.png");
+background-image: url("../../assets/cities/thailand.png");
 }
 .flightSearch {
     margin: 0px 100px ;

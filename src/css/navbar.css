@@ -1,0 +1,21 @@
+nav.navbar {
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: #dc3545;
+}
+.logo{
+    width: 40%;
+}
+.logo img {
+    height: 100px;
+}
+nav .navbar-nav {
+    width: 70%;
+}
+.navbar .nav-link {
+    transition: all 0.2s ease;
+}
+.navbar .nav-link:hover {
+    color: #f6cd2b !important;   
+    font-size: 1.2rem;
+}

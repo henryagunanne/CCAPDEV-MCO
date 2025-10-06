@@ -3,12 +3,13 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Home - Archers Airline</title>
-        <link rel="icon" type="image/x-icon" href="../../out/Logo/Archers-Airlines-favicon.ico">
+        <title>Archers Airline - Home</title>
+        <link rel="icon" type="image/x-icon" href="../../assets/Logo/Archers-Airlines-favicon.ico">
 
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
         <link href="../css/style.css" rel="stylesheet" type="text/css" media="all">
+        <link href="../css/navbar.css" rel="stylesheet" type="text/css" media="all">
         
         <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
@@ -16,178 +17,27 @@
 
         <style></style>
 
-        <script></script>
+        <script>
+          $(function(){
+            $("#navbar").load("navbar.html", function() {
+              // Handle Sign In click
+              $(".login").on("click", function() {
+                  let loginModal = new bootstrap.Modal(document.getElementById("loginModal"));
+                  loginModal.show();
+              });
+
+              // Handle Create account click
+              $(".create").on("click", function() {
+                  let signUpModal = new bootstrap.Modal(document.getElementById("signUpModal"));
+                  signUpModal.show();
+              });
+            });
+          });
+        </script>
     </head>
 
     <body>
-        <header>
-            <nav class="navbar navbar-expand-lg bg-danger">
-                <div class="container-fluid">
-
-                  <div class="logo">
-                      <a class="navbar-brand" href="#">
-                        <img src="../../out/Logo/logo-white.png" alt="Logo">
-                      </a>
-                  </div>
-
-                  <!-- Nav Bar toggler -->
-                  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                  </button>
-
-                  <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                    <!-- Nav Links -->
-                    <div class="navbar-nav">
-                        <a href="#" class="nav-link active text-white text-decoration-none mx-2">Home</a>
-                        <a href="#" class="nav-link text-white text-decoration-none mx-2">Flights</a>
-                        <a href="#" class="nav-link text-white text-decoration-none mx-2">Book</a>
-                        <a href="#" class="nav-link text-white text-decoration-none mx-2">Manage</a>
-                        <a href="#" class="nav-link text-white text-decoration-none mx-2">Travel Info</a>
-                    </div>
-
-                    <!-- Profile dropdown -->
-                    <div class="dropdown ms-3">
-                      <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-person-circle fs-5 me-1"></i>
-                        <span>Account</span>
-                      </button>
-                      <ul class="dropdown-menu">
-                        <li class="login"><a class="dropdown-item" href="#">Sign In</a></li>
-                        <li class="create"><a class="dropdown-item" href="#">Create Account</a></li>
-                      </ul>
-                    </div>
-
-                    <!-- Sign in modal-->
-                    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-                      <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                              <img class="text-center" src="../../out/Logo/Logo-red.png">
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                          </div>
-                          <div class="modal-body">
-                            <form class="needs-validation" novalidate>
-                              <header class="text-center">
-                                <h1 class="modal-title fs-5" id="loginModalLabel">Sign In to your Account</h1>
-                              </header>
-                              <br>
-                              <div class="mb-3">
-                                <label for="loginEmail" class="form-label">Email address</label>
-                                <input type="email" class="form-control" id="loginEmail" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required>
-                                <div class="invalid-feedback">Enter a valid email address.</div>
-                              </div>
-                              <div class="mb-3">
-                                <label for="loginPassword" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="loginPassword" required minlength="8">
-                                <div id="forgotPassword" class="form-text"><a href="#">Forgot Password?</a></div>
-                              </div>
-                              <div class="mb-3">
-                                <button type="submit" class="btn btn-danger float-end">Sign in</button>
-                              </div>
-                            </form>
-
-                            <div id="formMessage"></div>
-
-                          </div>
-                          <div class="modal-footer justify-content-center">
-                            <div id="accountLogin">Not yet a member? <a class="login-link" href="#" data-bs-target="#signUpModal" data-bs-toggle="modal" data-bs-dismiss="modal">Sign up</a></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Sign up modal -->
-                    <div class="modal fade" id="signUpModal" tabindex="-1" aria-labelledby="signUpModalLabel" aria-hidden="true">
-                      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                              <img class="text-center" src="../../out/Logo/Logo-red.png">
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                          </div>
-                          <div class="modal-body">
-                            <form class="needs-validation" novalidate>
-                              <header class="text-center">
-                                <h1 class="modal-title fs-5" id="signUpModalLabel">Create Your Account</h1>
-                              </header>
-                              <br>
-                              <div class="mb-3">
-                                <label for="firstname" class="form-label">First Name</label>
-                                <input type="text" class="form-control" id="firstname" minlength="2" required>
-                                <div class="invalid-feedback">Enter a valid First Name or select I have no First Name.</div>
-                                <input type="checkbox" id="noFirstname">
-                                <label for="noFirstname" class="form-text">I have no First Name</label>
-                              </div>
-                              <div>
-                                <label for="lastname" class="form-label">Last Name</label>
-                                <input type="text" class="form-control" id="lastname" minlength="2" required>
-                                <div class="invalid-feedback">Enter a valid Last Name.</div>
-                              </div>
-                              <div>
-                                <label for="email" class="form-label">Email address</label>
-                                <input type="email" class="form-control" id="email" aria-describedby="emailHelp" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required>
-                                <div class="invalid-feedback">Enter a valid email address.</div>
-                                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
-                              </div>
-                              <div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" minlength="8" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$" required>
-                                <div class="invalid-feedback">Passwords must follow requirments.</div>
-                              </div>
-                              <div class="mb-3 confirmPassword">
-                                <label for="confirmPassword" class="form-label">Confirm Password</label>
-                                <input type="password" class="form-control" id="confirmPassword" minlength="8" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$" required>
-                                <div class="invalid-feedback"></div>
-                              </div>
-
-                              <div>
-                                <p class="form-text">Password Requirement</p>
-                                <ul class="form-text">
-                                    <li>At least 8 characters</li>
-                                    <li>A lowercase letter</li>
-                                    <li>An uppercase letter</li>
-                                    <li>A number</li>
-                                    <li>A symbol</li>
-                                    <li>No parts of your username</li>
-                                    <li>Does not include your first name</li>
-                                    <li>Does not include your last name</li>
-                                  </ul>
-                              </div>
-                              <div class="acceptTerms">
-                                <div id="terms-conditions">
-                                  <div>
-                                    <input type="checkbox" id="termsCheck" required>
-                                    <div class="invalid-feedback">You must accept the terms and conditions to proceed.</div>
-                                  </div>
-          
-                                  <div>
-                                    <label for="termsCheck" class="form-text"> I confirm that I have read, understood, and
-                                      agree to the <a id="terms" href="#">Terms and Conditions</a> and the
-                                      updated Archers Airlines <a id="privacyPolicy" href="#">Privacy Policy</a>. I
-                                      consent to the collection, use, processing
-                                      and sharing of my personal information in
-                                      accordance therewith.</label>
-                                  </div>
-                                  
-                                </div>
-                              </div>
-              
-                              <div class="mb-3">
-                                <button type="submit" class="btn btn-danger float-end">Proceed</button><br>
-                              </div>
-                            </form>
-
-                          </div>
-                          <div class="modal-footer justify-content-center">
-                            <div id="accountLogin">Already a member? <a class="login-link" href="#" data-bs-target="#loginModal" data-bs-toggle="modal" data-bs-dismiss="modal">Sign In</a></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-            </nav>
-        </header>
+        <div id="navbar" class="sticky-top"></div>
         
         <main>
                       <!----------- LOCATION CAROUSEL ------------>
@@ -203,22 +53,22 @@
                 </div>
                 <div class="carousel-inner">
                     <div class="carousel-item active">
-                      <img src="../../out/cities/Vietnam.png" class="d-block w-100" alt="boracay.png">
+                      <img src="../../assets/cities/Vietnam.png" class="d-block w-100" alt="boracay.png">
                     </div>
                     <div class="carousel-item">
-                      <img src="../../out/cities/hongkong.png" class="d-block w-100" alt="hongkong.png">
+                      <img src="../../assets/cities/hongkong.png" class="d-block w-100" alt="hongkong.png">
                     </div>
                     <div class="carousel-item">
-                      <img src="../../out/cities/singapore.png" class="d-block w-100" alt="singapore.png">
+                      <img src="../../assets/cities/singapore.png" class="d-block w-100" alt="singapore.png">
                     </div>
                     <div class="carousel-item">
-                      <img src="../../out/cities/thailand.png" class="d-block w-100" alt="thailand.png">
+                      <img src="../../assets/cities/thailand.png" class="d-block w-100" alt="thailand.png">
                     </div>
                     <div class="carousel-item">
-                      <img src="../../out/cities/tokyo.png" class="d-block w-100" alt="tokyo.png">
+                      <img src="../../assets/cities/tokyo.png" class="d-block w-100" alt="tokyo.png">
                     </div>
                     <div class="carousel-item">
-                      <img src="../../out/cities/Boracay.png" class="d-block w-100" alt="vietnam.png">
+                      <img src="../../assets/cities/Boracay.png" class="d-block w-100" alt="vietnam.png">
                     </div>
                 </div>
             </div>
@@ -459,7 +309,7 @@
                     <div class="row g-2">
                       <div class="col-md-3">
                           <div class="card d-flex flex-column h-100">
-                              <img src="../../out/cities/hongkong.png" class="card-img-top" alt="hongkong.png">
+                              <img src="../../assets/cities/hongkong.png" class="card-img-top" alt="hongkong.png">
                               <div class="card-body d-flex flex-column">
                                 <h5 class="card-title">Manila (MNL) to Hong Kong (HKG)</h5>
                                 <p class="card-subtitle mb-2 text-body-secondary">20 Oct 2025 - 24 Oct 2025</p>
@@ -475,7 +325,7 @@
                       </div>
                       <div class="col-md-3">
                           <div class="card d-flex flex-column h-100">
-                              <img src="../../out/cities/Malaysia.png" class="card-img-top" alt="malaysia.png">
+                              <img src="../../assets/cities/Malaysia.png" class="card-img-top" alt="malaysia.png">
                               <div class="card-body d-flex flex-column">
                                 <h5 class="card-title">Manila (MNL) to Kuala Lumpur (KUL)</h5>
                                 <p class="card-subtitle mb-2 text-body-secondary">30 Oct 2025 - 2 Nov 2025</p>
@@ -491,7 +341,7 @@
                       </div>
                       <div class="col-md-3">
                           <div class="card d-flex flex-column h-100">
-                              <img src="../../out/cities/singapore.png" class="card-img-top" alt="singapore.png">
+                              <img src="../../assets/cities/singapore.png" class="card-img-top" alt="singapore.png">
                               <div class="card-body d-flex flex-column">
                                 <h5 class="card-title">Manila (MNL) to Singapore (SIN)</h5>
                                 <p class="card-subtitle mb-2 text-body-secondary">20 Oct 2025 - 24 Oct 2025</p>
@@ -507,7 +357,7 @@
                       </div>
                       <div class="col-md-3">
                         <div class="card d-flex flex-column h-100">
-                          <img src="../../out/cities/thailand.png" class="card-img-top" alt="thailand.png">
+                          <img src="../../assets/cities/thailand.png" class="card-img-top" alt="thailand.png">
                           <div class="card-body d-flex flex-column">
                             <h5 class="card-title">Manila (MNL) to Bangkok (BKK)</h5>
                             <p class="card-subtitle mb-2 text-body-secondary">25 Oct 2025 - 30 Oct 2025</p>
@@ -529,7 +379,7 @@
                     <div class="row g-2">
                       <div class="col-md-3">
                           <div class="card d-flex flex-column h-100">
-                              <img src="../../out/cities/hanoi.png" class="card-img-top" alt="hanoi.png">
+                              <img src="../../assets/cities/hanoi.png" class="card-img-top" alt="hanoi.png">
                               <div class="card-body d-flex flex-column">
                                 <h5 class="card-title">Manila (MNL) to Hanoi (HAN)</h5>
                                 <p class="card-subtitle mb-2 text-body-secondary">20 Oct 2025 - 27 Oct 2025</p>
@@ -545,7 +395,7 @@
                       </div>
                       <div class="col-md-3">
                           <div class="card d-flex flex-column h-100">
-                              <img src="../../out/cities/seoul.png" class="card-img-top" alt="seoul.png">
+                              <img src="../../assets/cities/seoul.png" class="card-img-top" alt="seoul.png">
                               <div class="card-body d-flex flex-column">
                                 <h5 class="card-title">Manila (MNL) to Seoul (ICN)</h5>
                                 <p class="card-subtitle mb-2 text-body-secondary">30 Oct 2025 - 31 Oct 2025</p>
@@ -561,7 +411,7 @@
                       </div>
                       <div class="col-md-3">
                           <div class="card d-flex flex-column h-100">
-                              <img src="../../out/cities/Ho Chi Minh City.png" class="card-img-top" alt="ho chi minh cit.png">
+                              <img src="../../assets/cities/Ho Chi Minh City.png" class="card-img-top" alt="ho chi minh cit.png">
                               <div class="card-body d-flex flex-column">
                                 <h5 class="card-title">Manila (MNL) to Ho Chi Minh City (SGN)</h5>
                                 <p class="card-subtitle mb-2 text-body-secondary">28 Nov 2025 - 30 Nov 2025</p>
@@ -577,7 +427,7 @@
                       </div>
                       <div class="col-md-3">
                         <div class="card d-flex flex-column h-100">
-                          <img src="../../out/cities/tapei.png" class="card-img-top" alt="tapei.png">
+                          <img src="../../assets/cities/tapei.png" class="card-img-top" alt="tapei.png">
                           <div class="card-body d-flex flex-column">
                             <h5 class="card-title">Manila (MNL) to Taipei (TPE)</h5>
                             <p class="card-subtitle mb-2 text-body-secondary">1 Dec 2025 - 12 Dec 2025</p>
@@ -653,6 +503,134 @@
         <footer class="bg-danger text-white text-center p-3">
             &copy; 2025 Archers Airline. All rights reserved.
         </footer>
+
+
+        <!-- Sign in modal-->
+        <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                  <img class="text-center" src="../../assets/Logo/Logo-red.png">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form class="needs-validation" novalidate>
+                  <header class="text-center">
+                    <h1 class="modal-title fs-5" id="loginModalLabel">Sign In to your Account</h1>
+                  </header>
+                  <br>
+                  <div class="mb-3">
+                    <label for="loginEmail" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="loginEmail" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required>
+                    <div class="invalid-feedback">Enter a valid email address.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="loginPassword" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="loginPassword" required minlength="8">
+                    <div id="forgotPassword" class="form-text"><a href="#">Forgot Password?</a></div>
+                  </div>
+                  <div class="mb-3">
+                    <button type="submit" class="btn btn-danger float-end">Sign in</button>
+                  </div>
+                </form>
+
+                <div id="formMessage"></div>
+
+              </div>
+              <div class="modal-footer justify-content-center">
+                <div id="accountLogin">Not yet a member? <a class="login-link" href="#" data-bs-target="#signUpModal" data-bs-toggle="modal" data-bs-dismiss="modal">Sign up</a></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sign up modal -->
+        <div class="modal fade" id="signUpModal" tabindex="-1" aria-labelledby="signUpModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+              <div class="modal-header">
+                  <img class="text-center" src="../../assets/Logo/Logo-red.png">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form class="needs-validation" novalidate>
+                  <header class="text-center">
+                    <h1 class="modal-title fs-5" id="signUpModalLabel">Create Your Account</h1>
+                  </header>
+                  <br>
+                  <div class="mb-3">
+                    <label for="firstname" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="firstname" minlength="2" required>
+                    <div class="invalid-feedback">Enter a valid First Name or select I have no First Name.</div>
+                    <input type="checkbox" id="noFirstname">
+                    <label for="noFirstname" class="form-text">I have no First Name</label>
+                  </div>
+                  <div>
+                    <label for="lastname" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="lastname" minlength="2" required>
+                    <div class="invalid-feedback">Enter a valid Last Name.</div>
+                  </div>
+                  <div>
+                    <label for="email" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="email" aria-describedby="emailHelp" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required>
+                    <div class="invalid-feedback">Enter a valid email address.</div>
+                    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" minlength="8" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$" required>
+                    <div class="invalid-feedback">Passwords must follow requirments.</div>
+                  </div>
+                  <div class="mb-3 confirmPassword">
+                    <label for="confirmPassword" class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" id="confirmPassword" minlength="8" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$" required>
+                    <div class="invalid-feedback"></div>
+                  </div>
+
+                  <div>
+                    <p class="form-text">Password Requirement</p>
+                    <ul class="form-text">
+                        <li>At least 8 characters</li>
+                        <li>A lowercase letter</li>
+                        <li>An uppercase letter</li>
+                        <li>A number</li>
+                        <li>A symbol</li>
+                        <li>No parts of your username</li>
+                        <li>Does not include your first name</li>
+                        <li>Does not include your last name</li>
+                      </ul>
+                  </div>
+                  <div class="acceptTerms">
+                    <div id="terms-conditions">
+                      <div>
+                        <input type="checkbox" id="termsCheck" required>
+                        <div class="invalid-feedback">You must accept the terms and conditions to proceed.</div>
+                      </div>
+
+                      <div>
+                        <label for="termsCheck" class="form-text"> I confirm that I have read, understood, and
+                          agree to the <a id="terms" href="#">Terms and Conditions</a> and the
+                          updated Archers Airlines <a id="privacyPolicy" href="#">Privacy Policy</a>. I
+                          consent to the collection, use, processing
+                          and sharing of my personal information in
+                          accordance therewith.</label>
+                      </div>
+                      
+                    </div>
+                  </div>
+  
+                  <div class="mb-3">
+                    <button type="submit" class="btn btn-danger float-end">Proceed</button><br>
+                  </div>
+                </form>
+
+              </div>
+              <div class="modal-footer justify-content-center">
+                <div id="accountLogin">Already a member? <a class="login-link" href="#" data-bs-target="#loginModal" data-bs-toggle="modal" data-bs-dismiss="modal">Sign In</a></div>
+              </div>
+            </div>
+          </div>
+        </div>
     </body>
 </html>
 

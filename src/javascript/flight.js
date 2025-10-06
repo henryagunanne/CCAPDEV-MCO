@@ -44,8 +44,15 @@ jQuery(function() {
     // Add click event listener to each dropdown item
     $options.on("click", function () {
         const selected = $(this).text(); // Get the text of the clicked option
+
         $toggle.text(selected); // Update the dropdown toggle text
-        toggleReturnDate(); // 
+        $("#tripTypeInput").val(selected); // Update hidden input value
+
+        // Mark as valid visually
+        $("#tripTypeInput")[0].setCustomValidity('');
+        $("#tripTypeInput").removeClass('is-invalid').addClass('is-valid');
+
+        toggleReturnDate(); 
     });
 
     /* ---------- Passenger & Cabin dropdown ---------- */
@@ -117,6 +124,10 @@ jQuery(function() {
         const city = $(this).text();
         $("#originDropdown .dropdown-toggle").text(city);
         //bootstrap.Dropdown.getInstance($("#originDropdown button")[0]).hide(); // close menu
+
+        $("#originInput").val(city);
+        $("#originInput")[0].setCustomValidity('');
+        $("#originInput").removeClass('is-invalid').addClass('is-valid');
     });
 
     /* ---------- Destination Selection dropdowm ---------- */
@@ -136,8 +147,12 @@ jQuery(function() {
 
     // Handle City Selection 
     $("#cityList li").on("click", function(){
-        const airport = $(this).text();
-        $("#destinationDropdown .dropdown-toggle").text(airport);
+        const city = $(this).text();
+        $("#destinationDropdown .dropdown-toggle").text(city);
+
+        $("#destinationInput").val(city);
+        $("#destinationInput")[0].setCustomValidity('');
+        $("#destinationInput").removeClass('is-invalid').addClass('is-valid');
     });
 
     // Handle Sign In click
@@ -181,12 +196,27 @@ jQuery(function() {
 
         // On form submission
         $form.on('submit', function (event) {
-        if (this.checkValidity() === false) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
+            // Validate hidden inputs (Trip, Origin, Destination)
+            if (!$("#tripTypeInput").val()) {
+                $("#tripTypeInput")[0].setCustomValidity('Please select a trip type.');
+                $("#tripTypeInput").addClass('is-invalid');
+            }
+            if (!$("#originInput").val()) {
+                $("#originInput")[0].setCustomValidity('Please select an origin.');
+                $("#originInput").addClass('is-invalid');
+            }
+            if (!$("#destinationInput").val()) {
+                $("#destinationInput")[0].setCustomValidity('Please select a destination.');
+                $("#destinationInput").addClass('is-invalid');
+            }
 
-        $form.addClass('was-validated');
+            // Block submission if invalid
+            if (this.checkValidity() === false) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            $form.addClass('was-validated');
         });
     });
 

@@ -242,6 +242,9 @@
                                         <li><button class="dropdown-item" type="button">Multi-City</button></li>
                                     </ul>
                                 </div>
+                                <!-- hidden input for validation -->
+                                <input type="hidden" id="tripTypeInput" name="tripType" required>
+                                <div class="invalid-feedback">Please select a trip type.</div>
                                 
                                 <!-- <select class="form-select border-danger text-danger" id="tripType" name="tripType" required>
                                   <option value="" disabled selected class="text-danger">Select Trip Type</option>
@@ -357,6 +360,10 @@
                                         </div>
                                       </div>
                                     </div>
+
+                                    <!-- Hidden Input for validation-->
+                                    <input type="hidden" id="originInput" name="origin" required>
+                                    <div class="invalid-feedback">Please select an origin.</div>
                                 </div>
                             </div>
 
@@ -407,14 +414,20 @@
                                       </div>
                                     </div>
                                 </div>
+
+                                <!-- Hidden Input for validation-->
+                                <input type="hidden" id="destinationInput" name="destination" required>
+                                <div class="invalid-feedback">Please select a destination.</div>
                             </div>
 
                             <!----------- Departure and Return Date Fields ------------>
                             <div class="col">
                                 <input type="text" class="form-control border-danger" id="departureDate" name="departureDate" required placeholder="Select Departure Date">
+                                <div class="invalid-feedback">Please select departure date.</div>
                             </div>
                             <div class="col">
                                 <input type="text" class="form-control border-danger" id="returnDate" name="returnDate" placeholder="Select Return Date" required>
+                                <div class="invalid-feedback">Please select return date.</div>
                             </div>
 
                             <!----------- Search Flight Button ------------>

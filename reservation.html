@@ -31,21 +31,29 @@
       <div class="card-body">
         <form id="reservationForm">
           
-          <!-- Passenger Info -->
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label for="name" class="form-label">Full Name</label>
-              <input type="text" id="name" class="form-control" required>
-            </div>
-            <div class="col-md-4">
-              <label for="email" class="form-label">Email</label>
-              <input type="email" id="email" class="form-control" required>
-            </div>
-            <div class="col-md-4">
-              <label for="passport" class="form-label">Passport #</label>
-              <input type="text" id="passport" class="form-control" required>
-            </div>
-          </div>
+          <!-- Passenger Details -->
+<div class="card-body">
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <label for="name" class="form-label">Full Name</label>
+      <input type="text" id="name" class="form-control" placeholder="Enter full name">
+      <div class="invalid-feedback">Invalid name. Use letters and spaces only.</div>
+    </div>
+
+    <div class="col-md-4">
+      <label for="email" class="form-label">Email</label>
+      <input type="email" id="email" class="form-control" placeholder="example@email.com">
+      <div class="invalid-feedback">Invalid email address format.</div>
+    </div>
+
+    <div class="col-md-4">
+      <label for="passport" class="form-label">Passport Number</label>
+      <input type="text" id="passport" class="form-control" placeholder="e.g. P1234567">
+      <div class="invalid-feedback">Invalid passport number. Use 6–9 alphanumeric characters.</div>
+    </div>
+  </div>
+</div>
+
 
           <!-- Add-ons -->
           <div class="row mb-3">

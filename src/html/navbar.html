@@ -18,7 +18,7 @@
             <a href="flight-search.html" class="nav-link active text-white text-decoration-none mx-2">Home</a>
             <a href="#" class="nav-link text-white text-decoration-none mx-2">Flights</a>
             <a href="reservation.html" class="nav-link text-white text-decoration-none mx-2">Book</a>
-            <a href="reservation.html" class="nav-link text-white text-decoration-none mx-2">My Reservation</a>
+            <a href="#" class="nav-link text-white text-decoration-none mx-2">My Reservation</a>
             <a href="#" class="nav-link text-white text-decoration-none mx-2">Travel Info</a>
         </div>
 
@@ -37,3 +37,130 @@
       </div>
     </div>
 </nav>
+
+ <!-- Sign in modal-->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+            <img class="text-center" src="../../assets/Logo/Logo-red.png">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form class="needs-validation" novalidate>
+            <header class="text-center">
+              <h1 class="modal-title fs-5" id="loginModalLabel">Sign In to your Account</h1>
+            </header>
+            <br>
+            <div class="mb-3">
+              <label for="loginEmail" class="form-label">Email address</label>
+              <input type="email" class="form-control" id="loginEmail" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required>
+              <div class="invalid-feedback">Enter a valid email address.</div>
+            </div>
+            <div class="mb-3">
+              <label for="loginPassword" class="form-label">Password</label>
+              <input type="password" class="form-control" id="loginPassword" required minlength="8">
+              <div id="forgotPassword" class="form-text"><a href="#">Forgot Password?</a></div>
+            </div>
+            <div class="mb-3">
+              <button type="submit" class="btn btn-danger float-end">Sign in</button>
+            </div>
+          </form>
+
+          <div id="formMessage"></div>
+
+        </div>
+        <div class="modal-footer justify-content-center">
+          <div id="accountLogin">Not yet a member? <a class="login-link" href="#" data-bs-target="#signUpModal" data-bs-toggle="modal" data-bs-dismiss="modal">Sign up</a></div>
+        </div>
+      </div>
+    </div>
+</div>
+
+  <!-- Sign up modal -->
+<div class="modal fade" id="signUpModal" tabindex="-1" aria-labelledby="signUpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+            <img class="text-center" src="../../assets/Logo/Logo-red.png">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form class="needs-validation" novalidate>
+            <header class="text-center">
+              <h1 class="modal-title fs-5" id="signUpModalLabel">Create Your Account</h1>
+            </header>
+            <br>
+            <div class="mb-3">
+              <label for="firstname" class="form-label">First Name</label>
+              <input type="text" class="form-control" id="firstname" minlength="2" required>
+              <div class="invalid-feedback">Enter a valid First Name or select I have no First Name.</div>
+              <input type="checkbox" id="noFirstname">
+              <label for="noFirstname" class="form-text">I have no First Name</label>
+            </div>
+            <div>
+              <label for="lastname" class="form-label">Last Name</label>
+              <input type="text" class="form-control" id="lastname" minlength="2" required>
+              <div class="invalid-feedback">Enter a valid Last Name.</div>
+            </div>
+            <div>
+              <label for="email" class="form-label">Email address</label>
+              <input type="email" class="form-control" id="email" aria-describedby="emailHelp" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required>
+              <div class="invalid-feedback">Enter a valid email address.</div>
+              <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input type="password" class="form-control" id="password" minlength="8" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$" required>
+              <div class="invalid-feedback">Passwords must follow requirments.</div>
+            </div>
+            <div class="mb-3 confirmPassword">
+              <label for="confirmPassword" class="form-label">Confirm Password</label>
+              <input type="password" class="form-control" id="confirmPassword" minlength="8" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$" required>
+              <div class="invalid-feedback"></div>
+            </div>
+
+            <div>
+              <p class="form-text">Password Requirement</p>
+              <ul class="form-text">
+                  <li>At least 8 characters</li>
+                  <li>A lowercase letter</li>
+                  <li>An uppercase letter</li>
+                  <li>A number</li>
+                  <li>A symbol</li>
+                  <li>No parts of your username</li>
+                  <li>Does not include your first name</li>
+                  <li>Does not include your last name</li>
+                </ul>
+            </div>
+            <div class="acceptTerms">
+              <div id="terms-conditions">
+                <div>
+                  <input type="checkbox" id="termsCheck" required>
+                  <div class="invalid-feedback">You must accept the terms and conditions to proceed.</div>
+                </div>
+
+                <div>
+                  <label for="termsCheck" class="form-text"> I confirm that I have read, understood, and
+                    agree to the <a id="terms" href="#">Terms and Conditions</a> and the
+                    updated Archers Airlines <a id="privacyPolicy" href="#">Privacy Policy</a>. I
+                    consent to the collection, use, processing
+                    and sharing of my personal information in
+                    accordance therewith.</label>
+                </div>
+                
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <button type="submit" class="btn btn-danger float-end">Proceed</button><br>
+            </div>
+          </form>
+
+        </div>
+        <div class="modal-footer justify-content-center">
+          <div id="accountLogin">Already a member? <a class="login-link" href="#" data-bs-target="#loginModal" data-bs-toggle="modal" data-bs-dismiss="modal">Sign In</a></div>
+        </div>
+      </div>
+    </div>
+</div>

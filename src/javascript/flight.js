@@ -1,5 +1,4 @@
 jQuery(function() {
-    'use strict';
 
     // Initialize the carousel
     $("#locationCarousel").carousel({
@@ -8,7 +7,7 @@ jQuery(function() {
 
     $("#popularDestCarousel").carousel({
         interval: 3000
-    })
+    });
     
     // update departure and return date attribute field on focus to date form text
     $("#departureDate, #returnDate").on("focus", function() {
@@ -155,57 +154,6 @@ jQuery(function() {
         $("#destinationInput").removeClass('is-invalid').addClass('is-valid');
     });
 
-    // Create account form interaction Handling
-    $("#noFirstname").on("change", function() {
-        if ($(this).is(":checked")) {
-          $("#firstname").prop("disabled", true);
-        } else {
-          $("#firstname").prop("disabled", false);
-        }
-    });
-
-    let password = $("#password").val();
-    let confirmPassword = $("#confirmPassword").val();
-    if (confirmPassword === "") {
-        $(".confirmPassword .invalid-feedback").text("Please confirm your password");
-    } else if (password !== confirmPassword) {
-        $(".confirmPassword .invalid-feedback").text("Passwords do not match");
-    } else {
-        $(".confirmPassword .invalid-feedback").text(""); // Clear feedback if passwords match
-    }
-
-
-    // Select all forms that need validation
-    const $forms = $('.needs-validation');
-
-    // Loop over each form
-    $forms.each(function () {
-        const $form = $(this);
-
-        // On form submission
-        $form.on('submit', function (event) {
-            // Validate hidden inputs (Trip, Origin, Destination)
-            if (!$("#tripTypeInput").val()) {
-                $("#tripTypeInput")[0].setCustomValidity('Please select a trip type.');
-                $("#tripTypeInput").addClass('is-invalid');
-            }
-            if (!$("#originInput").val()) {
-                $("#originInput")[0].setCustomValidity('Please select an origin.');
-                $("#originInput").addClass('is-invalid');
-            }
-            if (!$("#destinationInput").val()) {
-                $("#destinationInput")[0].setCustomValidity('Please select a destination.');
-                $("#destinationInput").addClass('is-invalid');
-            }
-
-            // Block submission if invalid
-            if (this.checkValidity() === false) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-
-            $form.addClass('was-validated');
-        });
-    });
+    
 
 });

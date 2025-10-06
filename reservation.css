@@ -82,3 +82,11 @@ body {
 footer {
   margin-top: 60px;
 }
+
+.is-valid {
+  border-color: #198754 !important;
+}
+
+.is-invalid {
+  border-color: #dc3545 !important;
+}

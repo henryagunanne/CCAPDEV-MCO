@@ -107,7 +107,7 @@ function validateInputs() {
 
 
   // -------- Booking Confirmation --------
-  $("#confirmBooking").click(function () {
+  $("#confirmBooking").on("click", function () {
     const isValid = validateInputs();
 
     if (!isValid) return;

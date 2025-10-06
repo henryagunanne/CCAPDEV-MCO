@@ -26,7 +26,7 @@ jQuery(function() {
     function toggleReturnDate (){
         let returnDate = $("#returnDate");
         let tripType = $("#tripDropdown .dropdown-toggle").text().trim();
-
+        
         if(tripType === "One Way"){
         returnDate.prop("disabled", true); // disable
         } else {

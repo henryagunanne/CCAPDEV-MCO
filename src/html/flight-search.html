@@ -74,9 +74,7 @@
                               <div class="mb-3">
                                 <label for="loginEmail" class="form-label">Email address</label>
                                 <input type="email" class="form-control" id="loginEmail" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required>
-                                <div class="invalid-feedback">
-                                  Enter a valid email address.
-                                </div>
+                                <div class="invalid-feedback">Enter a valid email address.</div>
                               </div>
                               <div class="mb-3">
                                 <label for="loginPassword" class="form-label">Password</label>
@@ -115,33 +113,25 @@
                               <div class="mb-3">
                                 <label for="firstname" class="form-label">First Name</label>
                                 <input type="text" class="form-control" id="firstname" minlength="2" required>
-                                <div class="invalid-feedback">
-                                  Enter a valid First Name or select I have no First Name.
-                                </div>
+                                <div class="invalid-feedback">Enter a valid First Name or select I have no First Name.</div>
                                 <input type="checkbox" id="noFirstname">
                                 <label for="noFirstname" class="form-text">I have no First Name</label>
                               </div>
                               <div>
                                 <label for="lastname" class="form-label">Last Name</label>
                                 <input type="text" class="form-control" id="lastname" minlength="2" required>
-                                <div class="invalid-feedback">
-                                  Enter a valid Last Name.
-                                </div>
+                                <div class="invalid-feedback">Enter a valid Last Name.</div>
                               </div>
                               <div>
                                 <label for="email" class="form-label">Email address</label>
                                 <input type="email" class="form-control" id="email" aria-describedby="emailHelp" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required>
-                                <div class="invalid-feedback">
-                                  Enter a valid email address.
-                                </div>
+                                <div class="invalid-feedback">Enter a valid email address.</div>
                                 <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
                               </div>
                               <div class="mb-3">
                                 <label for="password" class="form-label">Password</label>
                                 <input type="password" class="form-control" id="password" minlength="8" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$" required>
-                                <div class="invalid-feedback">
-                                  Passwords must follow requirments.
-                                </div>
+                                <div class="invalid-feedback">Passwords must follow requirments.</div>
                               </div>
                               <div class="mb-3 confirmPassword">
                                 <label for="confirmPassword" class="form-label">Confirm Password</label>
@@ -166,9 +156,7 @@
                                 <div id="terms-conditions">
                                   <div>
                                     <input type="checkbox" id="termsCheck" required>
-                                    <div class="invalid-feedback">
-                                      You must accept the terms and conditions to proceed.
-                                    </div>
+                                    <div class="invalid-feedback">You must accept the terms and conditions to proceed.</div>
                                   </div>
           
                                   <div>
@@ -254,12 +242,13 @@
                                         <li><button class="dropdown-item" type="button">Multi-City</button></li>
                                     </ul>
                                 </div>
-                              <!--<select class="form-select" id="tripType" name="tripType" required>
-                                    <option value="" disabled selected>Select Trip Type</option>
-                                    <option value="oneway">One Way</option>
-                                    <option value="roundtrip">Round Trip</option>
-                                    <option value="multicity">Multi-City</option>
-                                </select> --> 
+                                
+                                <!-- <select class="form-select border-danger text-danger" id="tripType" name="tripType" required>
+                                  <option value="" disabled selected class="text-danger">Select Trip Type</option>
+                                  <option value="oneway" class="text-danger">One Way</option>
+                                  <option value="roundtrip" class="text-danger">Round Trip</option>
+                                  <option value="multicity" class="text-danger">Multi-City</option>
+                                </select> -->
                             </div>
 
                             <!----------- Passenger count and Cabin selection Dropdown ------------>

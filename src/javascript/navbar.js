@@ -1,20 +1,6 @@
 jQuery(function() {
     'use strict';
 
-    function highlight (){
-        // automatically highlight current page
-        const currentPath = window.location.pathname.split("/").pop();  // gets the URL path of the current page.
-        $(".navbar-nav a").each(function () {
-            const linkPath = $(this).attr("href");
-
-            if (linkPath === currentPath) {
-                $(this).addClass("active text-warning"); // highlight color
-            } else {
-                $(this).removeClass("active text-warning");
-            }
-        });
-    }
-
     // load navbar
     $("#navbar").load("navbar.html", function() {
 
@@ -32,8 +18,6 @@ jQuery(function() {
             let signUpModal = new bootstrap.Modal(document.getElementById("signUpModal"));
             signUpModal.show();
         });
-
-        highlight();
     });
 
     // Create account form interaction Handling

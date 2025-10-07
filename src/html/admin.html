@@ -1,159 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Reservations - Archers Airline</title>
-  <link rel="icon" type="image/x-icon" href="../../assets/Logo/Archers-Airlines-favicon.ico">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel - Archers Airline</title>
 
   <!-- Bootstrap + Icons -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  />
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
-    rel="stylesheet"
-  />
-  <link href="../css/navbar.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
-  <!-- Theme Colors -->
-  <style>
-    body {
-      background-color: #f8f9fa;
-      font-family: "Segoe UI", sans-serif;
-    }
-
-    nav.navbar {
-      background-color: #dc3545;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    footer {
-      background-color: #dc3545;
-      color: white;
-    }
-
-    h3 {
-      color: #dc3545;
-      font-weight: bold;
-    }
-
-    .card {
-      border: none;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      border-radius: 10px;
-    }
-
-    .btn-danger {
-      background-color: #dc3545;
-      border: none;
-    }
-
-    .btn-outline-danger {
-      border-color: #dc3545;
-      color: #dc3545;
-    }
-
-    .btn-outline-danger:hover {
-      background-color: #dc3545;
-      color: white;
-    }
-  </style>
+  <!-- Custom CSS -->
+  <link href="admin.css" rel="stylesheet">
 </head>
 <body>
- <!-- Navbar -->
- <div id="navbar" class="sticky-top"></div>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center text-white fw-bold" href="#">
+        <img 
+          src="../asset/logo/Archers Airlines.png" 
+          alt="Archers Airlines Logo" 
+          height="45" 
+          class="me-2 align-middle logo-img">
+        <span class="brand-text">Archers Airline Admin</span>
+      </a>
 
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-
-  <main class="container my-5">
-    <!-- My Reservations Section -->
-    <div class="mb-5">
-      <h3>My Reservations</h3>
-      <p>Below is a list of your current flight bookings.</p>
-
-      <ul id="reservationList" class="list-group"></ul>
-
-      <!-- Add New Reservation Form -->
-      <div class="card mt-4 p-4">
-        <h5>Add a New Reservation</h5>
-        <form id="reservationForm">
-          <div class="row g-2">
-            <div class="col-md-3">
-              <input
-                type="text"
-                class="form-control"
-                id="passengerName"
-                placeholder="Passenger Name"
-                required
-              />
-            </div>
-            <div class="col-md-3">
-              <input
-                type="text"
-                class="form-control"
-                id="flightRoute"
-                placeholder="Flight (e.g., MNL → HKG)"
-                required
-              />
-            </div>
-            <div class="col-md-3">
-              <input
-                type="date"
-                class="form-control"
-                id="flightDate"
-                required
-              />
-            </div>
-            <div class="col-md-2">
-              <input
-                type="text"
-                class="form-control"
-                id="seatNumber"
-                placeholder="Seat #"
-                required
-              />
-            </div>
-            <div class="col-md-1 d-grid">
-              <button type="submit" class="btn btn-danger">Save</button>
-            </div>
-          </div>
-        </form>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="navbar-nav ms-auto">
+          <a href="../user/my-reservations.html" class="nav-link text-white mx-2">
+            <i class="bi bi-arrow-left-circle me-1"></i> Back to My Reservations
+          </a>
+          <a href="#" class="nav-link text-white mx-2 active-link">
+            <i class="bi bi-shield-lock me-1"></i> Admin Panel
+          </a>
+        </div>
       </div>
     </div>
+  </nav>
 
-    <hr />
+  <!-- Main Content -->
+  <main class="container my-5">
+    <h3>Admin Dashboard</h3>
+    <p>Manage flights and users from this panel.</p>
 
-    <!-- Admin UI Section -->
-    <div class="mb-5">
-      <h3>Admin Panel</h3>
-      <button
-        class="btn btn-danger"
-        data-bs-toggle="modal"
-        data-bs-target="#addFlightModal"
-      >
-        Add Flight
+    <div class="d-flex flex-wrap gap-3">
+      <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#addFlightModal">
+        <i class="bi bi-plus-circle me-1"></i> Add Flight
       </button>
-      <button class="btn btn-outline-danger ms-2">Manage Users</button>
+
+      <button class="btn btn-outline-danger" id="manageUsersBtn">
+        <i class="bi bi-people-fill me-1"></i> Manage Users
+      </button>
+    </div>
+
+    <div class="mt-4">
+      <h5 class="text-danger">Flight List</h5>
+      <table class="table table-striped mt-2">
+        <thead class="table-danger">
+          <tr>
+            <th>Flight No.</th>
+            <th>Origin</th>
+            <th>Destination</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="flightTableBody"></tbody>
+      </table>
     </div>
   </main>
-
-  <!-- Reservation Details Modal -->
-  <div class="modal fade" id="reservationModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Reservation Details</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body" id="reservationDetails"></div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Add Flight Modal -->
   <div class="modal fade" id="addFlightModal" tabindex="-1">
@@ -165,29 +83,22 @@
         </div>
         <div class="modal-body">
           <form id="addFlightForm">
-            <input
-              type="text"
-              class="form-control mb-2"
-              placeholder="Flight Number"
-              required
-            />
-            <input
-              type="text"
-              class="form-control mb-2"
-              placeholder="Origin"
-              required
-            />
-            <input
-              type="text"
-              class="form-control mb-2"
-              placeholder="Destination"
-              required
-            />
-            <input
-              type="date"
-              class="form-control mb-2"
-              required
-            />
+            <div class="mb-2">
+              <label class="form-label">Flight Number</label>
+              <input type="text" id="flightNumber" class="form-control" placeholder="e.g. PR1234" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Origin</label>
+              <input type="text" id="origin" class="form-control" placeholder="e.g. Manila" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Destination</label>
+              <input type="text" id="destination" class="form-control" placeholder="e.g. Tokyo" required>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Date</label>
+              <input type="date" id="flightDate" class="form-control" required>
+            </div>
           </form>
         </div>
         <div class="modal-footer">
@@ -198,100 +109,13 @@
   </div>
 
   <!-- Footer -->
-  <footer class="text-center p-3 mt-5">
-    &copy; 2025 Archers Airline. All rights reserved.
+  <footer class="text-center">
+    &copy; 2025 Archers Airline. Admin Panel.
   </footer>
 
-  <!-- Scripts -->
+  <!-- JS -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-  <script>
-    // ====================== In-Memory Reservation Data ======================
-    let reservations = [];
-    let nextReservationId = 1;
-
-    function renderReservations() {
-      const list = $("#reservationList");
-      list.empty();
-
-      if (reservations.length === 0) {
-        list.append('<li class="list-group-item text-muted">No reservations found.</li>');
-        return;
-      }
-
-      reservations.forEach((r) => {
-        list.append(`
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-              <strong>${r.name}</strong> — ${r.flight} (${r.date})
-            </div>
-            <button class="btn btn-sm btn-outline-danger" onclick="viewReservation(${r.id})">
-              View
-            </button>
-          </li>
-        `);
-      });
-    }
-
-    function viewReservation(id) {
-      const r = reservations.find((x) => x.id === id);
-      if (!r) return;
-
-      $("#reservationDetails").html(`
-        <p><strong>Passenger:</strong> ${r.name}</p>
-        <p><strong>Flight:</strong> ${r.flight}</p>
-        <p><strong>Date:</strong> ${r.date}</p>
-        <p><strong>Seat:</strong> ${r.seat}</p>
-      `);
-
-      const modal = new bootstrap.Modal(document.getElementById("reservationModal"));
-      modal.show();
-    }
-
-    // ====================== Handle Form Submission ======================
-    $("#reservationForm").on("submit", function (e) {
-      e.preventDefault();
-
-      const newRes = {
-        id: nextReservationId++,
-        name: $("#passengerName").val(),
-        flight: $("#flightRoute").val(),
-        date: $("#flightDate").val(),
-        seat: $("#seatNumber").val(),
-      };
-
-      reservations.push(newRes);
-      renderReservations();
-      this.reset();
-
-      alert("Reservation saved!");
-    });
-
-    // ====================== Admin UI Handlers ======================
-    $("#saveFlightBtn").on("click", function () {
-      alert("Flight added (UI only, not saved to database).");
-      const modal = bootstrap.Modal.getInstance(document.getElementById("addFlightModal"));
-      modal.hide();
-    });
-
-    // Initialize page
-    $(document).ready(function() {
-      $("#navbar").load("navbar.html", function() {
-        // Handle Sign In click
-        $(".login").on("click", function() {
-            let loginModal = new bootstrap.Modal(document.getElementById("loginModal"));
-            loginModal.show();
-        });
-
-        // Handle Create account click
-        $(".create").on("click", function() {
-            let signUpModal = new bootstrap.Modal(document.getElementById("signUpModal"));
-            signUpModal.show();
-        });
-      });
-      renderReservations();
-    });
-  </script>
+  <script src="admin.js"></script>
 </body>
 </html>

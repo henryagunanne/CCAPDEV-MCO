@@ -19,3 +19,46 @@ nav .navbar-nav {
     color: #f6cd2b !important;   
     font-size: 1.2rem;
 }
+
+/* =================== Active Link + Animated Underline =================== */
+.navbar-nav .nav-link.active-link {
+    font-weight: bold;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #dc3545 !important;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+  
+  .navbar-nav .nav-link.active-link:hover {
+    background-color: rgba(255, 255, 255, 1);
+    color: #b02a37 !important;
+  }
+  
+  .navbar-nav .nav-link {
+    position: relative;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  
+  .navbar-nav .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0%;
+    height: 2px;
+    background-color: white;
+    transition: width 0.3s ease;
+  }
+  
+  .navbar-nav .nav-link:hover::after {
+    width: 100%;
+  }
+  
+  .navbar-nav .nav-link.active-link::after {
+    background-color: #dc3545;
+    height: 3px;
+    width: 100%;
+  }

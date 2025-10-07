@@ -18,59 +18,50 @@ jQuery(function() {
             let signUpModal = new bootstrap.Modal(document.getElementById("signUpModal"));
             signUpModal.show();
         });
-    });
 
-    // Create account form interaction Handling
-    $("#noFirstname").on("change", function() {
-        if ($(this).is(":checked")) {
-          $("#firstname").prop("disabled", true);
-        } else {
-          $("#firstname").prop("disabled", false);
-        }
-    });
-
-    let password = $("#password").val();
-    let confirmPassword = $("#confirmPassword").val();
-    if (confirmPassword === "") {
-        $(".confirmPassword .invalid-feedback").text("Please confirm your password");
-    } else if (password !== confirmPassword) {
-        $(".confirmPassword .invalid-feedback").text("Passwords do not match");
-    } else {
-        $(".confirmPassword .invalid-feedback").text(""); // Clear feedback if passwords match
-    }
-
-
-    // Select all forms that need validation
-    const $forms = $('.needs-validation');
-
-    // Loop over each form
-    $forms.each(function () {
-        const $form = $(this);
-
-        // On form submission
-        $form.on('submit', function (event) {
-            // Validate hidden inputs (Trip, Origin, Destination)
-            if (!$("#tripTypeInput").val()) {
-                $("#tripTypeInput")[0].setCustomValidity('Please select a trip type.');
-                $("#tripTypeInput").addClass('is-invalid');
+        // Create account form interaction Handling
+        $("#noFirstname").on("change", function() {
+            if ($(this).is(":checked")) {
+                $("#firstname").prop("disabled", true);
+            } else {
+                $("#firstname").prop("disabled", false);
             }
-            if (!$("#originInput").val()) {
-                $("#originInput")[0].setCustomValidity('Please select an origin.');
-                $("#originInput").addClass('is-invalid');
-            }
-            if (!$("#destinationInput").val()) {
-                $("#destinationInput")[0].setCustomValidity('Please select a destination.');
-                $("#destinationInput").addClass('is-invalid');
-            }
-
-            // Block submission if invalid
-            if (this.checkValidity() === false) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-
-            $form.addClass('was-validated');
         });
+
+        // Ensure passwords are identical
+        $("#confirmPassword").on("input", function () {
+            let password = $("#password").val();
+            let confirmPassword = $(this).val();
+
+            if (confirmPassword === "") {
+                $(".confirmPassword .invalid-feedback").text("Please confirm your password");
+            } else if (password !== confirmPassword) {
+                $(".confirmPassword .invalid-feedback").text("Passwords do not match");
+            } else {
+                $(".confirmPassword .invalid-feedback").text(""); // Clear feedback if passwords match
+            }
+        });
+
+        // Select all forms that need validation
+        const $forms = $('.needs-validation');
+
+        // Loop over each form
+        $forms.each(function () {
+            const $form = $(this);
+
+            // On form submission
+            $form.on('submit', function (event) {
+                // Block submission if invalid
+                if (this.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+
+                $form.addClass('was-validated');
+            });
+        });
+
     });
+   
 
 });

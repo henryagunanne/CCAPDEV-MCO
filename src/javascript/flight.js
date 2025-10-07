@@ -154,6 +154,34 @@ jQuery(function() {
         $("#destinationInput").removeClass('is-invalid').addClass('is-valid');
     });
 
-    
+
+    // Select flight search form for validation
+    const $flightSearch = $('.flightSearch .needs-validation');
+
+    // On form submission
+    $flightSearch.on('submit', function (event) {
+        // Validate hidden inputs (Trip, Origin, Destination)
+        if (!$("#tripTypeInput").val()) {
+            $("#tripTypeInput")[0].setCustomValidity('Please select a trip type.');
+            $("#tripTypeInput").addClass('is-invalid');
+        }
+        if (!$("#originInput").val()) {
+            $("#originInput")[0].setCustomValidity('Please select an origin.');
+            $("#originInput").addClass('is-invalid');
+        }
+        if (!$("#destinationInput").val()) {
+            $("#destinationInput")[0].setCustomValidity('Please select a destination.');
+            $("#destinationInput").addClass('is-invalid');
+        }
+
+        // Block submission if invalid
+        if (this.checkValidity() === false) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        $flightSearch.addClass('was-validated');
+    });
+
 
 });

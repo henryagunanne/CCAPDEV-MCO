@@ -80,19 +80,19 @@ jQuery(function() {
         const $minus = $counter.find('.minus');
 
         $minus.on("click", function(e) {
-        e.stopPropagation();
-        let num = parseInt($ctr.text());
-        if (num > 0) {
-            $ctr.text(num - 1);
-            updateLabel();
-        }
+            e.stopPropagation();
+            let num = parseInt($ctr.text());
+            if (num > 0) {
+                $ctr.text(num - 1);
+                updateLabel();
+            }
         });
 
         $plus.on("click", function(e) {
-        e.stopPropagation();
-        let num = parseInt($ctr.text());
-        $ctr.text(num + 1);
-        updateLabel();
+            e.stopPropagation();
+            let num = parseInt($ctr.text());
+            $ctr.text(num + 1);
+            updateLabel();
         });
     });
 

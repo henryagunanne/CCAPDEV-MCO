@@ -1,0 +1,24 @@
+{
+  "name": "ccapdev-mco",
+  "version": "1.0.0",
+  "description": "In compliance with the course requirements for CCAPDEV",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/henryagunanne/CCAPDEV-MCO.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/henryagunanne/CCAPDEV-MCO/issues"
+  },
+  "homepage": "https://github.com/henryagunanne/CCAPDEV-MCO#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "mongodb": "^6.20.0"
+  }
+}

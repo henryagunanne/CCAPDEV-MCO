@@ -13,7 +13,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/airlineDB')
 // Configure Handlebars
 app.engine('handlebars', exphbs.engine());
 app.set('view engine', 'handlebars');
-app.set('views', './views');
+app.set('views', './views'); // might need to edit this path later
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));

@@ -17,10 +17,20 @@ const reservationSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    cabin: {
+        type: String,
+        enum: ['Economy', 'Premium Economy', 'Business', 'First'],
+        default: 'Economy'
+    },
     meal: {
         type: String,
         enum: ['Vegetarian', 'Non-Vegetarian', 'Vegan', 'Gluten-Free', 'None'],
         default: 'None'
+    },
+    passengers: {
+        type: Number,
+        required: true,
+        min: 1
     },
     baggageAllowance: {
         type: Number,

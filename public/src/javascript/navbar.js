@@ -1,8 +1,8 @@
 jQuery(function() {
     'use strict';
 
-    // load navbar (no longer needed when using handlebars)
-   //  $("#navbar").load("navbar.html", function() { 
+    // load navbar from external file
+   $("#navbar").load("navbar.html", function() { 
 
         // Move modals from the navbar container to the body
         $(".modal").appendTo("body");
@@ -63,7 +63,7 @@ jQuery(function() {
             });
         });
 
-    //});
+    });
    
 
 });

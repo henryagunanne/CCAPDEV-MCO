@@ -17,7 +17,7 @@ const reservationSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    cabin: {
+    travelClass: {
         type: String,
         enum: ['Economy', 'Premium Economy', 'Business', 'First'],
         default: 'Economy'

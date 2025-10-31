@@ -131,7 +131,7 @@ jQuery(function() {
 
     /* ---------- Destination Selection dropdowm ---------- */
     // Handle switching countries
-    $("#destinationDropdown li").on("click", function(e){
+    $("#countryList li").on("click", function(e){
         e.stopPropagation();
         const destination = $(this).data("country");
 
@@ -148,6 +148,7 @@ jQuery(function() {
     $("#cityList li").on("click", function(){
         const city = $(this).text();
         $("#destinationDropdown .dropdown-toggle").text(city);
+        bootstrap.Dropdown.getInstance($("#destinationDropdown button")[0]).hide(); // close menu
 
         $("#destinationInput").val(city);
         $("#destinationInput")[0].setCustomValidity('');

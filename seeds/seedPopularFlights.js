@@ -1,4 +1,4 @@
-const PopularFlight = require('../models/popularFlight');
+const PopularFlight = require('../models/PopularFlight');
 
 async function seedPopularFlights() {
   const count = await PopularFlight.countDocuments();

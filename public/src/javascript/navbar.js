@@ -1,12 +1,13 @@
 jQuery(function() {
     'use strict';
 
-    // load navbar
-    $("#navbar").load("navbar.html", function() {
+    // load navbar (no longer needed when using handlebars)
+   //  $("#navbar").load("navbar.html", function() { 
 
         // Move modals from the navbar container to the body
         $(".modal").appendTo("body");
         
+        /*
         // Handle Sign In click
         $(".login").on("click", function() {
             let loginModal = new bootstrap.Modal(document.getElementById("loginModal"));
@@ -18,7 +19,8 @@ jQuery(function() {
             let signUpModal = new bootstrap.Modal(document.getElementById("signUpModal"));
             signUpModal.show();
         });
-
+        */
+       
         // Create account form interaction Handling
         $("#noFirstname").on("change", function() {
             if ($(this).is(":checked")) {
@@ -61,7 +63,7 @@ jQuery(function() {
             });
         });
 
-    });
+    //});
    
 
 });

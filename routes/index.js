@@ -1,19 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const PopularFlight = require('../models/popularFlight');
+const PopularFlight = require('../models/PopularFlight');
 
 // Homepage = Flight Search Page
 router.get('/', async (req, res) => {
   try {
-    const popularFlights = await PopularFlight.find()
-      .sort({ price: 1 })
-      .lean();
+    const popularFlights = await PopularFlight.find().lean();
 
     res.render('flights/search', {
-      title: 'Archers Airline | Book Flights',
+      title: 'Archers Airline | Search Flights',
       popularFlights
     });
   } catch (error) {
+    console.error('❌ Error loading flights:', err);
     res.status(500).send('Server Error');
   }
 });

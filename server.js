@@ -39,16 +39,16 @@ app.engine('hbs', exphbs.engine({
             return result;
         },
         divide: (a, b) => Math.ceil(a / b),
-        range: function(start, end, options) {
-            let accum = '';
+        range: function(start, end) {
+            const rangeArray = [];
             for (let i = start; i < end; i++) {
-            accum += options.fn(i);
+              rangeArray.push(i);
             }
-            return accum;
+            return rangeArray;
         }
     }
 }));
-app.set('view engine', 'handlebars');
+app.set('view engine', 'hbs');
 app.set('views', './views'); // might need to edit this path later
 
 // Middleware
@@ -58,13 +58,11 @@ app.use(express.static('public'));
 
 // Routes
 app.use('/', require('./routes/index'));
-app.use('/users', require('./routes/users'));
+//app.use('/users', require('./routes/users'));
 app.use('/flights', require('./routes/flights'));
-app.use('/reservations', require('./routes/reservations'));
+//app.use('/reservations', require('./routes/reservations'));
 
 // Start Server
 app.listen(PORT, () => {
     console.log(`🚀 Server running at http://localhost:${PORT}`);
-
-
 });

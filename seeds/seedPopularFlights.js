@@ -26,7 +26,7 @@ async function seedPopularFlights() {
         startDate: new Date('2025-10-20'),
         endDate: new Date('2025-10-24'),
         price: 99,
-        tripType: 'One-Way',
+        tripType: 'One-way',
         travelClass: 'Economy',
         departureDate: new Date('2025-10-25'),
         image: '/assets/cities/singapore.png',

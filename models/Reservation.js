@@ -17,6 +17,10 @@ const reservationSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    tripType: {
+        enum: ['One-Way', 'Round-trip'],
+        default: 'One-Way'
+    },
     travelClass: {
         type: String,
         enum: ['Economy', 'Premium Economy', 'Business', 'First'],

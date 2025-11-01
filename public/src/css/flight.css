@@ -1,4 +1,6 @@
-
+.fullHeight {
+    min-height: 100vh
+}
 .carousel-item img {
     height: 500px;
     object-fit: cover;

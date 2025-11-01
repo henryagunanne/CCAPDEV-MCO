@@ -11,7 +11,7 @@ async function seedPopularFlights() {
     const flights = await Flight.find({
       flightNumber: { $in: [
         'AA1001', 'AA1002', 'AA1003', 'AA1004',
-        'AA1020', 'AA1021', 'AA1022', 'AA1023'
+        'AA2015', 'AA1021', 'AA1022', 'AA1023'
       ]}
     });
 
@@ -45,11 +45,11 @@ async function seedPopularFlights() {
         image: '/assets/cities/tokyo.png'
       },
       {
-        flight: flights.find(f => f.flightNumber === 'AA1020')._id,
+        flight: flights.find(f => f.flightNumber === 'AA2015')._id,
         startDate: new Date('2025-11-05'),
         endDate: new Date('2025-12-05'),
         tripType: 'Round-Trip',
-        image: '/assets/cities/australia.png'
+        image: '/assets/cities/Malaysia.png'
       },
       {
         flight: flights.find(f => f.flightNumber === 'AA1021')._id,

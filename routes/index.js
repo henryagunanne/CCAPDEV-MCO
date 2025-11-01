@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const PopularFlight = require('../models/PopularFlight');
+const Flight = require('../models/Flight');
 
 // Homepage = Flight Search Page
 router.get('/', async (req, res) => {

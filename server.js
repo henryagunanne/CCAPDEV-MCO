@@ -32,14 +32,13 @@ app.engine('hbs', exphbs.engine({
           });
         },
         // Chunk helper to group flights (e.g., 4 per slide)
-        chunk: function(array, size, options) {
-            if (!Array.isArray(array)) return '';
-            let result = '';
+        chunk: function (array, size) {
+            if (!Array.isArray(array)) return [];
+            const chunks = [];
             for (let i = 0; i < array.length; i += size) {
-            const slice = array.slice(i, i + size);
-            result += options.fn(slice);
+              chunks.push(array.slice(i, i + size));
             }
-            return result;
+            return chunks;
         },
         divide: (a, b) => Math.ceil(a / b),
         range: function(start, end) {
@@ -80,6 +79,7 @@ app.use('/', require('./routes/index'));
 //app.use('/users', require('./routes/users'));
 app.use('/flights', require('./routes/flights'));
 //app.use('/reservations', require('./routes/reservations'));
+app.use('/admin', require('./routes/admin'));
 
 // Start Server
 app.listen(PORT, () => {

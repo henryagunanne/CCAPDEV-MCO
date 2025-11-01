@@ -1,4 +1,4 @@
-<div class="searchResults container my-5">
+<div class="searchResults container my-5 fullHeight">
     <h1 class="text-center">Flight Search Results</h1>
     <br>
     <hr class="mb-4">
@@ -21,8 +21,9 @@
                 {{!-- Include flight card partial --}}
                 {{> flightCard this}}
             {{/each}}
-            
-        {{else if (and (eq tripType "Round-Trip") outboundFlights.length (not returnFlights.length))}}
+        {{/if}}
+        
+        {{#if (and (eq tripType "Round-Trip") outboundFlights.length (not returnFlights.length))}}
             <h3 class="text-center mb-4">Outbound Flights</h3>
             {{#each outboundFlights}}
                 {{!-- Include flight card partial --}}
@@ -34,13 +35,18 @@
 
                 {{!-- Return Flights Section --}}
                 <h3 class="text-center mb-4">No Return Flights Available</h3>
-        {{else if (and (eq tripType "One-Way") outboundFlights.length (not returnFlights.length))}}
+        {{/if}}
+
+        {{#if (and (eq tripType "One-Way") outboundFlights.length)}}
             <h3 class="text-center mb-4">Available Flights</h3>
             {{#each outboundFlights}}
                 {{!-- Include flight card partial --}}
                 {{> flightCard this}}
-            {{/each}}
-        {{else if (and (not outboundFlights.length) returnFlights.length)}}
+            {{/each}}          
+
+        {{/if}}
+
+        {{#if (and (not outboundFlights.length) returnFlights.length)}}
             <h3 class="text-center mb-4">No Outbound Flights Available for selected criteria</h3>
             <br>
             <hr class="mb-4">
@@ -51,10 +57,11 @@
                 {{!-- Include flight card partial --}}
                 {{> flightCard this}}
             {{/each}}
-        {{/else}}
+        {{/if}}
+     
+        {{#if (and (not outboundFlights.length) (not returnFlights.length))}}
             <h3 class="text-center mb-4">No Flights Available</h3>
+        {{/if}}
 
-        {{/if}} 
-       
     </div>
 </div>

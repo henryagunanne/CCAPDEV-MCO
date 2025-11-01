@@ -1,5 +1,5 @@
 
-<main>
+<main class="fullHeight">
                 <!----------- LOCATION CAROUSEL ------------>
     <div id="locationCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
         <div class="carousel-indicators">
@@ -267,7 +267,7 @@
             {{/each}}
         </div>
         <div class="carousel-inner">
-            {{#chunk popularFlights 4}}  {{!-- 4 flights per slide --}}
+            {{#each (chunk popularFlights 4)}}  {{!-- 4 flights per slide --}}
                 <div class="carousel-item {{#if @first}}active{{/if}}">
                     <div class="row g-2">
                         {{#each this}}
@@ -280,7 +280,7 @@
                                         <p class="card-text mb-1">From</p>
                                         <h3 class="card-text mb-1">USD {{this.flight.price}}*</h3>
                                         <p class="card-text mb-0">{{this.tripType}}/{{this.flight.travelClass}}</p>
-                                        <p class="card-text">Depart: {{formatDate this.flight.departureDate}}</p>
+                                        <p class="card-text">Depart: {{this.flight.departureDate}}</p>
                                         <div class="mt-auto">
                                             <a href="/reservations/book/{{_id}}" class="btn btn-danger d-grid gap-2">Book Now</a>
                                         </div>
@@ -290,7 +290,7 @@
                         {{/each}}
                     </div>
                 </div>
-            {{/chunk}}
+            {{/each}}
 
         </div>
         {{#unless popularFlights.length}}

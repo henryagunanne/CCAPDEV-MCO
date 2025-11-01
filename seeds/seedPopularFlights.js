@@ -78,6 +78,30 @@ async function seedPopularFlights() {
         travelClass: 'Economy',
         departureDate: new Date('2025-11-03'),
         image: '/assets/cities/seoul.png',
+      },
+      {
+        flightNumber: 'AA1007',
+        origin: 'Manila (MNL)',
+        destination: 'Ho Chi Minh City (SGN)',
+        startDate: new Date('2025-11-28'),
+        endDate: new Date('2025-11-30'),
+        price: 120,
+        tripType: 'Round-trip',
+        travelClass: 'Economy',
+        departureDate: new Date('2025-12-01'),
+        image: '/assets/cities/Ho Chi Minh City.png',
+      },
+      {
+        flightNumber: 'AA1008',
+        origin: 'Manila (MNL)',
+        destination: 'Taipei (TPE)',
+        startDate: new Date('2025-12-01'),
+        endDate: new Date('2025-12-12'),
+        price: 250,
+        tripType: 'Round-trip',
+        travelClass: 'Economy',
+        departureDate: new Date('2025-11-15'),
+        image: '/assets/cities/tapei.png',
       }
     ]);
 

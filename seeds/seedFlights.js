@@ -6,7 +6,7 @@ async function seedFlights() {
   if (count === 0) {
     console.log('🌱 Seeding Flights collection...');
 
-    await Flight.insertMany([
+    const baseFlights =[
       {
         flightNumber: 'AA1001',
         origin: 'Manila (MNL)',
@@ -62,7 +62,7 @@ async function seedFlights() {
       {
         flightNumber: 'AA1005',
         origin: 'Manila (MNL)',
-        destination: 'Sydney (SYD)',
+        destination: 'Hanoi (HAN)',
         departureDate: '2025-11-24',
         departureTime: '22:30',
         arrivalTime: '08:30',
@@ -75,7 +75,7 @@ async function seedFlights() {
       {
         flightNumber: 'AA1006',
         origin: 'Manila (MNL)',
-        destination: 'Seoul (ICN)',
+        destination: 'Brisbane (BNE)',
         departureDate: '2025-11-25',
         departureTime: '11:15',
         arrivalTime: '15:00',
@@ -205,7 +205,7 @@ async function seedFlights() {
       {
         flightNumber: 'AA1016',
         origin: 'Manila (MNL)',
-        destination: 'Hong Kong (HKG)',
+        destination: 'Davao (DVO)',
         departureDate: '2025-10-25',
         departureTime: '08:00',
         arrivalTime: '10:30',
@@ -218,7 +218,7 @@ async function seedFlights() {
       {
         flightNumber: 'AA1017',
         origin: 'Manila (MNL)',
-        destination: 'Singapore (SIN)',
+        destination: 'Clark (CRK)',
         departureDate: '2025-10-25',
         departureTime: '09:30',
         arrivalTime: '12:30',
@@ -244,7 +244,7 @@ async function seedFlights() {
       {
         flightNumber: 'AA1019',
         origin: 'Manila (MNL)',
-        destination: 'Tokyo (HND)',
+        destination: 'Shek Kong (VHSK)',
         departureDate: '2025-10-30',
         departureTime: '08:00',
         arrivalTime: '13:00',
@@ -348,7 +348,7 @@ async function seedFlights() {
       {
         flightNumber: 'AA2004',
         origin: 'Manila (MNL)',
-        destination: 'Bangkok (BKK)',
+        destination: 'Osaka (KIX)',
         departureDate: '2025-11-05',
         departureTime: '07:15',
         arrivalTime: '10:45',
@@ -400,7 +400,7 @@ async function seedFlights() {
       {
         flightNumber: 'AA2008',
         origin: 'Manila (MNL)',
-        destination: 'Ho Chi Minh City (SGN)',
+        destination: 'Busan (PUS)',
         departureDate: '2025-11-15',
         departureTime: '10:00',
         arrivalTime: '13:30',
@@ -413,7 +413,7 @@ async function seedFlights() {
       {
         flightNumber: 'AA2009',
         origin: 'Manila (MNL)',
-        destination: 'Taipei (TPE)',
+        destination: 'Kaohsiung (KHH)',
         departureDate: '2025-11-17',
         departureTime: '08:00',
         arrivalTime: '10:00',
@@ -426,7 +426,7 @@ async function seedFlights() {
       {
         flightNumber: 'AA2010',
         origin: 'Manila (MNL)',
-        destination: 'Dubai (DXB)',
+        destination: 'Davao (DVO)',
         departureDate: '2025-11-20',
         departureTime: '21:00',
         arrivalTime: '04:30',
@@ -465,7 +465,7 @@ async function seedFlights() {
       {
         flightNumber: 'AA2013',
         origin: 'Manila (MNL)',
-        destination: 'Los Angeles (LAX)',
+        destination: 'Chiang Mai (CNX)',
         departureDate: '2025-11-25',
         departureTime: '22:30',
         arrivalTime: '15:00',
@@ -478,7 +478,7 @@ async function seedFlights() {
       {
         flightNumber: 'AA2014',
         origin: 'Manila (MNL)',
-        destination: 'London (LHR)',
+        destination: 'Seletar (XSP)',
         departureDate: '2025-11-27',
         departureTime: '23:30',
         arrivalTime: '13:30',
@@ -501,7 +501,37 @@ async function seedFlights() {
         price: 150,
         status: 'On Time'
       }
-    ]);
+    ];
+
+    // --- Generate return flights dynamically ---
+    const returnFlights = baseFlights.map((flight, i) => {
+      // Compute a return flight number (AA9001, AA9002, ...)
+      const returnFlightNumber = `AA9${String(100 + i).slice(1)}`;
+
+      // Add 2 day to departureDate
+      const retDate = new Date(flight.departureDate);
+      retDate.setDate(retDate.getDate() + 2);
+      const formattedReturnDate = retDate.toISOString().split('T')[0];
+
+      return {
+        flightNumber: returnFlightNumber,
+        origin: flight.destination,
+        destination: flight.origin,
+        departureDate: formattedReturnDate,
+        departureTime: '17:00', // Example: standard return time
+        arrivalTime: '19:30',
+        aircraft: flight.aircraft,
+        travelClass: flight.travelClass,
+        seatCapacity: flight.seatCapacity,
+        price: flight.price + 10, // Slight price difference
+        status: 'Scheduled'
+      };
+    });
+
+    // Combine both outbound and return flights
+    const allFlights = [...baseFlights, ...returnFlights];
+
+    await Flight.insertMany(allFlights);
 
     console.log('✅ Flights successfully seeded!');
   } else {

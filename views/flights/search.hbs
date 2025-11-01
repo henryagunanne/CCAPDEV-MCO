@@ -3,7 +3,7 @@
                 <!----------- LOCATION CAROUSEL ------------>
     <div id="locationCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
         <div class="carousel-indicators">
-            {{#each [0,1,2,3,4,5]}}
+            {{#each (array 0 1 2 3 4 5)}}
                 <button type="button" data-bs-target="#locationCarousel" data-bs-slide-to="{{this}}" class="{{#if @first}}active{{/if}}" aria-label="Slide {{inc @index}}"></button>
             {{/each}}  
         </div>
@@ -133,37 +133,14 @@
                                 <!-- Left Column: Countries -->
                                 <div class="col-4 menu-left bg-light">
                                     <ul class="list-unstyled mb-0" id="countries">
-                                        <li class="active" data-country="Philippines">Philippines</li>
-                                        <li data-country="Japan">Japan</li>
-                                        <li data-country="China">China</li>
-                                        <li data-country="Australia">Australia</li>
+                                        {{> countries}}
                                     </ul>
                                 </div>
                             
                                 <!-- Right Column: Cities -->
                                 <div class="col-8 menu-right p-3" id="cities">
                                     <!-- Default shown (Philippines) -->
-                                    <ul class="list-unstyled mb-0" data-country="Philippines">
-                                    <li>Manila (MNL)</li>
-                                    <li>Cebu (CEB)</li>
-                                    <li>Davao (DVO)</li>
-                                    <li>Kalibo</li>
-                                    </ul>
-                                    <ul class="list-unstyled mb-0 d-none" data-country="Japan">
-                                    <li>Tokyo (HND)</li>
-                                    <li>Osaka</li>
-                                    <li>Nagoya</li>
-                                    </ul>
-                                    <ul class="list-unstyled mb-0 d-none" data-country="China">
-                                    <li>Beijing</li>
-                                    <li>Shanghai</li>
-                                    <li>Hong Kong (HKG)</li>
-                                    </ul>
-                                    <ul class="list-unstyled mb-0 d-none" data-country="Australia">
-                                    <li>Sydney (SYD)</li>
-                                    <li>Melbourne (MEL)</li>
-                                    <li>Perth (PER)</li>
-                                    </ul>
+                                    {{> cities}}
                                 </div>
                                 </div>
                             </div>
@@ -186,37 +163,14 @@
                                 <!-- Left Column: Countries -->
                                 <div class="col-4 menu-left bg-light">
                                     <ul class="list-unstyled mb-0" id="countryList">
-                                        <li class="active" data-country="Philippines">Philippines</li>
-                                        <li data-country="Japan">Japan</li>
-                                        <li data-country="China">China</li>
-                                        <li data-country="Australia">Australia</li>
-                                    </ul>
+                                        {{> countries}}
+                                    </ul>   
                                 </div>
                             
                                 <!-- Right Column: Cities -->
                                 <div class="col-8 menu-right p-3" id="cityList">
                                     <!-- Default shown (Philippines) -->
-                                    <ul class="list-unstyled mb-0" data-country="Philippines">
-                                    <li>Manila (MNL)</li>
-                                    <li>Cebu (CEB)</li>
-                                    <li>Davao (DVO)</li>
-                                    <li>Kalibo</li>
-                                    </ul>
-                                    <ul class="list-unstyled mb-0 d-none" data-country="Japan">
-                                    <li>Tokyo (HND)</li>
-                                    <li>Osaka</li>
-                                    <li>Nagoya</li>
-                                    </ul>
-                                    <ul class="list-unstyled mb-0 d-none" data-country="China">
-                                    <li>Beijing</li>
-                                    <li>Shanghai</li>
-                                    <li>Hong Kong (HKG)</li>
-                                    </ul>
-                                    <ul class="list-unstyled mb-0 d-none" data-country="Australia">
-                                    <li>Sydney (SYD)</li>
-                                    <li>Melbourne (MEL)</li>
-                                    <li>Perth (PER)</li>
-                                    </ul>
+                                    {{> cities}}
                                 </div>
                                 </div>
                             </div>

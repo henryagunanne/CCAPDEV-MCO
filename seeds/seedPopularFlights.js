@@ -11,7 +11,8 @@ async function seedPopularFlights() {
     const flights = await Flight.find({
       flightNumber: { $in: [
         'AA1001', 'AA1002', 'AA1003', 'AA1004',
-        'AA2015', 'AA1021', 'AA1022', 'AA1023'
+        'AA2015', 'AA1021', 'AA1022', 'AA1023',
+        'AA1005', 'AA1020', 'AA2010', 'AA1009'
       ]}
     });
 
@@ -71,6 +72,34 @@ async function seedPopularFlights() {
         endDate: new Date('2025-12-22'),
         tripType: 'One-Way',
         image: '/assets/cities/tapei.png'
+      },
+      {
+        flight: flights.find(f => f.flightNumber === 'AA1005')._id,
+        startDate: new Date('2025-11-11'),
+        endDate: new Date('2025-12-15'),
+        tripType: 'Round-Trip',
+        image: '/assets/cities/hanoi.png'
+      },
+      {
+        flight: flights.find(f => f.flightNumber === 'AA1020')._id,
+        startDate: new Date('2025-11-22'),
+        endDate: new Date('2025-12-01'),
+        tripType: 'One-Way',
+        image: '/assets/cities/australia.jpg'
+      },
+      {
+        flight: flights.find(f => f.flightNumber === 'AA2010')._id,
+        startDate: new Date('2025-11-30'),
+        endDate: new Date('2025-12-18'),
+        tripType: 'Round-Trip',
+        image: '/assets/cities/davao.jpg'
+      },
+      {
+        flight: flights.find(f => f.flightNumber === 'AA1009')._id,
+        startDate: new Date('2025-11-29'),
+        endDate: new Date('2025-12-09'),
+        tripType: 'One-Way',
+        image: '/assets/cities/shanghai.jpg'
       }
     ]);
 

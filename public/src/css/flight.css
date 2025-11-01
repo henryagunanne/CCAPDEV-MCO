@@ -86,3 +86,7 @@ h3, h1, h5 {
 .carousel-controls span {
     background-color: #dc3545;
 }
+.carousel-indicators [data-bs-target] {
+    background-color: #333 !important;
+  }
+  

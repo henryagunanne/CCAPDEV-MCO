@@ -22,6 +22,7 @@ app.engine('hbs', exphbs.engine({
     layoutsDir: 'views/layouts',       // Folder for layout files
     partialsDir: 'views/partials',     // Folder for partial files/reusable components
     helpers: {
+        array: (...args) => args.slice(0, -1),
         inc: (value) => parseInt(value) + 1,
         formatDate: (date) => {
           if (!date) return '';
@@ -63,7 +64,7 @@ app.engine('hbs', exphbs.engine({
         or: (...args) => args.slice(0, -1).some(Boolean),
 
         // Logical NOT
-        not: (a) => !a
+        not: (a) => !a,
     }
 }));
 app.set('view engine', 'hbs');

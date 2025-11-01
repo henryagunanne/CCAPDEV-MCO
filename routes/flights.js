@@ -93,12 +93,7 @@ router.get('/search', async (req, res) => {
 
         if (origin) departureQuery.origin = origin;
         if (destination) departureQuery.destination = destination;
-        if (departureDate) {
-            const depart = new Date(departureDate);
-            const nextDep = new Date(departureDate);
-            nextDep.setDate(nextDep.getDate() + 1);
-            departureQuery.departureTime = { $gte: depart, $lt: nextDep };
-        }
+        if (departureDate) departureQuery.departureDate = departureDate;
 
         // Get outbound flights
         const outboundFlights = await Flight.find(departureQuery).lean();
@@ -109,13 +104,9 @@ router.get('/search', async (req, res) => {
         if (tripType && tripType.toLowerCase() === 'round-trip' && returnDate) {
             const returnQuery = {
                 origin: destination,
-                destination: origin
+                destination: origin,
+                returnDate: returnDate
             };
-
-            const ret = new Date(returnDate);
-            const nextRet = new Date(ret);
-            nextRet.setDate(ret.getDate() + 1);
-            returnQuery.departureTime = { $gte: ret, $lt: nextRet };
 
             returnFlights = await Flight.find(returnQuery).lean();
         }
@@ -160,7 +151,7 @@ router.get('/search', async (req, res) => {
         }
   
         */
-       
+
         const flights = { outboundFlights, returnFlights };
 
         res.status(200).json(flights);

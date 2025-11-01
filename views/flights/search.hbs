@@ -43,8 +43,8 @@
                             </button>
 
                             <ul class="dropdown-menu">
-                                <li><button class="dropdown-item" type="button">One Way</button></li>
-                                <li><button class="dropdown-item" type="button">Round Trip</button></li>
+                                <li><button class="dropdown-item" type="button">One-Way</button></li>
+                                <li><button class="dropdown-item" type="button">Round-Trip</button></li>
                             </ul>
                         </div>
                         <!-- hidden input for validation -->
@@ -69,54 +69,56 @@
                             <div class="dropdown-menu p-3 w-100">
                                 <!-- Travel Class -->
                                 <div class="mb-3">
-                                <label for="travelClass" class="form-label mb-1">Travel Class</label>
-                                <select id="travelClass" class="form-select">
-                                    <option value="all">All Cabins</option>
-                                    <option value="economy">Economy</option>
-                                    <option value="premium">Premium Economy</option>
-                                    <option value="business">Business</option>
-                                    <option value="first">First</option>
-                                </select>
+                                    <label for="travelClass" class="form-label mb-1">Travel Class</label>
+                                    <select id="travelClass" name="travelClass" class="form-select">
+                                        <option value="All">All Cabins</option>
+                                        <option value="Economy">Economy</option>
+                                        <option value="Premium Economy">Premium Economy</option>
+                                        <option value="Business">Business</option>
+                                        <option value="First">First</option>
+                                    </select>
                                 </div>
                                 <hr class="dropdown-divider">
                                 <!-- Passengers -->
                                 <div>
-                                <h6 class="mb-2">Passengers</h6>
-                                <div class="d-flex justify-content-between align-items-center mb-2 counter">
-                                    <span>Adult</span>
-                                    <div>
-                                    <button class="btn btn-sm btn-secondary minus">−</button>
-                                    <span class="value mx-2">1</span>
-                                    <button class="btn btn-sm btn-secondary plus">+</button>
+                                    <h6 class="mb-2">Passengers</h6>
+                                    <div class="d-flex justify-content-between align-items-center mb-2 counter">
+                                        <span>Adult</span>
+                                        <div>
+                                            <button class="btn btn-sm btn-secondary minus">−</button>
+                                            <span class="value mx-2">1</span>
+                                            <button class="btn btn-sm btn-secondary plus">+</button>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center mb-2 counter">
-                                    <span>Child (2y - 11y)</span>
-                                    <div>
-                                    <button class="btn btn-sm btn-secondary minus">−</button>
-                                    <span class="value mx-2">0</span>
-                                    <button class="btn btn-sm btn-secondary plus">+</button>
+                                    <div class="d-flex justify-content-between align-items-center mb-2 counter">
+                                        <span>Child (2y - 11y)</span>
+                                        <div>
+                                            <button class="btn btn-sm btn-secondary minus">−</button>
+                                            <span class="value mx-2">0</span>
+                                            <button class="btn btn-sm btn-secondary plus">+</button>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center mb-2 counter">
-                                    <span>Infant (16d - 23m)</span>
-                                    <div>
-                                    <button class="btn btn-sm btn-secondary minus">−</button>
-                                    <span class="value mx-2">0</span>
-                                    <button class="btn btn-sm btn-secondary plus">+</button>
+                                    <div class="d-flex justify-content-between align-items-center mb-2 counter">
+                                        <span>Infant (16d - 23m)</span>
+                                        <div>
+                                            <button class="btn btn-sm btn-secondary minus">−</button>
+                                            <span class="value mx-2">0</span>
+                                            <button class="btn btn-sm btn-secondary plus">+</button>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center mb-2 counter">
-                                    <span>Student</span>
-                                    <div>
-                                        <button class="btn btn-sm btn-secondary minus">−</button>
-                                        <span class="value mx-2">0</span>
-                                        <button class="btn btn-sm btn-secondary plus">+</button>
+                                    <div class="d-flex justify-content-between align-items-center mb-2 counter">
+                                        <span>Student</span>
+                                        <div>
+                                            <button class="btn btn-sm btn-secondary minus">−</button>
+                                            <span class="value mx-2">0</span>
+                                            <button class="btn btn-sm btn-secondary plus">+</button>
+                                        </div>
                                     </div>
-                                </div>
                                 </div> 
                             </div>
-                            </div>
+                        </div>
+                        <!-- hidden input for validation -->
+                        <input type="hidden" id="passengers" name="passengers" required>
                     </div>
 
                     <!----------- Origin Selection Dropdown ------------>
@@ -142,25 +144,25 @@
                                 <div class="col-8 menu-right p-3" id="cities">
                                     <!-- Default shown (Philippines) -->
                                     <ul class="list-unstyled mb-0" data-country="Philippines">
-                                    <li>Manila</li>
-                                    <li>Cebu</li>
-                                    <li>Davao</li>
+                                    <li>Manila (MNL)</li>
+                                    <li>Cebu (CEB)</li>
+                                    <li>Davao (DVO)</li>
                                     <li>Kalibo</li>
                                     </ul>
                                     <ul class="list-unstyled mb-0 d-none" data-country="Japan">
-                                    <li>Tokyo</li>
+                                    <li>Tokyo (HND)</li>
                                     <li>Osaka</li>
                                     <li>Nagoya</li>
                                     </ul>
                                     <ul class="list-unstyled mb-0 d-none" data-country="China">
                                     <li>Beijing</li>
                                     <li>Shanghai</li>
-                                    <li>Hong Kong</li>
+                                    <li>Hong Kong (HKG)</li>
                                     </ul>
                                     <ul class="list-unstyled mb-0 d-none" data-country="Australia">
-                                    <li>Sydney</li>
-                                    <li>Melbourne</li>
-                                    <li>Perth</li>
+                                    <li>Sydney (SYD)</li>
+                                    <li>Melbourne (MEL)</li>
+                                    <li>Perth (PER)</li>
                                     </ul>
                                 </div>
                                 </div>
@@ -195,25 +197,25 @@
                                 <div class="col-8 menu-right p-3" id="cityList">
                                     <!-- Default shown (Philippines) -->
                                     <ul class="list-unstyled mb-0" data-country="Philippines">
-                                    <li>Manila</li>
-                                    <li>Cebu</li>
-                                    <li>Davao</li>
+                                    <li>Manila (MNL)</li>
+                                    <li>Cebu (CEB)</li>
+                                    <li>Davao (DVO)</li>
                                     <li>Kalibo</li>
                                     </ul>
                                     <ul class="list-unstyled mb-0 d-none" data-country="Japan">
-                                    <li>Tokyo</li>
+                                    <li>Tokyo (HND)</li>
                                     <li>Osaka</li>
                                     <li>Nagoya</li>
                                     </ul>
                                     <ul class="list-unstyled mb-0 d-none" data-country="China">
                                     <li>Beijing</li>
                                     <li>Shanghai</li>
-                                    <li>Hong Kong</li>
+                                    <li>Hong Kong (HKG)</li>
                                     </ul>
                                     <ul class="list-unstyled mb-0 d-none" data-country="Australia">
-                                    <li>Sydney</li>
-                                    <li>Melbourne</li>
-                                    <li>Perth</li>
+                                    <li>Sydney (SYD)</li>
+                                    <li>Melbourne (MEL)</li>
+                                    <li>Perth (PER)</li>
                                     </ul>
                                 </div>
                                 </div>

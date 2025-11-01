@@ -106,7 +106,7 @@ router.get('/search', async (req, res) => {
         let returnFlights = [];
 
         // If round trip, also search for return flights
-        if (tripType && tripType.toLowerCase() === 'roundtrip' && returnDate) {
+        if (tripType && tripType.toLowerCase() === 'round-trip' && returnDate) {
             const returnQuery = {
                 origin: destination,
                 destination: origin
@@ -120,23 +120,27 @@ router.get('/search', async (req, res) => {
             returnFlights = await Flight.find(returnQuery).lean();
         }
 
+        // If no flights found, show message in UI
+        if (outboundFlights.length === 0 && returnFlights.length === 0) {
+            /* return res.render('flights/searchResults', { 
+                title: 'Flight Search Results',
+                noResults: true,
+                tripType,
+                origin,
+                destination
+            }); */
+            return res.status(404).json({ message: 'No flights found for the given criteria' }); 
+        }
+
         // Render both sets of flights
         res.render('flights/searchResults', { 
             title: 'Flight Search Results', 
             outboundFlights, 
-            returnFlights 
+            returnFlights,
+            tripType 
         });
 
-        const flights = {
-            outbound: outboundFlights,
-            return: returnFlights
-        };
-
-        if (flights.outbound.length === 0 && flights.return.length === 0) {
-            return res.status(404).json({ message: 'No flights found for the given criteria' });   
-        }
-
-        res.status(200).json(flights);
+        //res.status(200).json(flights);
     } catch (error) {
         res.status(500).json({ message: 'Error searching for flights', error });
     }

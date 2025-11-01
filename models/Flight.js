@@ -29,6 +29,11 @@ const flightSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    travelClass: {
+        type: String,
+        enum: ['Economy', 'Premium Economy', 'Business', 'First'],
+        default: 'Economy'
+    },
     seatCapacity: {
         type: Number,
         required: true

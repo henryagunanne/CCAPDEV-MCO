@@ -1,0 +1,19 @@
+<!--- Flight Card Partial Template --->
+<div class="col-md-6 d-flex justify-content-center">
+    <div class="card w-100" style="max-width: 36rem;">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">                        
+                    <h5 class="card-title">{{this.origin}} → {{this.destination}}</h5>     
+                </div>
+                <div class="col-md-6 text-end">
+                    <h6 class="card-subtitle mb-2 text-body-secondary">✈ Flight {{this.flightNumber}}</h6>
+                    <p class="card-subtitle mb-2 text-body-secondary">🛫 Depart {{formatDate this.departureTime}}  Arrive {{formatDate this.arrivalTime}}</p>
+                    <p class="card-subtitle mb-2 text-body-secondary">{{this.travelClass}}</p>
+                    <p class="card-text fw-bold">USD {{this.price}}</p>
+                    <a href="/reservations/book/{{_id}}" class="btn btn-danger w-100">Book Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -471,7 +471,73 @@
                     </div>
                 </div>
             </div>
-
+            <div class="searchResults container my-5">
+              <h1 class="text-center">Flight Search Results</h1>
+              <br>
+              <hr class="mb-4">
+              <br>
+              <div class="row justify-content-center g-4">
+                <div class="col-md-6 d-flex justify-content-center">
+                    <!-- outboundFlights Display -->
+                    <div class="card w-100" style="max-width: 36rem;">
+                        <div class="card-body">
+                            <h5 class="card-title">Card title</h5>
+                            <h6 class="card-subtitle mb-2 text-body-secondary">Card subtitle</h6>
+                            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card’s content.</p>
+                            <a href="#" class="card-link">Card link</a>
+                            <a href="#" class="card-link">Another link</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 d-flex justify-content-center">
+                  <!-- outboundFlights Display -->
+                  <div class="card w-100" style="max-width: 36rem;">
+                      <div class="card-body">
+                          <h5 class="card-title">Card title</h5>
+                          <h6 class="card-subtitle mb-2 text-body-secondary">Card subtitle</h6>
+                          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card’s content.</p>
+                          <a href="#" class="card-link">Card link</a>
+                          <a href="#" class="card-link">Another link</a>
+                      </div>
+                  </div>
+                </div>
+                <div class="col-md-6 d-flex justify-content-center">
+                  <!-- outboundFlights Display -->
+                  <div class="card w-100" style="max-width: 36rem;">
+                      <div class="card-body">
+                          <h5 class="card-title">Card title</h5>
+                          <h6 class="card-subtitle mb-2 text-body-secondary">Card subtitle</h6>
+                          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card’s content.</p>
+                          <a href="#" class="card-link">Card link</a>
+                          <a href="#" class="card-link">Another link</a>
+                      </div>
+                  </div>
+                </div>
+                <div class="col-md-6 d-flex justify-content-center">
+                  <div class="card w-100" style="max-width: 36rem;">
+                      <div class="card-body">
+                          <div class="row">
+                              <div class="col-md-6"> 
+                                <div class="flight-route">                       
+                                  <div class="flight-col"><h5 class="card-title">{{this.origin}}</h5></div>
+                                  <div class="divider"></div>
+                                  <div class="flight-col"><h5 class="card-title">{{this.destination}}</h5></div>
+                                </div>
+                              </div>
+                              <div class="col-md-6 text-end">
+                                  <h6 class="card-subtitle mb-2 text-body-secondary">✈ Flight {{this.flightNumber}}</h6>
+                                  <p class="card-subtitle mb-2 text-body-secondary">🛫 Depart {{formatDate this.departureTime}}  Arrive {{formatDate this.arrivalTime}}</p>
+                                  <p class="card-subtitle mb-2 text-body-secondary">{{this.travelClass}}</p>
+                                  <p class="card-text fw-bold">USD {{this.price}}</p>
+                                  <a href="/reservations/book/{{_id}}" class="btn btn-danger w-100">Book Now</a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              </div>
+              </div>
+            </div>
             <hr class="divider">
 
 

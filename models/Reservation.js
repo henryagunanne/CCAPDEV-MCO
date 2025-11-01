@@ -18,7 +18,7 @@ const reservationSchema = new mongoose.Schema({
         required: true
     },
     tripType: {
-        enum: ['One-Way', 'Round-trip'],
+        enum: ['One-Way', 'Round-Trip'],
         default: 'One-Way'
     },
     travelClass: {

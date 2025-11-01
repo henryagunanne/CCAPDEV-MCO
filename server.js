@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const exphbs = require('express-handlebars');
 const seedPopularFlights = require('./seeds/seedPopularFlights'); // Seed popular flights
+const seedFlights = require('./seeds/seedFlights'); // Seed flights
 const app = express();
 const PORT = 3000;
 
@@ -10,7 +11,8 @@ const PORT = 3000;
 mongoose.connect('mongodb://127.0.0.1:27017/airlineDB')
 .then(async () => {
     console.log('✅ MongoDB connected.');
-    await seedPopularFlights(); // 🌱 seed if empty
+    await seedPopularFlights(); // 🌱 seed popular flights if empty
+    await seedFlights(); // 🌱 seeds flights if empty
   })
 .catch(err => console.error('❌ MongoDB connection error:', err));
 
@@ -46,7 +48,23 @@ app.engine('hbs', exphbs.engine({
               rangeArray.push(i);
             }
             return rangeArray;
-        }
+        },
+        // --- Logic Helpers ---
+        eq: (a, b) => a === b,
+        ne: (a, b) => a !== b,
+        gt: (a, b) => a > b,
+        gte: (a, b) => a >= b,
+        lt: (a, b) => a < b,
+        lte: (a, b) => a <= b,
+
+        // Allows multiple AND conditions
+        and: (...args) => args.slice(0, -1).every(Boolean),
+
+        // Allows multiple OR conditions
+        or: (...args) => args.slice(0, -1).some(Boolean),
+
+        // Logical NOT
+        not: (a) => !a
     }
 }));
 app.set('view engine', 'hbs');

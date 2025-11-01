@@ -9,7 +9,7 @@ hr {
     margin: 1rem 0; 
 }
 #search {
-background-image: url("../../assets/cities/thailand.png");
+    background-image: url("../../assets/cities/thailand.png");
 }
 .flightSearch {
     margin: 0px 100px ;
@@ -36,7 +36,7 @@ background-image: url("../../assets/cities/thailand.png");
     max-height: 300px;
     overflow-y: auto;
 }
-h3 {
+h3, h1, h5 {
     font-weight: bold;
     color: #dc3545;
 }
@@ -84,4 +84,3 @@ h3 {
 .carousel-controls span {
     background-color: #dc3545;
 }
-

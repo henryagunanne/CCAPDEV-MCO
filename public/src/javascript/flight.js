@@ -26,7 +26,7 @@ jQuery(function() {
         let returnDate = $("#returnDate");
         let tripType = $("#tripDropdown .dropdown-toggle").text().trim();
         
-        if(tripType === "One Way"){
+        if(tripType === "One-Way"){
         returnDate.prop("disabled", true); // disable
         } else {
         returnDate.prop("disabled", false);
@@ -67,6 +67,10 @@ jQuery(function() {
             totalPassengers += parseInt($(this).text());
         });
 
+        //update hidden input field for number of passengers
+        $("#passengers").val(totalPassengers);
+
+        // Update the label text
         const passengerText = totalPassengers === 1 ? "1 Passenger" : totalPassengers + " Passengers";
 
         $value.text(`${passengerText}, ${$travelClass.find("option:selected").text()}`);

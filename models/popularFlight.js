@@ -31,7 +31,7 @@ const popularFlightSchema = new mongoose.Schema({
     },
     tripType: {
         type: String,
-        enum: ['One-way', 'Round-trip'],
+        enum: ['One-Way', 'Round-Trip'],
         required: true
     },
     travelClass: {

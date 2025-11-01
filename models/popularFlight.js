@@ -3,18 +3,9 @@ const mongoose = require('mongoose');
 
 // Define the schema for a Flight
 const popularFlightSchema = new mongoose.Schema({
-    flightNumber: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true
-    },
-    origin: {
-        type: String,
-        required: true
-    },
-    destination: {
-        type: String,
+    flight: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Flight',
         required: true
     },
     startDate: {
@@ -25,22 +16,9 @@ const popularFlightSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
-    price: {
-        type: Number,
-        required: true
-    },
     tripType: {
         type: String,
         enum: ['One-Way', 'Round-Trip'],
-        required: true
-    },
-    travelClass: {
-        type: String,
-        enum: ['Economy', 'Premium Economy', 'Business', 'First'],
-        default: 'Economy'
-    },
-    departureDate: {
-        type: Date,
         required: true
     },
     image: {

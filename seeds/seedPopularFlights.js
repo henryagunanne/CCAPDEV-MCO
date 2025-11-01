@@ -1,4 +1,5 @@
 const PopularFlight = require('../models/PopularFlight');
+const Flight = require('../models/Flight');
 
 async function seedPopularFlights() {
   const count = await PopularFlight.countDocuments();
@@ -6,102 +7,70 @@ async function seedPopularFlights() {
   if (count === 0) {
     console.log('🌱 Seeding Popular Flights collection...');
 
+    // Get flights from the database
+    const flights = await Flight.find({
+      flightNumber: { $in: [
+        'AA1001', 'AA1002', 'AA1003', 'AA1004',
+        'AA1020', 'AA1021', 'AA1022', 'AA1023'
+      ]}
+    });
+
     await PopularFlight.insertMany([
       {
-        flightNumber: 'AA1001',
-        origin: 'Manila (MNL)',
-        destination: 'Hong Kong (HKG)',
-        startDate: new Date('2025-10-20'),
-        endDate: new Date('2025-10-24'),
-        price: 148,
-        tripType: 'Round-Trip',
-        travelClass: 'Economy',
-        departureDate: new Date('2025-10-25'),
-        image: '/assets/cities/hongkong.png',
-      },
-      {
-        flightNumber: 'AA1002',
-        origin: 'Manila (MNL)',
-        destination: 'Singapore (SIN)',
-        startDate: new Date('2025-10-20'),
-        endDate: new Date('2025-10-24'),
-        price: 99,
+        flight: flights.find(f => f.flightNumber === 'AA1001')._id,
+        startDate: new Date('2025-11-10'),
+        endDate: new Date('2025-12-10'),
         tripType: 'One-Way',
-        travelClass: 'Economy',
-        departureDate: new Date('2025-10-25'),
-        image: '/assets/cities/singapore.png',
+        image: '/assets/cities/hongkong.png'
       },
       {
-        flightNumber: 'AA1003',
-        origin: 'Manila (MNL)',
-        destination: 'Bangkok (BKK)',
-        startDate: new Date('2025-10-25'),
-        endDate: new Date('2025-10-30'),
-        price: 188,
+        flight: flights.find(f => f.flightNumber === 'AA1002')._id,
+        startDate: new Date('2025-11-15'),
+        endDate: new Date('2025-12-15'),
         tripType: 'Round-Trip',
-        travelClass: 'Economy',
-        departureDate: new Date('2025-10-31'),
-        image: '/assets/cities/thailand.png',
+        image: '/assets/cities/singapore.png'
       },
       {
-        flightNumber: 'AA1004',
-        origin: 'Manila (MNL)',
-        destination: 'Tokyo (HND)',
-        startDate: new Date('2025-10-25'),
-        endDate: new Date('2025-10-29'),
-        price: 200,
+        flight: flights.find(f => f.flightNumber === 'AA1003')._id,
+        startDate: new Date('2025-11-20'),
+        endDate: new Date('2025-12-20'),
+        tripType: 'One-Way',
+        image: '/assets/cities/thailand.png'
+      },
+      {
+        flight: flights.find(f => f.flightNumber === 'AA1004')._id,
+        startDate: new Date('2025-11-25'),
+        endDate: new Date('2025-12-25'),
+        tripType: 'One-Way',
+        image: '/assets/cities/tokyo.png'
+      },
+      {
+        flight: flights.find(f => f.flightNumber === 'AA1020')._id,
+        startDate: new Date('2025-11-05'),
+        endDate: new Date('2025-12-05'),
         tripType: 'Round-Trip',
-        travelClass: 'Premium Economy',
-        departureDate: new Date('2025-10-30'),
-        image: '/assets/cities/tokyo.png',
+        image: '/assets/cities/australia.png'
       },
       {
-        flightNumber: 'AA1005',
-        origin: 'Manila (MNL)',
-        destination: 'Sydney (SYD)',
-        startDate: new Date('2025-11-01'),
-        endDate: new Date('2025-11-08'),
-        price: 350,
-        tripType: 'Round-Trip',
-        travelClass: 'Business',
-        departureDate: new Date('2025-11-09'),
-        image: '/assets/cities/australia.png',
-      },
-      {
-        flightNumber: 'AA1006',
-        origin: 'Manila (MNL)',
-        destination: 'Seoul (ICN)',
-        startDate: new Date('2025-10-30'),
-        endDate: new Date('2025-11-02'),
-        price: 175,
-        tripType: 'Round-Trip',
-        travelClass: 'Economy',
-        departureDate: new Date('2025-11-03'),
-        image: '/assets/cities/seoul.png',
-      },
-      {
-        flightNumber: 'AA1007',
-        origin: 'Manila (MNL)',
-        destination: 'Ho Chi Minh City (SGN)',
-        startDate: new Date('2025-11-28'),
-        endDate: new Date('2025-11-30'),
-        price: 120,
-        tripType: 'Round-Trip',
-        travelClass: 'Economy',
-        departureDate: new Date('2025-12-01'),
-        image: '/assets/cities/Ho Chi Minh City.png',
-      },
-      {
-        flightNumber: 'AA1008',
-        origin: 'Manila (MNL)',
-        destination: 'Taipei (TPE)',
-        startDate: new Date('2025-12-01'),
+        flight: flights.find(f => f.flightNumber === 'AA1021')._id,
+        startDate: new Date('2025-11-12'),
         endDate: new Date('2025-12-12'),
-        price: 250,
+        tripType: 'One-Way',
+        image: '/assets/cities/seoul.png'
+      },
+      {
+        flight: flights.find(f => f.flightNumber === 'AA1022')._id,
+        startDate: new Date('2025-11-18'),
+        endDate: new Date('2025-12-18'),
         tripType: 'Round-Trip',
-        travelClass: 'Economy',
-        departureDate: new Date('2025-11-15'),
-        image: '/assets/cities/tapei.png',
+        image: '/assets/cities/Ho Chi Minh City.png'
+      },
+      {
+        flight: flights.find(f => f.flightNumber === 'AA1023')._id,
+        startDate: new Date('2025-11-22'),
+        endDate: new Date('2025-12-22'),
+        tripType: 'One-Way',
+        image: '/assets/cities/tapei.png'
       }
     ]);
 

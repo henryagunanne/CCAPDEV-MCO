@@ -32,7 +32,7 @@
         <!----------- FLIGHT SEARCH ------------>
     <div id="search">
         <div class="flightSearch">
-            <form id="flightSearch" class="needs-validation" method="get" action="/flights/search" novalidate>
+            <form id="flightSearch" class="needs-validation" method="get" novalidate>
                 <div class="row g-3">
 
                     <!----------- Trip selection dropdown ------------>
@@ -248,6 +248,12 @@
         <br><br><br>
     </div>
 
+    <!--
+    <!-- placeholder for AJAX results --
+    <div id="searchResultsContainer" class="mt-5"></div>
+    <hr class="mb-4">
+    -->
+
     <div class="my-5 text-center">
         <h3>Popular Destinations</h3>
         <p>Explore our most popular flight destinations around the world.</p>
@@ -267,14 +273,14 @@
                         {{#each this}}
                             <div class="col-md-3">
                                 <div class="card d-flex flex-column h-100">
-                                    <img src="{{image}}" class="card-img-top" alt="{{destination}}">
+                                    <img src="{{this.image}}" class="card-img-top" alt="{{this.flight.destination}}">
                                     <div class="card-body d-flex flex-column">
-                                        <h5 class="card-title">{{origin}} → {{destination}}</h5>
-                                        <p class="card-subtitle mb-2 text-body-secondary">{{startDate}} - {{endDate}}</p>
+                                        <h5 class="card-title">{{this.flight.origin}} → {{this.flight.destination}}</h5>
+                                        <p class="card-subtitle mb-2 text-body-secondary">{{formatDate this.startDate}} - {{formatDate this.endDate}}</p>
                                         <p class="card-text mb-1">From</p>
-                                        <h3 class="card-text mb-1">USD {{price}}*</h3>
-                                        <p class="card-text mb-0">{{tripType}}/{{travelClass}}</p>
-                                        <p class="card-text">Depart: {{departureDate}}</p>
+                                        <h3 class="card-text mb-1">USD {{this.flight.price}}*</h3>
+                                        <p class="card-text mb-0">{{this.tripType}}/{{this.flight.travelClass}}</p>
+                                        <p class="card-text">Depart: {{formatDate this.flight.departureDate}}</p>
                                         <div class="mt-auto">
                                             <a href="/reservations/book/{{_id}}" class="btn btn-danger d-grid gap-2">Book Now</a>
                                         </div>

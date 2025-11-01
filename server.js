@@ -11,8 +11,8 @@ const PORT = 3000;
 mongoose.connect('mongodb://127.0.0.1:27017/airlineDB')
 .then(async () => {
     console.log('✅ MongoDB connected.');
-    await seedPopularFlights(); // 🌱 seed popular flights if empty
     await seedFlights(); // 🌱 seeds flights if empty
+    await seedPopularFlights(); // 🌱 seed popular flights if empty
   })
 .catch(err => console.error('❌ MongoDB connection error:', err));
 

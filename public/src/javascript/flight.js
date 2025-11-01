@@ -186,6 +186,35 @@ jQuery(function() {
         }
 
         $flightSearch.addClass('was-validated');
+
+        /*
+        /* ---------- AJAX Flight Search ---------- /
+       event.preventDefault(); // stop default page reload
+
+        const query = $(this).serialize(); // grab all form data
+        console.log("Searching flights with:", query);
+    
+        // Show loading state
+        $('#searchResultsContainer').html('<p class="text-center text-muted">Searching flights...</p>');
+    
+        // Perform AJAX GET request
+        $.ajax({
+          url: '/flights/search',
+          method: 'GET',
+          data: query,
+          success: function (data) {
+            // data is the rendered HTML from res.render()
+            $('#searchResultsContainer').html(data);
+          },
+          error: function (xhr) {
+            let message = 'An error occurred while searching for flights.';
+            if (xhr.status === 404) {
+              message = 'No flights found for the given criteria.';
+            }
+            $('#searchResultsContainer').html(`<p class="text-center text-danger">${message}</p>`);
+          }
+        });
+        */
     });
 
 

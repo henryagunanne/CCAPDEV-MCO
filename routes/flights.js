@@ -27,7 +27,7 @@ router.get('/:flightNumber', async (req, res) => {
             res.render('flights/detail', { title: 'Flight Details', flight });
             res.status(200).json(flight);
         } else {
-            res.status(404).json({ message: 'Flight not found' });
+            res.status(404).json({ message: 'Could not find Flight' });
         }
     } catch (error) {
         res.status(500).json({ message: 'Error retrieving flight', error });
@@ -57,7 +57,7 @@ router.put('/update', async (req, res) => {
         if (updatedFlight) {
             res.status(200).json(updatedFlight);
         } else {
-            res.status(404).json({ message: 'Flight not found' });
+            res.status(404).json({ message: 'Flight to Update not found' });
         }
     } catch (error) {
         res.status(400).json({ message: 'Error updating flight', error });
@@ -72,7 +72,7 @@ router.delete('/delete', async (req, res) => {
         if (deletedFlight) {
             res.status(200).json({ message: 'Flight deleted successfully' });
         } else {
-            res.status(404).json({ message: 'Flight not found' });
+            res.status(404).json({ message: 'Flight to Delete not found' });
         }
     } catch (error) {
         res.status(400).json({ message: 'Error deleting flight', error });
@@ -135,12 +135,35 @@ router.get('/search', async (req, res) => {
         // Render both sets of flights
         res.render('flights/searchResults', { 
             title: 'Flight Search Results', 
-            outboundFlights, 
+            outboundFlights,
             returnFlights,
-            tripType 
+            tripType
         });
+        
+        /*
+       // If request is AJAX, render only the partial (no layout)
+        if (req.xhr) {
+            res.render('flights/searchResults', { 
+            layout: false,
+            outboundFlights,
+            returnFlights,
+            tripType
+            });
+        } else {
+            // Regular request (user visited /flights/search manually)
+            res.render('flights/searchResults', { 
+            title: 'Flight Search Results', 
+            outboundFlights,
+            returnFlights,
+            tripType
+            });
+        }
+  
+        */
+       
+        const flights = { outboundFlights, returnFlights };
 
-        //res.status(200).json(flights);
+        res.status(200).json(flights);
     } catch (error) {
         res.status(500).json({ message: 'Error searching for flights', error });
     }

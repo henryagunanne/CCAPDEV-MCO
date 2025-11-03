@@ -15,7 +15,6 @@ async function seedFlights() {
         departureTime: '08:30',
         arrivalTime: '10:45',
         aircraft: 'Airbus A321',
-        travelClass: 'Economy',
         seatCapacity: 180,
         price: 148,
         status: 'Scheduled'
@@ -28,7 +27,6 @@ async function seedFlights() {
         departureTime: '09:15',
         arrivalTime: '12:45',
         aircraft: 'Airbus A320',
-        travelClass: 'Economy',
         seatCapacity: 186,
         price: 99,
         status: 'Scheduled'
@@ -41,7 +39,6 @@ async function seedFlights() {
         departureTime: '10:30',
         arrivalTime: '13:45',
         aircraft: 'Airbus A320neo',
-        travelClass: 'Economy',
         seatCapacity: 190,
         price: 188,
         status: 'Scheduled'
@@ -54,7 +51,6 @@ async function seedFlights() {
         departureTime: '07:00',
         arrivalTime: '12:00',
         aircraft: 'Boeing 787',
-        travelClass: 'Premium Economy',
         seatCapacity: 250,
         price: 200,
         status: 'Scheduled'
@@ -67,7 +63,6 @@ async function seedFlights() {
         departureTime: '22:30',
         arrivalTime: '08:30',
         aircraft: 'Boeing 777',
-        travelClass: 'Business',
         seatCapacity: 300,
         price: 350,
         status: 'Scheduled'
@@ -79,8 +74,7 @@ async function seedFlights() {
         departureDate: '2025-11-25',
         departureTime: '11:15',
         arrivalTime: '15:00',
-        aircraft: 'Airbus A330',
-        travelClass: 'Economy',
+        aircraft: 'Airbus A330',        
         seatCapacity: 260,
         price: 175,
         status: 'Scheduled'
@@ -92,8 +86,7 @@ async function seedFlights() {
         departureDate: '2025-11-26',
         departureTime: '13:00',
         arrivalTime: '15:45',
-        aircraft: 'Airbus A320',
-        travelClass: 'Economy',
+        aircraft: 'Airbus A320',        
         seatCapacity: 180,
         price: 120,
         status: 'Scheduled'
@@ -105,8 +98,7 @@ async function seedFlights() {
         departureDate: '2025-11-27',
         departureTime: '09:30',
         arrivalTime: '11:45',
-        aircraft: 'Airbus A321neo',
-        travelClass: 'Economy',
+        aircraft: 'Airbus A321neo',        
         seatCapacity: 200,
         price: 250,
         status: 'Scheduled'
@@ -119,7 +111,6 @@ async function seedFlights() {
         departureTime: '06:30',
         arrivalTime: '10:30',
         aircraft: 'Boeing 737 MAX',
-        travelClass: 'Economy',
         seatCapacity: 190,
         price: 220,
         status: 'Scheduled'
@@ -131,8 +122,7 @@ async function seedFlights() {
         departureDate: '2025-11-29',
         departureTime: '20:00',
         arrivalTime: '06:30',
-        aircraft: 'Boeing 787',
-        travelClass: 'Business',
+        aircraft: 'Boeing 787',        
         seatCapacity: 280,
         price: 420,
         status: 'Scheduled'
@@ -144,8 +134,7 @@ async function seedFlights() {
         departureDate: '2025-11-30',
         departureTime: '14:00',
         arrivalTime: '15:25',
-        aircraft: 'Airbus A320',
-        travelClass: 'Economy',
+        aircraft: 'Airbus A320',        
         seatCapacity: 180,
         price: 85,
         status: 'Scheduled'
@@ -157,8 +146,7 @@ async function seedFlights() {
         departureDate: '2025-12-01',
         departureTime: '07:45',
         arrivalTime: '09:30',
-        aircraft: 'Airbus A320neo',
-        travelClass: 'Economy',
+        aircraft: 'Airbus A320neo',       
         seatCapacity: 180,
         price: 95,
         status: 'Scheduled'
@@ -170,8 +158,7 @@ async function seedFlights() {
         departureDate: '2025-12-02',
         departureTime: '08:00',
         arrivalTime: '12:30',
-        aircraft: 'Boeing 737 MAX',
-        travelClass: 'Economy',
+        aircraft: 'Boeing 737 MAX',        
         seatCapacity: 200,
         price: 210,
         status: 'Scheduled'
@@ -183,8 +170,7 @@ async function seedFlights() {
         departureDate: '2025-12-03',
         departureTime: '09:45',
         arrivalTime: '14:00',
-        aircraft: 'Boeing 787',
-        travelClass: 'Premium Economy',
+        aircraft: 'Boeing 787',       
         seatCapacity: 250,
         price: 230,
         status: 'Scheduled'
@@ -196,8 +182,7 @@ async function seedFlights() {
         departureDate: '2025-12-04',
         departureTime: '10:30',
         arrivalTime: '14:45',
-        aircraft: 'Airbus A321neo',
-        travelClass: 'Economy',
+        aircraft: 'Airbus A321neo',        
         seatCapacity: 200,
         price: 215,
         status: 'Scheduled'
@@ -209,8 +194,7 @@ async function seedFlights() {
         departureDate: '2025-10-25',
         departureTime: '08:00',
         arrivalTime: '10:30',
-        aircraft: 'Airbus A320',
-        travelClass: 'Economy',
+        aircraft: 'Airbus A320',        
         seatCapacity: 180,
         price: 148,
         status: 'Scheduled'
@@ -222,8 +206,7 @@ async function seedFlights() {
         departureDate: '2025-10-25',
         departureTime: '09:30',
         arrivalTime: '12:30',
-        aircraft: 'Boeing 737 MAX',
-        travelClass: 'Economy',
+        aircraft: 'Boeing 737 MAX',        
         seatCapacity: 170,
         price: 99,
         status: 'Scheduled'
@@ -235,8 +218,7 @@ async function seedFlights() {
         departureDate: '2025-10-31',
         departureTime: '07:15',
         arrivalTime: '10:00',
-        aircraft: 'Airbus A320',
-        travelClass: 'Economy',
+        aircraft: 'Airbus A320',        
         seatCapacity: 180,
         price: 188,
         status: 'On Time'
@@ -248,8 +230,7 @@ async function seedFlights() {
         departureDate: '2025-10-30',
         departureTime: '08:00',
         arrivalTime: '13:00',
-        aircraft: 'Boeing 787 Dreamliner',
-        travelClass: 'Premium Economy',
+        aircraft: 'Boeing 787 Dreamliner',        
         seatCapacity: 240,
         price: 200,
         status: 'Scheduled'
@@ -262,7 +243,6 @@ async function seedFlights() {
         departureTime: '23:00',
         arrivalTime: '09:30',
         aircraft: 'Airbus A350',
-        travelClass: 'Business',
         seatCapacity: 300,
         price: 350,
         status: 'Scheduled'
@@ -275,7 +255,6 @@ async function seedFlights() {
         departureTime: '07:15',
         arrivalTime: '11:00',
         aircraft: 'Airbus A321',
-        travelClass: 'Economy',
         seatCapacity: 200,
         price: 175,
         status: 'On Time'
@@ -288,7 +267,6 @@ async function seedFlights() {
         departureTime: '10:00',
         arrivalTime: '13:00',
         aircraft: 'Airbus A320',
-        travelClass: 'Economy',
         seatCapacity: 190,
         price: 120,
         status: 'Scheduled'
@@ -301,7 +279,6 @@ async function seedFlights() {
         departureTime: '08:00',
         arrivalTime: '10:30',
         aircraft: 'Boeing 737 MAX',
-        travelClass: 'Economy',
         seatCapacity: 180,
         price: 250,
         status: 'Scheduled'
@@ -313,8 +290,7 @@ async function seedFlights() {
         departureDate: '2025-11-01',
         departureTime: '08:00',
         arrivalTime: '13:00',
-        aircraft: 'Airbus A321',
-        travelClass: 'Economy',
+        aircraft: 'Airbus A321',        
         seatCapacity: 180,
         price: 200,
         status: 'Scheduled'
@@ -326,8 +302,7 @@ async function seedFlights() {
         departureDate: '2025-11-06',
         departureTime: '09:30',
         arrivalTime: '14:15',
-        aircraft: 'Airbus A321',
-        travelClass: 'Economy',
+        aircraft: 'Airbus A321',        
         seatCapacity: 180,
         price: 205,
         status: 'On Time'
@@ -339,8 +314,7 @@ async function seedFlights() {
         departureDate: '2025-11-03',
         departureTime: '09:30',
         arrivalTime: '12:45',
-        aircraft: 'Boeing 737 MAX',
-        travelClass: 'Premium Economy',
+        aircraft: 'Boeing 737 MAX',        
         seatCapacity: 160,
         price: 180,
         status: 'On Time'
@@ -352,8 +326,7 @@ async function seedFlights() {
         departureDate: '2025-11-05',
         departureTime: '07:15',
         arrivalTime: '10:45',
-        aircraft: 'Airbus A320',
-        travelClass: 'Economy',
+        aircraft: 'Airbus A320',       
         seatCapacity: 170,
         price: 188,
         status: 'Scheduled'
@@ -365,8 +338,7 @@ async function seedFlights() {
         departureDate: '2025-11-07',
         departureTime: '10:00',
         arrivalTime: '12:30',
-        aircraft: 'Airbus A320',
-        travelClass: 'Economy',
+        aircraft: 'Airbus A320',        
         seatCapacity: 150,
         price: 148,
         status: 'On Time'
@@ -378,8 +350,7 @@ async function seedFlights() {
         departureDate: '2025-11-09',
         departureTime: '23:00',
         arrivalTime: '09:30',
-        aircraft: 'Airbus A350',
-        travelClass: 'Business',
+        aircraft: 'Airbus A350',        
         seatCapacity: 280,
         price: 350,
         status: 'Scheduled'
@@ -391,8 +362,7 @@ async function seedFlights() {
         departureDate: '2025-11-12',
         departureTime: '07:15',
         arrivalTime: '11:00',
-        aircraft: 'Boeing 787 Dreamliner',
-        travelClass: 'Economy',
+        aircraft: 'Boeing 787 Dreamliner',        
         seatCapacity: 220,
         price: 175,
         status: 'Scheduled'
@@ -404,8 +374,7 @@ async function seedFlights() {
         departureDate: '2025-11-15',
         departureTime: '10:00',
         arrivalTime: '13:30',
-        aircraft: 'Airbus A321',
-        travelClass: 'Economy',
+        aircraft: 'Airbus A321',        
         seatCapacity: 190,
         price: 120,
         status: 'Scheduled'
@@ -417,8 +386,7 @@ async function seedFlights() {
         departureDate: '2025-11-17',
         departureTime: '08:00',
         arrivalTime: '10:00',
-        aircraft: 'Airbus A320',
-        travelClass: 'Economy',
+        aircraft: 'Airbus A320',        
         seatCapacity: 160,
         price: 250,
         status: 'On Time'
@@ -431,7 +399,6 @@ async function seedFlights() {
         departureTime: '21:00',
         arrivalTime: '04:30',
         aircraft: 'Boeing 777',
-        travelClass: 'First',
         seatCapacity: 300,
         price: 950,
         status: 'Scheduled'
@@ -443,8 +410,7 @@ async function seedFlights() {
         departureDate: '2025-11-22',
         departureTime: '08:00',
         arrivalTime: '09:30',
-        aircraft: 'Airbus A320',
-        travelClass: 'Economy',
+        aircraft: 'Airbus A320',        
         seatCapacity: 180,
         price: 120,
         status: 'On Time'
@@ -456,8 +422,7 @@ async function seedFlights() {
         departureDate: '2025-11-22',
         departureTime: '10:30',
         arrivalTime: '12:00',
-        aircraft: 'Airbus A320',
-        travelClass: 'Economy',
+        aircraft: 'Airbus A320',       
         seatCapacity: 180,
         price: 125,
         status: 'On Time'
@@ -469,8 +434,7 @@ async function seedFlights() {
         departureDate: '2025-11-25',
         departureTime: '22:30',
         arrivalTime: '15:00',
-        aircraft: 'Boeing 777',
-        travelClass: 'Business',
+        aircraft: 'Boeing 777',       
         seatCapacity: 320,
         price: 980,
         status: 'Scheduled'
@@ -482,8 +446,7 @@ async function seedFlights() {
         departureDate: '2025-11-27',
         departureTime: '23:30',
         arrivalTime: '13:30',
-        aircraft: 'Airbus A350',
-        travelClass: 'First',
+        aircraft: 'Airbus A350',       
         seatCapacity: 300,
         price: 1100,
         status: 'Scheduled'
@@ -496,7 +459,6 @@ async function seedFlights() {
         departureTime: '06:30',
         arrivalTime: '09:00',
         aircraft: 'Boeing 737',
-        travelClass: 'Economy',
         seatCapacity: 180,
         price: 150,
         status: 'On Time'
@@ -506,7 +468,7 @@ async function seedFlights() {
     // --- Generate return flights dynamically ---
     const returnFlights = baseFlights.map((flight, i) => {
       // Compute a return flight number (AA9001, AA9002, ...)
-      const returnFlightNumber = `AA9${String(100 + i).slice(1)}`;
+      const returnFlightNumber = `AA90${String(100 + i).slice(1)}`;
 
       // Add 2 day to departureDate
       const retDate = new Date(flight.departureDate);
@@ -521,7 +483,6 @@ async function seedFlights() {
         departureTime: '17:00', // Example: standard return time
         arrivalTime: '19:30',
         aircraft: flight.aircraft,
-        travelClass: flight.travelClass,
         seatCapacity: flight.seatCapacity,
         price: flight.price + 10, // Slight price difference
         status: 'Scheduled'

@@ -13,11 +13,8 @@ const reservationSchema = new mongoose.Schema({
         ref: 'Flight',
         required: true
     },
-    seatNumber: {
-        type: String,
-        required: true
-    },
     tripType: {
+        type: String,
         enum: ['One-Way', 'Round-Trip'],
         default: 'One-Way'
     },
@@ -25,6 +22,10 @@ const reservationSchema = new mongoose.Schema({
         type: String,
         enum: ['Economy', 'Premium Economy', 'Business', 'First'],
         default: 'Economy'
+    },
+    seatNumber: {
+        type: String,
+        required: true
     },
     meal: {
         type: String,

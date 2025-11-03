@@ -1,11 +1,13 @@
 // server.js - Express + Mongoose + Handlebars
-const express = require('express');
-const mongoose = require('mongoose');
-const exphbs = require('express-handlebars');
+const express = require('express'); // Express framework
+const mongoose = require('mongoose'); // MongoDB ODM
+const exphbs = require('express-handlebars'); // Handlebars templating engine
 const seedPopularFlights = require('./seeds/seedPopularFlights'); // Seed popular flights
 const seedFlights = require('./seeds/seedFlights'); // Seed flights
-const app = express();
-const PORT = 3000;
+const seedUsers = require('./seeds/seedUsers');
+const seedReservations = require('./seeds/seedReservations');
+const app = express();  // Initialize Express app
+const PORT = 3000;  // Server port
 
 // Connect to MongoDB
 mongoose.connect('mongodb://127.0.0.1:27017/airlineDB')
@@ -13,6 +15,8 @@ mongoose.connect('mongodb://127.0.0.1:27017/airlineDB')
     console.log('✅ MongoDB connected.');
     await seedFlights(); // 🌱 seeds flights if empty
     await seedPopularFlights(); // 🌱 seed popular flights if empty
+    await seedUsers(); // 🌱 seed users if empty
+    await seedReservations(); // 🌱 seed reservations if empty
   })
 .catch(err => console.error('❌ MongoDB connection error:', err));
 
@@ -77,9 +81,9 @@ app.use(express.static('public'));
 
 // Routes
 app.use('/', require('./routes/index'));
-//app.use('/users', require('./routes/users'));
+app.use('/users', require('./routes/users'));
 app.use('/flights', require('./routes/flights'));
-//app.use('/reservations', require('./routes/reservations'));
+app.use('/reservations', require('./routes/reservations'));
 app.use('/admin', require('./routes/admin'));
 
 // Start Server

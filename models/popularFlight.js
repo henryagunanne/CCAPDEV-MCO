@@ -16,6 +16,11 @@ const popularFlightSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
+    travelClass: {
+        type: String,
+        enum: ['Economy', 'Premium Economy', 'Business', 'First'],
+        default: 'Economy'
+    },
     tripType: {
         type: String,
         enum: ['One-Way', 'Round-Trip'],

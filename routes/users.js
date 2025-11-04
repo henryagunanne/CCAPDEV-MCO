@@ -19,6 +19,13 @@ router.post('/register', async (req, res) => {
         password: hashedPassword,
         dateOfBirth
       });
+
+      const existingUser = await User.findOne({email: email});
+      if (existingUser) {
+        return res
+        .status(400)
+        .json({ success: false, message: 'Email already registered' });
+      }
   
       await newUser.save();
       res.json({ success: true });
@@ -46,8 +53,10 @@ router.post('/login', async (req, res) => {
   
       // Password matched
       req.session.user = user; // store user in session
-      res.send(`Welcome, ${user.firstName}!`);
-      res.json({ success: true });
+      return res.json({ 
+        success: true, 
+        message: `Welcome, ${user.firstName}!` 
+      });
 
     } catch (err) {
       console.error('❌ Login error:', err);
@@ -96,7 +105,11 @@ router.post('/edit/:userId', async (req, res) => {
   
       // Update session user data
       req.session.user = updatedUser;
-      res.json({ success: true, user: updatedUser });
+      res.json({ 
+        success: true, 
+        message: 'Profile updated successfully!',
+        user: updatedUser 
+      });
     } catch (err) {
       console.error('❌ Profile update error:', err);
       res.status(500).send('Server error during profile update');

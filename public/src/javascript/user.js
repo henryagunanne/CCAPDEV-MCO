@@ -20,7 +20,7 @@ jQuery(function (){
             email: $("#email").val(),
             dateOfBirth: $("#dateOfBirth").val()
         };
-
+        
         // Send AJAX request to update profile
         $.ajax({
             url: `/users/edit/${userId}`,

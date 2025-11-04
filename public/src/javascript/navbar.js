@@ -72,18 +72,19 @@ jQuery(function() {
             url: "/users/login",
             data: JSON.stringify(formData),
             contentType: "application/json",
-            success: function(response) {
+            success: function(res) {
                 if (res.success) {
                     $('#loginModal').modal('hide');
-                    alert("Login successful! Welcome back.");
+                    alert("Login successful!");
                     location.reload();
                 } else {
-                    $('#loginError').text(res.message);
+                    $('#loginError').text(res.message).show();
                 }
             },
             error: function(xhr) {
                 // Show error message on failure
-                $("#loginError").text(xhr.responseText).show();
+                const msg = xhr.responseText || "⚠️ Login failed. Please try again.";
+                $("#loginError").text(msg).show();
             }
         });
     });
@@ -126,7 +127,7 @@ jQuery(function() {
             },
             error: function(xhr) {
                 // Show error message on failure
-                $("#registerError").text(xhr.responseText).show();
+                $("#registerError").text(res.message).show();
             }
         });
     });

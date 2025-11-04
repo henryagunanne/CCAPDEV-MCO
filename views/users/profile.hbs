@@ -1,18 +1,18 @@
-<div>
-    <h2>Your Profile</h2>
+<div class="container my-5 fullHeight">
+    <h1 class="text-center">Your Profile</h1>
     <br><br>
     <div class="profile-details">
         <p><strong>Name:</strong> {{user.firstName}} {{user.lastName}}</p>
         <p><strong>Email:</strong> {{user.email}}</p>
-        <p><strong>Date of Birth:</strong> {{user.dateOfBirth}}</p>
-        <p><strong>Member Since:</strong> {{user.createdAt}}</p>
+        <p><strong>Date of Birth:</strong> {{formatDate user.dateOfBirth}}</p>
+        <p><strong>Member Since:</strong> {{formatDate user.createdAt}}</p>
     </div>
 
     <br>
     <hr>
     <br>
     <div class="profile-actions">
-        <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit Profile</a>
+        <a href="#" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit Profile</a>
         <a href="#" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#changePasswordModal"> Change Password</a>
         <a href="#" class="btn btn-danger"  data-bs-toggle="modal" data-bs-target="#deleteAccountModal">Delete Account</a>
     </div>
@@ -24,11 +24,11 @@
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <img class="text-center" src="../../public/assets/Logo/Logo-red.png">
+                <img class="text-center" src="../../assets/Logo/Logo-red.png">
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="editProfileForm" method="POST" class="needs-validation" novalidate>
+                <form id="editProfileForm" method="POST" class="needs-validation" data-user-id="{{user._id}}" novalidate>
                     <header class="text-center">
                         <h1 class="modal-title fs-5" id="editProfileModalLabel">Edit Your Profile</h1>
                     </header>
@@ -53,7 +53,7 @@
                         <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth" value="{{user.dateOfBirth}}" required>
                         <div class="invalid-feedback">Please enter your date of birth.</div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="submit" class="btn btn-danger">Save Changes</button>
                 </form>
 
                 <div><p id="editError" class="text-danger mt-2"></p></div>
@@ -68,11 +68,11 @@
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <img class="text-center" src="../../public/assets/Logo/Logo-red.png">
+                <img class="text-center" src="../../assets/Logo/Logo-red.png">
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="changePasswordForm" method="POST" class="needs-validation" novalidate>
+                <form id="changePasswordForm" method="POST" class="needs-validation" data-user-id="{{user._id}}" novalidate>
                     <header class="text-center">
                         <h1 class="modal-title fs-5" id="changePasswordModalLabel">Change Your Password</h1>
                     </header>
@@ -92,7 +92,7 @@
                         <input type="password" class="form-control" id="confirmNewPassword" name="confirmNewPassword" required>
                         <div class="invalid-feedback">Please confirm your new password.</div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Change Password</button>
+                    <button type="submit" class="btn btn-danger">Change Password</button>
                 </form>
 
                 <div><p id="passwordError" class="text-danger mt-2"></p></div>
@@ -106,19 +106,17 @@
 <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
-            <div class="modal-header">
-                <img class="text-center" src="../../public/assets/Logo/Logo-red.png">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
             <div class="modal-body">
                 <header class="text-center">
                     <h1 class="modal-title fs-5" id="deleteAccountModalLabel">Delete Your Account</h1>
                 </header>
                 <br>
                 <p>Are you sure you want to delete your account? This action cannot be undone.</p>
-                <form id="deleteAccountForm" method="POST">
-                    <button type="submit" class="btn btn-danger">Yes, Delete My Account</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteAccountForm" data-user-id="{{user._id}}" method="POST">
+                    <div class="mb-3 gap-3"></div>
+                        <button type="submit" class="btn btn-danger">Yes, Delete My Account</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
                 </form>
             </div>
         </div>

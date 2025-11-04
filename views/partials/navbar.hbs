@@ -28,13 +28,13 @@
               <span>{{user.firstName}}</span>
             {{else}}
               <span>Account</span>
+            {{/if}}
           </button>
           <ul class="dropdown-menu">
             {{#if user}}
               <li class="profile">
                 <a class="dropdown-item" href="/users/profile">Profile</a>
               </li>
-              <hr>
               <li class="logout">
                 <form id="logoutForm" action="/users/logout" method="POST">
                   <button type="submit" id="logoutBtn" class="dropdown-item">Sign Out</button>
@@ -47,6 +47,7 @@
               <li class="create">
                   <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#signUpModal">Create Account</a>
               </li>
+            {{/if}}
           </ul>
         </div>
 

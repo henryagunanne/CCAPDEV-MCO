@@ -2,6 +2,8 @@
 const express = require('express'); // Express framework
 const mongoose = require('mongoose'); // MongoDB ODM
 const exphbs = require('express-handlebars'); // Handlebars templating engine
+const session = require('express-session'); // Session management
+const MongoStore = require('connect-mongo'); // MongoDB session store
 const seedPopularFlights = require('./seeds/seedPopularFlights'); // Seed popular flights
 const seedFlights = require('./seeds/seedFlights'); // Seed flights
 const seedUsers = require('./seeds/seedUsers');
@@ -20,14 +22,16 @@ mongoose.connect('mongodb://127.0.0.1:27017/airlineDB')
   })
 .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// Configure Handlebars
+// Configure Handlebars and handlebars helpers
 app.engine('hbs', exphbs.engine({
     extname: '.hbs',                   // File extension for Handlebars files
     layoutsDir: 'views/layouts',       // Folder for layout files
     partialsDir: 'views/partials',     // Folder for partial files/reusable components
     helpers: {
-        array: (...args) => args.slice(0, -1),
-        inc: (value) => parseInt(value) + 1,
+        array: (...args) => args.slice(0, -1),  // Collects all args into an array except the last one (Handlebars passes an options object as the last arg)
+        inc: (value) => parseInt(value) + 1,    // Increment helper
+
+        //  Date formatting helper
         formatDate: (date) => {
           if (!date) return '';
           return new Date(date).toLocaleDateString('en-US', {
@@ -36,6 +40,7 @@ app.engine('hbs', exphbs.engine({
             year: 'numeric'
           });
         },
+
         // Chunk helper to group flights (e.g., 4 per slide)
         chunk: function (array, size) {
             if (!Array.isArray(array)) return [];
@@ -45,7 +50,9 @@ app.engine('hbs', exphbs.engine({
             }
             return chunks;
         },
-        divide: (a, b) => Math.ceil(a / b),
+        divide: (a, b) => Math.ceil(a / b), // Division helper with ceiling
+
+        // Generates an array of numbers from start to end-1
         range: function(start, end) {
             const rangeArray = [];
             for (let i = start; i < end; i++) {
@@ -71,13 +78,28 @@ app.engine('hbs', exphbs.engine({
         not: (a) => !a,
     }
 }));
-app.set('view engine', 'hbs');
-app.set('views', './views'); // might need to edit this path later
+app.set('view engine', 'hbs');  // Set Handlebars as the view engine
+app.set('views', './views'); // Set views directory
 
 // Middleware
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));    // Parse URL-encoded bodies
+app.use(express.json());    // Parse JSON bodies
+app.use(express.static('public'));  // Serve static files
+
+// Session management
+app.use(session({
+    secret: 'AASecret23',
+    resave: false,  // Don't save session if unmodified
+    saveUninitialized: false,   // Don't create session until something stored
+    store: MongoStore.create({ mongoUrl: 'mongodb://127.0.0.1:27017/airlineDB' })   // Store sessions in MongoDB
+}));
+
+// Make user data available in all views
+app.use((req, res, next) => {
+    res.locals.user = req.session.user;
+    next();
+});
+  
 
 // Routes
 app.use('/', require('./routes/index'));

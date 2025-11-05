@@ -15,10 +15,10 @@ jQuery(function (){
         // Gather form data
         const userId = $form.data("user-id");
         const formData = {
-            firstName: $("#firstName").val(),
-            lastName: $("#lastName").val(),
-            email: $("#email").val(),
-            dateOfBirth: $("#dateOfBirth").val()
+            firstName: $("#editFirstName").val(),
+            lastName: $("#editLastName").val(),
+            email: $("#editEmail").val(),
+            dateOfBirth: $("#editDateOfBirth").val()
         };
         
         // Send AJAX request to update profile
@@ -57,7 +57,7 @@ jQuery(function (){
         }
     });
 
-    // ensure that current password and new passwords are not the same
+    /* ensure that current password and new passwords are not the same
     $("#newPassword").on("input", function() {
         const currentPassword = $("#currentPassword").val();
         const newPassword = $(this).val();
@@ -69,14 +69,14 @@ jQuery(function (){
         } else {
             $(".newPassword .invalid-feedback").text(""); // Clear feedback if valid
         }
-    });
+    }); */
 
     // handle change password form submission
     $("#changePasswordForm").on("submit", function(event) {
         event.preventDefault(); // Prevent default form submission
 
         const $form = $(this);
-
+        
         // Check form validity
         if (this.checkValidity() === false) {
             event.stopPropagation();
@@ -89,6 +89,7 @@ jQuery(function (){
         const formData = {
             currentPassword: $("#currentPassword").val(),
             newPassword: $("#newPassword").val(),
+            confirmNewPassword: $("#confirmNewPassword").val()
         };
 
         // Send AJAX request to change password

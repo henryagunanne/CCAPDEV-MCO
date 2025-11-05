@@ -91,7 +91,7 @@ router.get('/profile', (req, res) => {
 router.post('/edit/:userId', async (req, res) => {
     const { userId } = req.params;
     const { firstName, lastName, email, dateOfBirth } = req.body;
-  
+
     try {
       const updatedUser = await User.findByIdAndUpdate(
         userId,
@@ -119,7 +119,7 @@ router.post('/edit/:userId', async (req, res) => {
 // POST /users/change-password/:userId - Change user password
 router.post('/change-password/:userId', async (req, res) => {
     const { userId } = req.params;
-    const { currentPassword, newPassword } = req.body;
+    const { currentPassword, newPassword, confirmNewPassword } = req.body;
   
     try {
       const user = await User.findById(userId);
@@ -131,6 +131,16 @@ router.post('/change-password/:userId', async (req, res) => {
       const isMatch = await bcrypt.compare(currentPassword, user.password);
       if (!isMatch) {
         return res.status(400).send('Current password is incorrect');
+      }
+
+      // ensure that current password and new passwords are not the same
+      if (currentPassword === newPassword) {
+        return res.status(400).send('New password must be different from current password');
+      }
+
+      // ensure that new password and confirm password match
+      if (newPassword !== confirmNewPassword) {
+        return res.status(400).send('New password and confirmation do not match');
       }
   
       // Hash the new password

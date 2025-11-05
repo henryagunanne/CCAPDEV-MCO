@@ -34,23 +34,23 @@
                     </header>
                     <br>
                     <div class="mb-3">
-                        <label for="firstName" class="form-label">First Name</label>
-                        <input type="text" class="form-control" id="firstName" name="firstName" value="{{user.firstName}}" required>
+                        <label for="editFirstName" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="editFirstName" name="editFirstName" value="{{user.firstName}}" required>
                         <div class="invalid-feedback">Please enter your first name.</div>
                     </div>
                     <div class="mb-3">
-                        <label for="lastName" class="form-label">Last Name</label>
-                        <input type="text" class="form-control" id="lastName" name="lastName" value="{{user.lastName}}" required>
+                        <label for="editLastName" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="editLastName" name="editLastName" value="{{user.lastName}}" required>
                         <div class="invalid-feedback">Please enter your last name.</div>
                     </div>
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email address</label>
-                        <input type="email" class="form-control" id="email" name="email" value="{{user.email}}" required>
+                        <label for="editEmail" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="editEmail" name="editEmail" value="{{user.email}}" required>
                         <div class="invalid-feedback">Please enter a valid email address.</div>
                     </div>
                     <div class="mb-3">
-                        <label for="dateOfBirth" class="form-label">Date of Birth</label>
-                        <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth" value="{{user.dateOfBirth}}" required>
+                        <label for="editDateOfBirth" class="form-label">Date of Birth</label>
+                        <input type="date" class="form-control" id="editDateOfBirth" name="editDateOfBirth" value="{{user.dateOfBirth}}" required>
                         <div class="invalid-feedback">Please enter your date of birth.</div>
                     </div>
                     <button type="submit" class="btn btn-danger">Save Changes</button>
@@ -84,12 +84,12 @@
                     </div>
                     <div class="mb-3">
                         <label for="newPassword" class="form-label">New Password</label>
-                        <input type="password" class="form-control" id="newPassword" name="newPassword" required minlength="8" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$" required>
+                        <input type="password" class="form-control" id="newPassword" name="newPassword" minlength="8" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$" required>
                         <div class="invalid-feedback">Please enter a new password (minimum 8 characters).</div>
                     </div>
                     <div class="mb-3">
                         <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
-                        <input type="password" class="form-control" id="confirmNewPassword" name="confirmNewPassword" required>
+                        <input type="password" class="form-control" id="confirmNewPassword" name="confirmNewPassword" minlength="8" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$"  required>
                         <div class="invalid-feedback">Please confirm your new password.</div>
                     </div>
                     <button type="submit" class="btn btn-danger">Change Password</button>

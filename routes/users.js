@@ -92,6 +92,14 @@ router.post('/edit/:userId', async (req, res) => {
     const { userId } = req.params;
     const { firstName, lastName, email, dateOfBirth } = req.body;
 
+    // check if the new email is already taken by another user
+    const existingUser = await User.findOne({email: email});
+    if (existingUser) {
+      return res
+      .status(400)
+      .json({ success: false, message: 'Email already registered' });
+    }
+
     try {
       const updatedUser = await User.findByIdAndUpdate(
         userId,

@@ -40,6 +40,12 @@
                   <button type="submit" id="logoutBtn" class="dropdown-item">Sign Out</button>
                 </form>
               </li>
+              {{#if (eq user.role 'Admin')}}
+                <li><hr class="dropdown-divider"></li>
+                <li class="admin-dashboard">
+                  <a class="dropdown-item" href="/admin">Admin Dashboard</a>
+                </li>
+              {{/if}}
             {{else}}
               <li class="login">
                   <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Sign In</a>
@@ -48,7 +54,6 @@
                   <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#signUpModal">Create Account</a>
               </li>
             {{/if}}
-          </ul>
         </div>
 
       </div>
@@ -88,7 +93,7 @@
 
         </div>
         <div class="modal-footer justify-content-center">
-          <div id="accountLogin">Not yet a member? <a class="login-link" href="#" data-bs-target="#signUpModal" data-bs-toggle="modal" data-bs-dismiss="modal">Sign up</a></div>
+          <div id="accountSignUp">Not yet a member? <a class="login-link" href="#" data-bs-target="#signUpModal" data-bs-toggle="modal" data-bs-dismiss="modal">Sign up</a></div>
         </div>
       </div>
     </div>
@@ -212,6 +217,9 @@
                 </form>
 
                 <div><p id="forgotError" class="text-danger mt-2"></p></div>
+            </div>
+            <div class="modal-footer justify-content-center">
+              <div id="backToLogin"><a class="login-link" href="#" data-bs-target="#loginModal" data-bs-toggle="modal" data-bs-dismiss="modal">Go Back to Login </a></div>
             </div>
         </div>
     </div>

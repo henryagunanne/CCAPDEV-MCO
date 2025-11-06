@@ -74,8 +74,8 @@ jQuery(function() {
             contentType: "application/json",
             success: function(res) {
                 if (res.success) {
+                    alert(res.message).show();
                     $('#loginModal').modal('hide');
-                    alert("Login successful!");
                     location.reload();
                 } else {
                     $('#loginError').text(res.message).show();

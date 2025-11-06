@@ -7,6 +7,20 @@ const router = express.Router();
    ADMIN ROUTES FOR FLIGHTS
 =========================== */
 
+// Middleware to check if user is admin
+router.use((req, res, next) => {
+    if (req.session.user && req.session.user.role === 'Admin') {
+        next();
+    } else {
+        res.status(403).json({ message: 'Access denied. Admins only.' });
+    }
+});
+
+// GET / Admin dashboard route
+router.get('/', (req, res) => {
+    res.render('admin/dashboard', { title: 'Admin Dashboard' });
+});
+
 // GET /admin/flights - Retrieve all flights
 router.get('/flights', async (req, res) => {
     try {

@@ -18,7 +18,10 @@ router.use((req, res, next) => {
 
 // GET / - Admin dashboard route
 router.get('/', (req, res) => {
-    res.render('admin/dashboard', { title: 'Admin Dashboard' });
+    res.render('admin/dashboard', { 
+        title: 'Admin Dashboard',
+        admin: req.session.user
+    });
 });
 
 // GET /admin/flights - Retrieve all flights

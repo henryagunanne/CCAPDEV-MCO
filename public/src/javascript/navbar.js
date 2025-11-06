@@ -153,5 +153,50 @@ jQuery(function() {
         });
     });
 
+    // Show forgot password modal from login modal
+    $('#forgotPassword').on("click", function() {
+        $('#loginModal').modal('hide');
+        $('#forgotPasswordModal').modal('show');
+    });
+
+    // forgot password handling
+    $("#forgotPasswordForm").on("submit", function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const $form = $(this);
+
+        // Check form validity
+        if (this.checkValidity() === false) {
+            event.stopPropagation();
+            $form.addClass('was-validated');
+            return;
+        }
+
+        // Gather form data
+        const email = $("#forgotEmail").val();
+
+        // Send AJAX request to initiate password reset
+        $.ajax({
+            url: '/users/forgot-password',
+            type: 'POST',
+            data: JSON.stringify({ email }),
+            contentType: 'application/json',
+            success: function(res) {
+                if (res.success) {
+                    $('#forgotPasswordModal').modal('hide');
+                    alert(res.message).show();
+                    $form[0].reset();
+                    $form.removeClass('was-validated');
+                } else {
+                    $('#forgotError').text(res.message).show();
+                }
+            },
+            error: function(xhr) {
+                // Handle errors
+                $("#forgotError").text(xhr.responseText).show();
+            }
+        });
+    });
+
 
 });

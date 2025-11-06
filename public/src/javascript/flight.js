@@ -27,9 +27,9 @@ jQuery(function() {
         let tripType = $("#tripDropdown .dropdown-toggle").text().trim();
         
         if(tripType === "One-Way"){
-        returnDate.prop("disabled", true); // disable
+            returnDate.prop("disabled", true); // disable
         } else {
-        returnDate.prop("disabled", false);
+            returnDate.prop("disabled", false);
         }
     }
 

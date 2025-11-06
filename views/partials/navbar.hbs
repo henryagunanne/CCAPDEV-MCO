@@ -186,3 +186,33 @@
       </div>
     </div>
 </div>
+
+
+<!-- Forgot Password Modal -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <img class="text-center" src="../../assets/Logo/Logo-red.png">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="forgotPasswordForm" method="POST" class="needs-validation" novalidate>
+                    <header class="text-center">
+                        <h1 class="modal-title fs-5" id="forgotPasswordModalLabel">Reset Your Password</h1>
+                    </header>
+                    <br>
+                    <div class="mb-3">
+                        <label for="forgotEmail" class="form-label">Email address</label>
+                        <input type="email" class="form-control" id="forgotEmail" name="forgotEmail" aria-describedby="emailHelp" pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$" required>
+                        <div class="invalid-feedback">Enter a valid email address.</div>
+                        <div id="emailHelp" class="form-text">We'll send you an email to reset your password.</div>
+                    </div>
+                    <button type="submit" class="btn btn-danger float-end">Send Reset Link</button>
+                </form>
+
+                <div><p id="forgotError" class="text-danger mt-2"></p></div>
+            </div>
+        </div>
+    </div>
+</div>

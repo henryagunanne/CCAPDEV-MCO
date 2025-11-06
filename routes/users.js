@@ -20,7 +20,7 @@ router.post('/register', async (req, res) => {
         dateOfBirth
       });
 
-      const existingUser = await User.findOne({email: email});
+      const existingUser = await User.findOne({email: email}).lean();
       if (existingUser) {
         return res
         .status(400)
@@ -40,7 +40,7 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
   
     try {
-      const user = await User.findOne({ email });
+      const user = await User.findOne({ email: email }).lean();
   
       if (!user) {
         return res.status(400).send('User not found');
@@ -185,6 +185,27 @@ router.post('/delete/:userId', async (req, res) => {
       console.error('❌ Account deletion error:', err);
       res.status(500).send('Server error during account deletion');
     }
+});
+
+// POST /users/forgot-password - Handle forgot password
+router.post('/forgot-password', async (req, res) => {
+  const { email } = req.body; 
+
+  try {
+    const findUser = await User.findOne({ email: email }).lean();
+    if (!findUser) {
+      return res.status(400).send('User not found');
+    }
+
+    // Here you would typically generate a password reset token and send an email
+    res.json({ 
+      success: true, 
+      message: 'Password reset link sent to email (simulated)' 
+    });
+  } catch (err) {
+    console.error('❌ Forgot password error:', err);
+    res.status(500).send('Server error during password reset');
+  }
 });
 
 // Export the router

@@ -4,6 +4,14 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs'); // for password hashing
 const router = express.Router();
 
+// Middleware to check if user is authenticated
+function isAuthenticated(req, res, next) {
+    if (req.session.user) {
+      return next();
+    }
+    res.status(401).send('Unauthorized: Please log in to access this resource');  
+}
+
 // POST /users/register - Handle user registration
 router.post('/register', async (req, res) => {
     const { firstName, lastName, email, password, dateOfBirth } = req.body;
@@ -65,7 +73,7 @@ router.post('/login', async (req, res) => {
 });
 
 // POST /users/logout - Handle user logout
-router.post('/logout', (req, res) => {
+router.post('/logout', isAuthenticated, (req, res) => {
     req.session.destroy(err => {
       if (err) {
         console.error('❌ Logout error:', err);
@@ -76,7 +84,7 @@ router.post('/logout', (req, res) => {
 });
 
 // GET /users/profile - Display user profile
-router.get('/profile', (req, res) => {
+router.get('/profile', isAuthenticated, (req, res) => {
     if (!req.session.user) {
       return res.redirect('/'); // redirect to home if not logged in
     }
@@ -88,7 +96,7 @@ router.get('/profile', (req, res) => {
 });
 
 // POST /users/edit/:userId - Edit user profile
-router.post('/edit/:userId', async (req, res) => {
+router.post('/edit/:userId', isAuthenticated, async (req, res) => {
     const { userId } = req.params;
     const { firstName, lastName, email, dateOfBirth } = req.body;
 
@@ -117,7 +125,7 @@ router.post('/edit/:userId', async (req, res) => {
 });
 
 // POST /users/change-password/:userId - Change user password
-router.post('/change-password/:userId', async (req, res) => {
+router.post('/change-password/:userId', isAuthenticated, async (req, res) => {
     const { userId } = req.params;
     const { currentPassword, newPassword, confirmNewPassword } = req.body;
   
@@ -156,7 +164,7 @@ router.post('/change-password/:userId', async (req, res) => {
 });
 
 // POST /users/delete/:userId - Delete user account
-router.post('/delete/:userId', async (req, res) => {
+router.post('/delete/:userId', isAuthenticated, async (req, res) => {
     const { userId } = req.params;
   
     try {

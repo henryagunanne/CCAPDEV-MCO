@@ -74,8 +74,8 @@ jQuery(function() {
             contentType: "application/json",
             success: function(res) {
                 if (res.success) {
-                    alert(res.message).show();
                     $('#loginModal').modal('hide');
+                    alert("Login successful!");
                     location.reload();
                 } else {
                     $('#loginError').text(res.message).show();
@@ -132,23 +132,21 @@ jQuery(function() {
         });
     });
    
-    // Logout handling
+    // logout handling
     $("#logoutBtn").on("click", function(event) {
         event.preventDefault(); // Prevent default link behavior
 
-        // AJAX GET request for logout
+        // Send AJAX request to logout
         $.ajax({
-            type: "GET",
-            url: "/users/logout",
-            success: function(res) {
-                if (res.success) {
-                    location.reload();
-                } else {
-                    alert("Logout failed. Please try again.");
-                }
+            url: '/users/logout',
+            type: 'POST',
+            success: function() {
+                alert("Logged out successfully.");
+                window.location.href = "/"; // Redirect to homepage
             },
-            error: function() {
-                alert("An error occurred during logout. Please try again.");
+            error: function(xhr) {
+                // Handle errors
+                alert("Error logging out: " + xhr.responseText);
             }
         });
     });

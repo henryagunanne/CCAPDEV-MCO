@@ -16,7 +16,7 @@ router.use((req, res, next) => {
     }
 });
 
-// GET / Admin dashboard route
+// GET / - Admin dashboard route
 router.get('/', (req, res) => {
     res.render('admin/dashboard', { title: 'Admin Dashboard' });
 });

@@ -75,7 +75,7 @@ jQuery(function() {
             success: function(res) {
                 if (res.success) {
                     $('#loginModal').modal('hide');
-                    alert("Login successful!");
+                    alert(res.message).show();
                     location.reload();
                 } else {
                     $('#loginError').text(res.message).show();

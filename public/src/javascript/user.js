@@ -142,23 +142,13 @@ jQuery(function (){
         });
     });
 
-    // logout handling
-    $("#logoutBtn").on("click", function(event) {
-        event.preventDefault(); // Prevent default link behavior
 
-        // Send AJAX request to logout
-        $.ajax({
-            url: '/users/logout',
-            type: 'POST',
-            success: function() {
-                alert("Logged out successfully.");
-                window.location.href = "/"; // Redirect to homepage
-            },
-            error: function(xhr) {
-                // Handle errors
-                alert("Error logging out: " + xhr.responseText);
-            }
-        });
+    // ensure all modals clear previous errors when opened and inputs are reset
+    $('.modal').on('show.bs.modal', function () {
+        $(this).find('form')[0].reset();
+        $(this).find('.invalid-feedback').text('');
+        $(this).find('.was-validated').removeClass('was-validated');
+        $(this).find('.error-message').hide();
     });
 
 });

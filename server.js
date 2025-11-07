@@ -32,7 +32,7 @@ app.engine('hbs', exphbs.engine({
         array: (...args) => args.slice(0, -1),  // Collects all args into an array except the last one (Handlebars passes an options object as the last arg)
         inc: (value) => parseInt(value) + 1,    // Increment helper
 
-        //  Date formatting helper
+        /*  Date formatting helper
         formatDate: (date) => {
           if (!date) return '';
           return new Date(date).toLocaleDateString('en-US', {
@@ -40,6 +40,14 @@ app.engine('hbs', exphbs.engine({
             month: 'short',
             year: 'numeric'
           });
+        },*/
+
+        formatDate: (date) => {
+            return new Date(date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+            });
         },
 
         // Chunk helper to group flights (e.g., 4 per slide)

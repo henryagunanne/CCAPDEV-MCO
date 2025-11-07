@@ -7,6 +7,23 @@ const router = express.Router();
    ADMIN ROUTES FOR FLIGHTS
 =========================== */
 
+// Middleware to check if user is admin
+router.use((req, res, next) => {
+    if (req.session.user && req.session.user.role === 'Admin') {
+        next();
+    } else {
+        res.status(403).json({ message: 'Access denied. Admins only.' });
+    }
+});
+
+// GET / - Admin dashboard route
+router.get('/', (req, res) => {
+    res.render('admin/dashboard', { 
+        title: 'Admin Dashboard',
+        admin: req.session.user
+    });
+});
+
 // GET /admin/flights - Retrieve all flights
 router.get('/flights', async (req, res) => {
     try {
@@ -44,8 +61,8 @@ router.post('/create', async (req, res) => {
     }
 });
 
-//  PUT /admin/update - Update an existing flight
-router.put('/update', async (req, res) => {
+//  POST /admin/update - Update an existing flight
+router.post('/update', async (req, res) => {
     try {
         const updatedFlight = await Flight.findOneAndUpdate(
             { flightNumber: req.body.flightNumber },
@@ -63,8 +80,28 @@ router.put('/update', async (req, res) => {
     }
 });
 
-// DELETE /admin/delete - Delete a flight
-router.delete('/delete', async (req, res) => {
+// POST /admin/update/:id - Update an existing flight by id
+router.post('/update/:id', async (req, res) => {
+    const flightId = req.params.id;
+    try {
+        const updatedFlight = await Flight.findByIdAndUpdate(
+            flightId,
+            req.body,
+            { new: true }
+        ).lean();
+
+        if (updatedFlight) {
+            res.status(200).json(updatedFlight);
+        } else {
+            res.status(404).json({ message: 'Flight to Update not found' });
+        }
+    } catch (error) {
+        res.status(400).json({ message: 'Error updating flight', error });
+    }
+});
+
+// POST /admin/delete - Delete a flight
+router.post('/delete', async (req, res) => {
     try {
         const deletedFlight = await Flight.findOneAndDelete({ flightNumber: req.body.flightNumber }).lean();
 

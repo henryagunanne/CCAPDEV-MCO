@@ -75,7 +75,7 @@ jQuery(function() {
             success: function(res) {
                 if (res.success) {
                     $('#loginModal').modal('hide');
-                    alert("Login successful!");
+                    alert(res.message).show();
                     location.reload();
                 } else {
                     $('#loginError').text(res.message).show();
@@ -132,23 +132,66 @@ jQuery(function() {
         });
     });
    
-    // Logout handling
+    // logout handling
     $("#logoutBtn").on("click", function(event) {
         event.preventDefault(); // Prevent default link behavior
 
-        // AJAX GET request for logout
+        // Send AJAX request to logout
         $.ajax({
-            type: "GET",
-            url: "/users/logout",
+            url: '/users/logout',
+            type: 'POST',
+            success: function() {
+                alert("Logged out successfully.");
+                window.location.href = "/"; // Redirect to homepage
+            },
+            error: function(xhr) {
+                // Handle errors
+                alert("Error logging out: " + xhr.responseText);
+            }
+        });
+    });
+
+    // Show forgot password modal from login modal
+    $('#forgotPassword').on("click", function() {
+        $('#loginModal').modal('hide');
+        $('#forgotPasswordModal').modal('show');
+    });
+
+    // forgot password handling
+    $("#forgotPasswordForm").on("submit", function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const $form = $(this);
+
+        // Check form validity
+        if (this.checkValidity() === false) {
+            event.stopPropagation();
+            $form.addClass('was-validated');
+            return;
+        }
+
+        // Gather form data
+        const email = $("#forgotEmail").val();
+
+        // Send AJAX request to initiate password reset
+        $.ajax({
+            url: '/users/forgot-password',
+            type: 'POST',
+            data: JSON.stringify({ email }),
+            contentType: 'application/json',
             success: function(res) {
                 if (res.success) {
-                    location.reload();
+                    $('#forgotPasswordModal').modal('hide');
+                    alert(res.message).show();
+                    $form[0].reset();
+                    $form.removeClass('was-validated');
                 } else {
-                    alert("Logout failed. Please try again.");
+                    $('#forgotError').text(res.message).show();
                 }
             },
-            error: function() {
-                alert("An error occurred during logout. Please try again.");
+            error: function(xhr) {
+                // Handle errors
+                $("#forgotError").text(xhr.responseText).show();
             }
         });
     });

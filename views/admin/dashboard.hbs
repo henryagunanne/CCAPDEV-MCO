@@ -1,0 +1,23 @@
+<div class="container my-5 fullHeight">
+    <h1 class="text-center">Admin Dashboard</h1>
+    <br><br>
+    <div class="dashboard-overview text-center">
+        <p>Welcome, {{admin.firstName}} {{admin.lastName}}!</p>
+        <p>Here you can manage users, view reports, and configure system settings.</p>
+    </div>
+    <div class="dashboard-actions mt-4 text-center">
+        <form id="searchFlightForm">
+            <div class="input-group mt-3">
+                <input type="text" class="form-control" placeholder="Search Flights by Flight Number" aria-label="Search Flights" aria-describedby="searchFlightButton" id="searchFlightInput">
+                <button class="btn btn-danger" type="submit" id="searchFlightButton">Search</button>
+            </div>
+        </form>
+        <br>
+        <a class="btn btn-danger mx-2">View all Flights</a>
+        <a class="btn btn-danger mx-2">Create Flight</a>
+    </div>
+    <br>
+    <div id="flightResults" class="mt-4">
+        {{!-- Flight search results will be displayed here using AJAX --}}
+    </div>
+</div>

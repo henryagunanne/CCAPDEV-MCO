@@ -4,6 +4,7 @@ const mongoose = require('mongoose'); // MongoDB ODM
 const exphbs = require('express-handlebars'); // Handlebars templating engine
 const session = require('express-session'); // Session management
 const MongoStore = require('connect-mongo'); // MongoDB session store
+const path = require('path');
 const seedPopularFlights = require('./seeds/seedPopularFlights'); // Seed popular flights
 const seedFlights = require('./seeds/seedFlights'); // Seed flights
 const seedUsers = require('./seeds/seedUsers');
@@ -84,6 +85,7 @@ app.set('views', './views'); // Set views directory
 // Middleware
 app.use(express.urlencoded({ extended: true }));    // Parse URL-encoded bodies
 app.use(express.json());    // Parse JSON bodies
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static('public'));  // Serve static files
 
 // Session management

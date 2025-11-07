@@ -86,6 +86,28 @@ router.get('/search', async (req, res) => {
     }
 });
 
+// GET /flights/:id/book - Display booking form for a specific flight
+router.get('/:id/book', async (req, res) => {
+  try {
+    const flight = await Flight.findById(req.params.id).lean();
+
+    if (!flight) {
+      return res.status(404).send('Flight not found');
+    }
+
+    // Render the booking form (details.hbs)
+res.render('reservations/reservation', {
+  title: 'Book Your Flight',
+  layout: 'main',
+  flight
+});
+
+
+  } catch (err) {
+    console.error('Error loading flight booking page:', err);
+    res.status(500).send('Error loading flight booking page');
+  }
+});
 
 
 // Export the router

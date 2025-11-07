@@ -1,0 +1,55 @@
+<div class="container mt-5">
+  <h2 class="mb-4">Book This Flight</h2>
+
+  <form action="/reservations/create" method="POST" class="p-4 border rounded bg-light shadow-sm">
+
+    <!-- Hidden Flight ID -->
+    <input type="hidden" name="flight" value="{{flight._id}}">
+
+    <div class="mb-3">
+      <label for="seatNumber" class="form-label">Seat Number</label>
+      <input type="text" name="seatNumber" id="seatNumber" class="form-control" placeholder="e.g. 12A" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="tripType" class="form-label">Trip Type</label>
+      <select name="tripType" id="tripType" class="form-select">
+        <option value="One-Way">One-Way</option>
+        <option value="Round-Trip">Round-Trip</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="travelClass" class="form-label">Class</label>
+      <select name="travelClass" id="travelClass" class="form-select">
+        <option value="Economy">Economy</option>
+        <option value="Premium Economy">Premium Economy</option>
+        <option value="Business">Business</option>
+        <option value="First">First</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="meal" class="form-label">Meal Preference</label>
+      <select name="meal" id="meal" class="form-select">
+        <option value="None">None</option>
+        <option value="Vegetarian">Vegetarian</option>
+        <option value="Non-Vegetarian">Non-Vegetarian</option>
+        <option value="Vegan">Vegan</option>
+        <option value="Gluten-Free">Gluten-Free</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="passengers" class="form-label">Number of Passengers</label>
+      <input type="number" name="passengers" id="passengers" class="form-control" min="1" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="baggageAllowance" class="form-label">Baggage Allowance (kg)</label>
+      <input type="number" name="baggageAllowance" id="baggageAllowance" class="form-control" min="0">
+    </div>
+
+    <button type="submit" class="btn btn-danger w-100">Confirm Booking</button>
+  </form>
+</div>

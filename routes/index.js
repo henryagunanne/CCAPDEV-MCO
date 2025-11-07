@@ -17,5 +17,10 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/bookFlight', (req, res) => {
+  res.redirect('/flights/search');
+});
+
+
 // Export the router
 module.exports = router;

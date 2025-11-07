@@ -1,0 +1,41 @@
+<div class="container mt-5">
+  <h2>My Bookings</h2>
+
+  {{#if reservations.length}}
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Flight</th>
+          <th>Seat</th>
+          <th>Trip Type</th>
+          <th>Class</th>
+          <th>Passengers</th>
+          <th>Meal</th>
+          <th>Baggage</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each reservations}}
+        <tr>
+          <td>{{flight.flightNumber}}</td>
+          <td>{{seatNumber}}</td>
+          <td>{{tripType}}</td>
+          <td>{{travelClass}}</td>
+          <td>{{passengers}}</td>
+          <td>{{meal}}</td>
+          <td>{{baggageAllowance}} kg</td>
+          <td>{{status}}</td>
+          <td>
+            <a href="/reservations/{{_id}}" class="btn btn-sm btn-outline-primary">Details</a>
+            <a href="/reservations/delete/{{_id}}" class="btn btn-sm btn-outline-danger">Cancel</a>
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  {{else}}
+    <div class="alert alert-info mt-4">You have no bookings yet.</div>
+  {{/if}}
+</div>

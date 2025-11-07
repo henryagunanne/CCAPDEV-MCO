@@ -30,7 +30,6 @@
   <!-- Main Content -->
   <main class="container my-5 d-flex justify-content-center">
     <div class="card shadow-lg w-100" style="max-width: 900px;">
-
       <div class="card-header bg-danger text-white text-center">
         <h3>Book Your Flight – {{flight.flightNumber}}</h3>
         <p>{{flight.origin}} → {{flight.destination}}</p>
@@ -40,7 +39,11 @@
 
       <div class="card-body">
         <form id="reservationForm" action="/reservations/create" method="POST">
+          <!-- Hidden Fields -->
           <input type="hidden" name="flight" value="{{flight._id}}">
+          <input type="hidden" name="tripType" value="One-Way">
+          <input type="hidden" id="travelClass" name="travelClass" value="Economy">
+          <input type="hidden" id="seatNumber" name="seatNumber">
 
           <!-- Passenger Info -->
           <div class="row mb-3">
@@ -63,10 +66,11 @@
             <div class="col-md-6">
               <label for="meal" class="form-label">Meal Option</label>
               <select id="meal" name="meal" class="form-select">
-                <option value="standard">Standard - ₱0</option>
-                <option value="vegetarian">Vegetarian - ₱150</option>
-                <option value="kosher">Kosher - ₱150</option>
-                <option value="halal">Halal - ₱150</option>
+                <option value="None">None</option>
+                <option value="Vegetarian">Vegetarian</option>
+                <option value="Non-Vegetarian">Non-Vegetarian</option>
+                <option value="Vegan">Vegan</option>
+                <option value="Gluten-Free">Gluten-Free</option>
               </select>
             </div>
             <div class="col-md-6">
@@ -77,7 +81,6 @@
 
           <!-- Seat Selection -->
           <h5 class="text-center text-danger mt-4">Seat Selection</h5>
-          <input type="hidden" id="seatNumber" name="seatNumber">
           <div id="seat-map" class="my-3"></div>
 
           <!-- Legend -->
@@ -111,7 +114,6 @@
     </div>
   </main>
 
-  <!-- Footer -->
   <div id="footer"></div>
 </body>
 </html>

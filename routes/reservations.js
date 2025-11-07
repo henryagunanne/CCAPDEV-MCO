@@ -9,22 +9,45 @@ const router = express.Router();
 ============================= */
 router.post('/create', async (req, res) => {
   try {
-    const { userId, flight, seatNumber, tripType, travelClass, passengers, meal, baggageAllowance } = req.body;
-
-    const newReservation = new Reservation({
-      userId: userId || '672cxxxxxx', // temporary fallback ID if no login
+    const {
+      fullName,
+      email,
+      passport,
       flight,
       seatNumber,
       tripType,
       travelClass,
-      passengers,
       meal,
-      baggageAllowance,
+      baggageAllowance
+    } = req.body;
+
+console.log("🧾 Form data received:", req.body);
+
+
+    // Validate required fields
+    if (!fullName || !email || !passport || !seatNumber || !flight) {
+      console.error('❌ Missing required fields from form');
+      return res.status(400).send('Missing required fields.');
+    }
+
+    // Create reservation document
+    const newReservation = new Reservation({
+      userId: req.session?.user?._id || null, // optional guest
+      fullName,
+      email,
+      passport,
+      flight,
+      seatNumber,
+      tripType: tripType || 'One-Way',
+      travelClass: travelClass || 'Economy',
+      meal: meal || 'None',
+      baggageAllowance: baggageAllowance ? parseInt(baggageAllowance) : 0,
       status: 'Confirmed'
     });
 
     await newReservation.save();
-    console.log('✅ Reservation created!');
+    console.log(`✅ Reservation created for ${fullName} (${seatNumber})`);
+
     res.redirect('/reservations/myBookings');
   } catch (err) {
     console.error('Error creating reservation:', err);

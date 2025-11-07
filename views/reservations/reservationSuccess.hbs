@@ -1,0 +1,13 @@
+<div class="container text-center my-5">
+  <h2 class="text-success fw-bold">Booking Confirmed!</h2>
+  <p>Thank you, <strong>{{reservation.fullName}}</strong>.</p>
+  <p>Your flight to <strong>{{reservation.flight.destination}}</strong> is confirmed.</p>
+  <hr>
+  <p><strong>Seat:</strong> {{reservation.seatNumber}}</p>
+  <p><strong>Meal:</strong> {{reservation.meal}}</p>
+  <p><strong>Baggage:</strong> {{reservation.baggageAllowance}} kg</p>
+  <p><strong>Status:</strong> {{reservation.status}}</p>
+
+  <a href="/" class="btn btn-primary mt-3">Return to Home</a>
+  <a href="/reservations/my" class="btn btn-outline-secondary mt-3">View My Reservations</a>
+</div>

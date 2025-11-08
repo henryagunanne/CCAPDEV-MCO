@@ -4,7 +4,7 @@
     <h1 class="display-4 text-danger">Access Denied</h1>
     <p class="lead">You do not have permission to access this resource.</p>
     {{#if user}}
-      {{#if not user.isAdmin}}
+      {{#if (not user.isAdmin)}}
         <p class="">Administrator privileges are required to access this page.</p>
       {{/if}}
     {{else}}

@@ -80,7 +80,7 @@ router.get('/flights/:flightNumber', async (req, res) => {
     });
   } catch (error) {
     console.error('❌ Error retrieving flight:', error);
-    res.status(500).json({ message: 'Error retrieving flight', error });
+    res.status(500).json({ message: 'Error retrieving flight' });
   }
 });
 

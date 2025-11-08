@@ -38,7 +38,8 @@ jQuery (function() {
       },
       error: function(xhr) {
         $spinner.hide();
-        $results.html(`<p class="text-danger mt-3">Error fetching flight data.</p>`);
+        const errorMsg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'An error occurred while searching for the flight.';
+        $results.html(`<p class="text-danger mt-3">${errorMsg}</p>`);
       }
     });
   });

@@ -1,3 +1,4 @@
+/* Admin Dashboard */
 .fullHeight {
   min-height: 85vh;
 }
@@ -21,4 +22,88 @@
 }
 .btn-danger {
   border-radius: 10px;
+}
+
+/* Layout */
+body { margin: 0; font-family: "Inter", sans-serif; background-color: #f9f9fb; }
+.admin-wrapper { min-height: 100vh; overflow: hidden; }
+.admin-sidebar {
+  width: 230px;
+  background: #dc3545;
+  color: white;
+  min-height: 100vh;
+  position: fixed;
+  top: 0; left: 0;
+}
+.admin-main { margin-left: 230px; overflow-y: auto; }
+.nav-link {
+  color: rgba(255,255,255,0.85);
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 10px 15px;
+  transition: all 0.2s ease;
+}
+.nav-link:hover, .nav-link.active {
+  background-color: rgba(255,255,255,0.2);
+  color: #fff;
+  text-decoration: none;
+}
+@media (max-width: 768px) {
+  .admin-sidebar { position: static; width: 100%; height: auto; }
+  .admin-main { margin-left: 0; }
+}
+
+/* flight list */
+.container-fluid { 
+  max-width: 95%; 
+  margin: auto; 
+}
+.table th, .table td { 
+  vertical-align: middle; 
+}
+.table-hover tbody tr:hover { 
+  background-color: #fff5f5; 
+  transition: background-color 0.2s ease; 
+}
+.table th { 
+  cursor: pointer; 
+  user-select: none; 
+}
+.table th:hover { 
+  background-color: 
+  #ffe6e6; 
+}
+.badge { 
+  font-size: 0.85rem; 
+  padding: 6px 10px; 
+  border-radius: 8px; 
+}
+.input-group .form-control:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.15rem rgba(220,53,69,.25);
+}
+.btn-outline-primary:hover { 
+  background-color:#0d6efd; 
+  color:white; 
+}
+.btn-outline-danger:hover { 
+  background-color:#dc3545; 
+  color:white; 
+}
+
+
+/* create flight */
+.card {
+  border-radius: 12px;
+  border: none;
+}
+input:invalid, select:invalid {
+  border-color: #dc3545 !important;
+}
+input:focus, select:focus {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 0.15rem rgba(220,53,69,.25);
+}
+.btn-danger:disabled {
+  opacity: 0.7;
 }

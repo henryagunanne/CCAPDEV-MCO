@@ -1,3 +1,5 @@
+const e = require("express");
+
 jQuery(function() {
     'use strict';
 
@@ -77,6 +79,14 @@ jQuery(function() {
                     $('#loginModal').modal('hide');
                     alert("Login successful!");
                     location.reload();
+
+                    // Optionally redirect based on role
+                    /* if (res.isAdmin) {
+                        window.location.href = "/admin";
+                    } else {
+                        location.reload();
+                    }
+                    */
                 } else {
                     $('#loginError').text(res.message).show();
                 }

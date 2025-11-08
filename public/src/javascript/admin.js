@@ -1,29 +1,27 @@
 
 jQuery (function() {
 
-<<<<<<< HEAD
-=======
   // Flight search form submission handling
   $('#searchFlightForm').on('submit', function (e) {
     e.preventDefault();
-    const query = $('#searchFlightInput').value.trim();
+    const query = $('#searchFlightInput').val().trim();
 
     if (!query) return;
   
-    const spinner = $('#loadingSpinner');
-    const results = $('#flightResults'); 
+    const $spinner = $('#loadingSpinner');
+    const $results = $('#flightResults'); 
 
-    results.empty();
-    spinner.show();
+    $results.empty();
+    $spinner.show();
 
     $.ajax ({
       url: `/admin/flights/${query}`,
       method: 'GET',
       dataType: 'json',
-      success: function(data, xhr) {
-        spinner.hide();
-        if (xhr.status === 200) {
-          results.html(`
+      success: function(data) {
+        $spinner.hide();
+        if (data.success) {
+          $results.html(`
           <div class="card mx-auto mt-4 shadow-sm" style="max-width: 600px; border-radius:12px;">
             <div class="card-body text-start">
               <h5 class="card-title">Flight ${data.flightNumber}</h5>
@@ -34,18 +32,123 @@ jQuery (function() {
           </div>
         `);
         }else {
-          results.html(`<p class="text-danger mt-3">${data.message}</p>`);
+          $results.html(`<p class="text-danger mt-3">${data.message}</p>`);
         }
 
       },
       error: function(xhr) {
-        spinner.hide();
-        const message = xhr.responseJSON?.message || 'Error fetching flight data.';
-        results.html(`<p class="text-danger mt-3">${message}</p>`);
+        $spinner.hide();
+        const errorMsg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'An error occurred while searching for the flight.';
+        $results.html(`<p class="text-danger mt-3">${errorMsg}</p>`);
       }
     });
   });
 
-  //
->>>>>>> 9a7c67e7b748f1d2558c344f7d06d340a3e63f1b
+  // FLIGHT LIST PAGE JS
+  /* ======== Toast helper (jQuery) ======== */
+  function showToast(message, success = true) {
+    const $toast = $('#toast');
+    $toast
+      .removeClass('bg-success bg-danger')
+      .addClass(success ? 'bg-success' : 'bg-danger');
+
+    $('#toastBody').text(message);
+    new bootstrap.Toast($toast[0]).show();
+  }
+
+  /* ======== Delete flight ======== */
+  function deleteFlight(id) {
+    if (!confirm('Are you sure you want to delete this flight?')) return;
+
+    $.ajax({
+      url: `/admin/delete/${id}`,
+      type: 'DELETE',
+      dataType: 'json',
+      success: function (data) {
+        $(`#flight-${id}`).remove();
+        showToast(data.message || 'Flight deleted successfully', true);
+      },
+      error: function (xhr) {
+        let msg = 'Failed to delete flight';
+        if (xhr.responseJSON && xhr.responseJSON.message) {
+          msg = xhr.responseJSON.message;
+        }
+        showToast(msg, false);
+      }
+    });
+  }
+
+  /* ======== Search filter ======== */
+  $('#flightFilter').on('keyup', function () {
+    const query = $(this).val().toLowerCase();
+    $('#flightTable tr').each(function () {
+      const text = $(this).text().toLowerCase();
+      $(this).toggle(text.includes(query));
+    });
+  });
+
+  /* ======== Column sort ======== */
+  $('th').on('click', function () {
+    const index = $(this).index();
+    const rows = $('#flightTable tr').get();
+
+    rows.sort(function (a, b) {
+      const aText = $(a).children().eq(index).text().toLowerCase();
+      const bText = $(b).children().eq(index).text().toLowerCase();
+      return aText.localeCompare(bText, undefined, { numeric: true });
+    });
+
+    $('#flightTable').append(rows);
+  });
+
+  // create.hbs JS
+  /* Handle flight creation */
+  $('#createFlightForm').on('submit', async function(e) {
+    e.preventDefault();
+    const $form = $(this);
+    $form.addClass('was-validated');
+    
+    if (!$form[0].checkValidity()) return;
+
+    const formData = $form.serializeArray().reduce((obj, item) => {
+      obj[item.name] = item.value;
+      return obj;
+    }, {});
+    
+    $.ajax({
+      url: '/admin/create',
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(formData),
+      success: function(res) {
+        showToast(res.message || 'Flight created successfully!', true);
+        $form[0].reset();
+        $form.removeClass('was-validated');
+        setTimeout(() => window.location.href = '/admin/flights', 1500);
+      },
+      error: function(xhr) {
+        let msg = 'Error connecting to server.';
+        if (xhr.responseJSON && xhr.responseJSON.message) {
+          msg = xhr.responseJSON.message;
+        }
+        showToast(msg, false);
+      }
+    });
+  });
+
+  // handle logout
+  $('.logoutButton').on('click', function() {
+    $.ajax({
+      url: '/users/logout',
+      type: 'POST',
+      success: function() {
+        alert("Logged out successfully.");
+        window.location.href = "/"; // Redirect to homepage
+      },
+      error: function(xhr) {
+        // Handle errors
+        alert("Error logging out: " + xhr.responseText);
+      }
+    });
+  });
 });

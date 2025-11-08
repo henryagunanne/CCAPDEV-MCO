@@ -5,10 +5,20 @@ const Flight = require('../models/Flight');
 const User = require('../models/User');
 const router = express.Router();
 
+// Helper middleware to check if user is authenticated
+function isAuthenticated(req, res, next) {
+  if (req.session.user) {
+    return next();
+  }else{
+    res.redirect('/users/login');
+  }
+  //res.status(401).send('Unauthorized: Please log in to access this resource');  
+}
+
 /* =============================
    BOOK PAGE - Show booking form
 ============================= */
-router.get('/book/:flightId', async (req, res) => {
+router.get('/book/:flightId', isAuthenticated, async (req, res) => {
   const flightId = req.params.flightId;
 
   try {
@@ -31,7 +41,7 @@ router.get('/book/:flightId', async (req, res) => {
 /* =============================
    CREATE - Make a new booking
 ============================= */
-router.post('/create', async (req, res) => {
+router.post('/create', isAuthenticated, async (req, res) => {
   try {
     const {
       fullName,
@@ -93,7 +103,7 @@ router.post('/create', async (req, res) => {
 /* =============================
    READ - Show all reservations
 ============================= */
-router.get('/myBookings', async (req, res) => {
+router.get('/myBookings', isAuthenticated, async (req, res) => {
   try {
     const reservations = await Reservation.find()
       .populate('flight')
@@ -108,7 +118,7 @@ router.get('/myBookings', async (req, res) => {
 /* =============================
    READ - View single reservation
 ============================= */
-router.get('/:id', async (req, res) => {
+router.get('/:id', isAuthenticated, async (req, res) => {
   try {
     const reservation = await Reservation.findById(req.params.id).populate('flight').lean();
     if (!reservation) return res.status(404).send('Reservation not found');
@@ -121,7 +131,7 @@ router.get('/:id', async (req, res) => {
 /* =============================
    DELETE - Cancel reservation
 ============================= */
-router.post('/delete/:id', async (req, res) => {
+router.post('/delete/:id', isAuthenticated, async (req, res) => {
   try {
     await Reservation.findByIdAndDelete(req.params.id);
     console.log('❌ Reservation cancelled');

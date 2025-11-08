@@ -8,8 +8,10 @@ const router = express.Router();
 function isAuthenticated(req, res, next) {
     if (req.session.user) {
       return next();
+    }else {
+      res.redirect('/users/login');
     }
-    res.status(401).send('Unauthorized: Please log in to access this resource');  
+    //res.status(401).send('Unauthorized: Please log in to access this resource');  
 }
 
 // POST /users/register - Handle user registration

@@ -1,52 +1,36 @@
-let flights = [
-  { number: "PR1001", origin: "Manila", destination: "Cebu", date: "2025-10-15" },
-  { number: "PR2002", origin: "Manila", destination: "Hong Kong", date: "2025-10-18" }
-];
+jQuery(function (){
+  $('#searchFlightForm').on('submit', function (e) {
+    e.preventDefault();
 
-function renderFlights() {
-  const tbody = $("#flightTableBody");
-  tbody.empty();
-
-  if (flights.length === 0) {
-    tbody.append('<tr><td colspan="4" class="text-center text-muted">No flights available.</td></tr>');
-    return;
-  }
-
-  flights.forEach(f => {
-    tbody.append(`
-      <tr>
-        <td>${f.number}</td>
-        <td>${f.origin}</td>
-        <td>${f.destination}</td>
-        <td>${f.date}</td>
-      </tr>
-    `);
+    const query = document.getElementById('searchFlightInput').value.trim();
+    if (!query) return;
+  
+    const spinner = document.getElementById('loadingSpinner');
+    spinner.style.display = 'block';
+    const results = document.getElementById('flightResults');
+  
+    try {
+      const res = await fetch(`/admin/flights/${query}`);
+      const data = await res.json();
+      spinner.style.display = 'none';
+  
+      if (res.ok) {
+        results.innerHTML = `
+          <div class="card mx-auto mt-4 shadow-sm" style="max-width: 600px; border-radius:12px;">
+            <div class="card-body text-start">
+              <h5 class="card-title">Flight ${data.flightNumber}</h5>
+              <p><strong>From:</strong> ${data.origin} → <strong>To:</strong> ${data.destination}</p>
+              <p><strong>Date:</strong> ${new Date(data.date).toLocaleDateString()}</p>
+              <p><strong>Price:</strong> ₱${data.price}</p>
+            </div>
+          </div>
+        `;
+      } else {
+        results.innerHTML = `<p class="text-danger mt-3">${data.message}</p>`;
+      }
+    } catch (err) {
+      spinner.style.display = 'none';
+      results.innerHTML = `<p class="text-danger mt-3">Error fetching flight data.</p>`;
+    }
   });
-}
-
-$("#saveFlightBtn").on("click", function () {
-  const number = $("#flightNumber").val().trim();
-  const origin = $("#origin").val().trim();
-  const destination = $("#destination").val().trim();
-  const date = $("#flightDate").val();
-
-  if (!number || !origin || !destination || !date) {
-    alert("Please fill in all fields.");
-    return;
-  }
-
-  flights.push({ number, origin, destination, date });
-  renderFlights();
-
-  $("#addFlightForm")[0].reset();
-  const modal = bootstrap.Modal.getInstance(document.getElementById("addFlightModal"));
-  modal.hide();
-
-  alert("Flight added successfully (in memory only).");
 });
-
-$("#manageUsersBtn").on("click", function () {
-  alert("Manage Users feature coming soon.");
-});
-
-$(document).ready(renderFlights);

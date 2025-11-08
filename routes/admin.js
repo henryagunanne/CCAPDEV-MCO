@@ -49,7 +49,7 @@ router.get('/flights', async (req, res) => {
       return res.status(200).json(flights);
     }
 
-    res.render('flights/list', {
+    res.render('admin/list', {
       layout: 'admin',
       title: 'All Flights',
       flights

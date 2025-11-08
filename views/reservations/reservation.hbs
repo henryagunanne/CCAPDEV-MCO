@@ -15,72 +15,48 @@
         <input type="hidden" id="travelClass" name="travelClass" value="Economy">
         <input type="hidden" id="seatNumber" name="seatNumber">
 
-        <!-- Passenger Info -->
-        <div class="row mb-3">
-          <div class="col-md-4">
-            <label for="name" class="form-label">Full Name</label>
-            <input type="text" id="name" name="fullName" class="form-control" placeholder="Enter full name" required>
-          </div>
-          <div class="col-md-4">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" id="email" name="email" class="form-control" placeholder="example@email.com" required>
-          </div>
-          <div class="col-md-4">
-            <label for="passport" class="form-label">Passport Number</label>
-            <input type="text" id="passport" name="passport" class="form-control" placeholder="e.g. P1234567" required>
-          </div>
-        </div>
+<!-- Passenger Count -->
+<div class="row mb-3">
+  <div class="col-md-4">
+    <label for="passengerCount" class="form-label">Number of Passengers</label>
+    <input type="number" id="passengerCount" name="passengerCount" class="form-control" min="1" max="10" value="1" required>
+  </div>
+</div>
 
-        <!-- Add-ons -->
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label for="meal" class="form-label">Meal Option</label>
-            <select id="meal" name="meal" class="form-select">
-              <option value="None">None</option>
-              <option value="Vegetarian">Vegetarian</option>
-              <option value="Non-Vegetarian">Non-Vegetarian</option>
-              <option value="Vegan">Vegan</option>
-              <option value="Gluten-Free">Gluten-Free</option>
-            </select>
-          </div>
-          <div class="col-md-6">
-            <label for="baggage" class="form-label">Extra Baggage (₱50/kg)</label>
-            <input type="number" id="baggage" name="baggageAllowance" class="form-control" min="0" value="0">
-          </div>
-        </div>
+<!-- Dynamic Passenger Cards -->
+<div id="passengerFields"></div>
 
-        <!-- Seat Selection -->
-        <h5 class="text-center text-danger mt-4">Seat Selection</h5>
-        <div id="seat-map" class="my-3"></div>
+<!-- Seat Selection -->
+<h5 class="text-center text-danger mt-4">Seat Selection</h5>
+<div id="seat-map" class="my-3"></div>
 
-        <!-- Legend -->
-        <div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
-          <span class="badge bg-danger">First Class</span>
-          <span class="badge bg-light text-dark border border-purple">Business</span>
-          <span class="badge bg-primary">Economy</span>
-          <span class="badge bg-secondary">Occupied</span>
-          <span class="badge bg-warning text-dark">Selected</span>
-        </div>
+<!-- Legend -->
+<div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
+  <span class="badge bg-danger">First Class</span>
+  <span class="badge bg-light text-dark border border-purple">Business</span>
+  <span class="badge bg-primary">Economy</span>
+  <span class="badge bg-secondary">Occupied</span>
+  <span class="badge bg-warning text-dark">Selected</span>
+</div>
 
-        <!-- Price Summary -->
-        <div class="card bg-light p-3 mb-3">
-          <h5>Price Summary</h5>
-          <p>Base Fare: ₱<span id="baseFare">{{flight.price}}</span></p>
-          <p>Meal Fee: ₱<span id="mealFee">0</span></p>
-          <p>Baggage Fee: ₱<span id="baggageFee">0</span></p>
-          <p>Seat Total: ₱<span id="seatFee">0</span></p>
-          <hr>
-          <h5>Total: ₱<span id="totalPrice">{{flight.price}}</span></h5>
-        </div>
+<!-- Price Summary -->
+<div class="card bg-light p-3 mb-3">
+  <h5 class="text-danger">Price Summary</h5>
+  <p>Base Fare: ₱<span id="baseFare">{{flight.price}}</span></p>
+  <p>Meal Total: ₱<span id="mealFee">0</span></p>
+  <p>Baggage Total: ₱<span id="baggageFee">0</span></p>
+  <p>Seat Total: ₱<span id="seatFee">0</span></p>
+  <hr>
+  <h5>Total: ₱<span id="totalPrice">{{flight.price}}</span></h5>
+</div>
 
-        <div id="formMessage" class="text-danger mb-3"></div>
+<div id="formMessage" class="text-danger mb-3"></div>
 
-        <div class="d-flex justify-content-center gap-2">
-          <button type="submit" id="confirmBooking" class="btn btn-danger">Confirm Booking</button>
-          <button type="reset" class="btn btn-outline-secondary">Reset</button>
-        </div>
-      </form>
-    </div>
+<div class="d-flex justify-content-center gap-2">
+  <button type="submit" id="confirmBooking" class="btn btn-danger">Confirm Booking</button>
+  <button type="reset" class="btn btn-outline-secondary">Reset</button>
+</div>
+
   </div>
 </div>
 

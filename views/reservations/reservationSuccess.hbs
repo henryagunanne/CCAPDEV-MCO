@@ -1,6 +1,13 @@
 <div class="container text-center my-5">
   <h2 class="text-success fw-bold mb-4">Booking Confirmed!</h2>
-  <p>Thank you, <strong>{{reservation.fullName}}</strong>.</p>
+  <p>Thank you for booking! Here are the passengers:</p>
+<ul class="list-group">
+  {{#each reservation.passengers}}
+  <li class="list-group-item">
+    <strong>{{this.fullName}}</strong> — {{this.email}} ({{this.passport}})
+  </li>
+  {{/each}}
+</ul>
   <p>Your flight from <strong>{{reservation.flight.origin}}</strong> 
      to <strong>{{reservation.flight.destination}}</strong> is confirmed.</p>
 

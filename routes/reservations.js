@@ -39,61 +39,44 @@ router.get('/book/:flightId', isAuthenticated, async (req, res) => {
   }
 });
 
-/* =============================
-   CREATE - Make a new booking
-============================= */
 router.post('/create', isAuthenticated, async (req, res) => {
   try {
-    const {
-      fullName,
-      email,
-      passport,
-      flight,
-      seatNumber,
-      tripType,
-      travelClass,
-      meal,
-      baggageAllowance
-    } = req.body;
+    const { flight, tripType, travelClass, passengers } = req.body;
 
-    console.log("🧾 Form data received:", req.body);
-
-
-    // Validate required fields
-    if (!fullName || !email || !passport || !seatNumber || !flight) {
-      console.error('❌ Missing required fields from form');
-      return res.status(400).send('Missing required fields.');
+    if (!passengers || !Array.isArray(passengers) || passengers.length === 0) {
+      return res.status(400).send('Missing passenger information.');
     }
 
-    // Create reservation document
-    const newReservation = new Reservation({
-      userId: req.session?.user?._id || null, // optional guest
-      fullName,
-      email,
-      passport,
-      flight,
-      seatNumber,
-      tripType: tripType || 'One-Way',
-      travelClass: travelClass || 'Economy',
-      meal: meal || 'None',
-      baggageAllowance: baggageAllowance ? parseInt(baggageAllowance) : 0,
-      status: 'Confirmed'
-    });
+    // Get logged in user
+    const userId = req.session?.user?._id || null;
 
-    await newReservation.save();
-    console.log(`✅ Reservation created for ${fullName} (${seatNumber})`);
+    // Save one reservation per passenger
+    const createdReservations = [];
+    for (const p of passengers) {
+      const newReservation = new Reservation({
+        userId,
+        flight,
+        tripType: tripType || 'One-Way',
+        travelClass: travelClass || 'Economy',
+        fullName: p.fullName,
+        email: p.email,
+        passport: p.passport,
+        seatNumber: p.seatNumber,
+        meal: p.meal,
+        baggageAllowance: p.baggageAllowance || 0,
+        status: 'Confirmed',
+      });
 
-    // Fetch the saved reservation again, now with full flight details
-    const populatedReservation = await Reservation.findById(newReservation._id)
-      .populate('flight')
-      .lean();
+      await newReservation.save();
+      createdReservations.push(newReservation);
+    }
+
+    console.log(`✅ Created ${createdReservations.length} individual reservations.`);
 
     res.render('reservations/reservationSuccess', {
       title: 'Booking Confirmed',
-      reservation: populatedReservation
+      reservations: createdReservations.map(r => r.toObject()),
     });
-
-
 
   } catch (err) {
     console.error('Error creating reservation:', err);
@@ -101,20 +84,7 @@ router.post('/create', isAuthenticated, async (req, res) => {
   }
 });
 
-/* =============================
-   READ - Show all reservations
-============================= */
-router.get('/myBookings', isAuthenticated, async (req, res) => {
-  try {
-    const reservations = await Reservation.find()
-      .populate('flight')
-      .lean();
-    res.render('reservations/myBookings', { title: 'My Bookings', reservations });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error loading bookings');
-  }
-});
+
 
 /* =============================
    READ - View single reservation

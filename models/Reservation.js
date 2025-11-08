@@ -1,8 +1,7 @@
-// models/Reservation.js
 const mongoose = require('mongoose');
 
 const reservationSchema = new mongoose.Schema({
-  // optional: sino yung naka-login
+  // linked user (optional)
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -16,7 +15,7 @@ const reservationSchema = new mongoose.Schema({
     required: true
   },
 
-  // basic booking details
+  // trip details
   tripType: {
     type: String,
     enum: ['One-Way', 'Round-Trip'],
@@ -28,40 +27,34 @@ const reservationSchema = new mongoose.Schema({
     default: 'Economy'
   },
 
-  // passenger info (ONE passenger per reservation)
-  fullName: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  email: {
-    type: String,
-    required: true,
-    lowercase: true,
-    trim: true
-  },
-  passport: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  seatNumber: {
-    type: String,
-    required: true
+  // ✅ updated passenger array (multi-passenger ready)
+  passengers: [
+    {
+      fullName: { type: String, required: true, trim: true },
+      email: { type: String, required: true, lowercase: true, trim: true },
+      passport: { type: String, required: true, trim: true },
+      seatNumber: { type: String },
+      meal: {
+        type: String,
+        enum: ['None', 'Vegetarian', 'Non-Vegetarian', 'Vegan', 'Gluten-Free'],
+        default: 'None'
+      },
+      baggageAllowance: { type: Number, default: 0 }
+    }
+  ],
+
+  // ✅ optional — to quickly display seat numbers in My Reservation page
+  seatNumbers: {
+    type: [String],
+    default: []
   },
 
-  // add–ons
-  meal: {
-    type: String,
-    enum: ['None', 'Vegetarian', 'Non-Vegetarian', 'Vegan', 'Gluten-Free'],
-    default: 'None'
-  },
-  baggageAllowance: {
+  // ✅ store computed total cost
+  totalAmount: {
     type: Number,
-    default: 0 // in kg
+    default: 0
   },
 
-  // system fields
   bookingDate: {
     type: Date,
     default: Date.now

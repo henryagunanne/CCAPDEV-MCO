@@ -1,17 +1,68 @@
 $(document).ready(function () {
-
-  // Base pricing
-  const baseFare = 1500;
+  const baseFare = parseInt($("#baseFare").text());
   const mealPrice = 150;
   const bagPrice = 50;
-
-  // Seat pricing and classes
   const seatPricing = { first: 5000, business: 3000, economy: 1500 };
   const seatClasses = { 1: "first", 2: "first", 3: "business", 4: "business" };
+  
+  let passengers = [];
+  let selectedSeats = [];
 
-  let selected = [];
+  // -------- Passenger Generator --------
+  $("#passengerCount").on("input", function () {
+    const count = parseInt($(this).val());
+    const container = $("#passengerFields");
+    container.empty();
+    passengers = [];
 
-  // -------- Generate Seat Map --------
+    for (let i = 1; i <= count; i++) {
+      passengers.push({ seat: null, meal: "None", baggage: 0 });
+
+      container.append(`
+        <div class="card my-3 shadow-sm">
+          <div class="card-header bg-light"><strong>Passenger ${i}</strong></div>
+          <div class="card-body">
+            <div class="row mb-2">
+              <div class="col-md-4">
+                <label class="form-label">Full Name</label>
+                <input type="text" name="passengers[${i - 1}][fullName]" class="form-control" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Email</label>
+                <input type="email" name="passengers[${i - 1}][email]" class="form-control" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Passport Number</label>
+                <input type="text" name="passengers[${i - 1}][passport]" class="form-control" required>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <label class="form-label">Meal Option</label>
+                <select name="passengers[${i - 1}][meal]" class="form-select meal-option" data-index="${i - 1}">
+                  <option value="None">None</option>
+                  <option value="Vegetarian">Vegetarian</option>
+                  <option value="Non-Vegetarian">Non-Vegetarian</option>
+                  <option value="Vegan">Vegan</option>
+                  <option value="Gluten-Free">Gluten-Free</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Baggage (kg)</label>
+                <input type="number" class="form-control baggage-input" data-index="${i - 1}" min="0" value="0" name="passengers[${i - 1}][baggageAllowance]">
+              </div>
+            </div>
+            <div class="mt-2 text-muted small seat-info">Seat: None</div>
+          </div>
+        </div>
+      `);
+    }
+
+    updateSummary();
+  }).trigger("input");
+
+  // -------- Seat Map Generation --------
   for (let row = 1; row <= 10; row++) {
     ["A", "B", "C", "D", "E", "F"].forEach(function (col) {
       const seatClass = seatClasses[row] || "economy";
@@ -30,114 +81,43 @@ $(document).ready(function () {
     });
   }
 
-// -------- Seat Selection (Toggle + Hidden Input Update) --------
-$(document).on("click", ".seat", function () {
-  if ($(this).hasClass("occupied")) return; // disable occupied seats
+  // -------- Seat Selection (1 per Passenger) --------
+  $(document).on("click", ".seat.available", function () {
+    const seatId = $(this).data("id");
+    const seatPrice = parseInt($(this).data("price"));
+    const seatClass = $(this).data("class");
 
-  const seatId = $(this).data("id");
-  const seatPrice = parseInt($(this).data("price"));
-  const seatClass = $(this).data("class");
+    const nextPassenger = passengers.findIndex(p => p.seat === null);
+    if (nextPassenger === -1) {
+      alert("All passengers already have seats!");
+      return;
+    }
 
-  // Deselect any previously selected seat
-  $(".seat.selected").removeClass("selected").addClass("available");
-  selected = [];
+    $(this).removeClass("available").addClass("selected");
+    passengers[nextPassenger].seat = { id: seatId, price: seatPrice, class: seatClass };
+    $(`#passengerFields .card:eq(${nextPassenger}) .seat-info`).text(`Seat: ${seatId}`);
 
-  // Select this seat
-  $(this).addClass("selected").removeClass("available");
-  selected.push({ id: seatId, price: seatPrice, seatClass });
+    updateSummary();
+  });
 
-  // ✅ Update hidden form fields
-  $("#seatNumber").val(seatId);
-  $("#travelClass").val(seatClass.charAt(0).toUpperCase() + seatClass.slice(1));
+  // -------- Meal/Baggage Change --------
+  $(document).on("change input", ".meal-option, .baggage-input", function () {
+    const index = $(this).data("index");
+    if ($(this).hasClass("meal-option")) passengers[index].meal = $(this).val();
+    else passengers[index].baggage = parseInt($(this).val()) || 0;
+    updateSummary();
+  });
 
-  console.log("✅ Seat selected:", seatId, "| Class:", seatClass);
-
-  updateSummary();
-});
-
-
-  // -------- Update Summary --------
+  // -------- Price Summary --------
   function updateSummary() {
-    const mealFee = ($("#meal").val() !== "standard") ? mealPrice : 0;
-    const bagFee = ($("#baggage").val() * bagPrice);
-    const seatFee = selected.reduce((sum, s) => sum + s.price, 0);
-    const total = baseFare + seatFee + mealFee + bagFee;
+    const mealFee = passengers.reduce((sum, p) => sum + (p.meal !== "None" ? mealPrice : 0), 0);
+    const bagFee = passengers.reduce((sum, p) => sum + (p.baggage * bagPrice || 0), 0);
+    const seatFee = passengers.reduce((sum, p) => sum + (p.seat ? p.seat.price : 0), 0);
+    const total = (baseFare * passengers.length) + mealFee + bagFee + seatFee;
 
     $("#mealFee").text(mealFee);
     $("#baggageFee").text(bagFee);
     $("#seatFee").text(seatFee);
     $("#totalPrice").text(total);
   }
-
-  // -------- Event Listeners --------
-  $("#meal, #baggage").on("change input", updateSummary);
-
-  // -------- Input Validation --------
-function validateInputs() {
-  const name = $("#name").val().trim();
-  const email = $("#email").val().trim();
-  const passport = $("#passport").val().trim();
-
-  const namePattern = /^[A-Za-z\s]{2,}$/;
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const passportPattern = /^[A-Za-z0-9]{6,9}$/;
-
-  let valid = true;
-
-  // Name
-  if (!namePattern.test(name)) {
-    $("#name").addClass("is-invalid").removeClass("is-valid");
-    valid = false;
-  } else {
-    $("#name").addClass("is-valid").removeClass("is-invalid");
-  }
-
-  // Email
-  if (!emailPattern.test(email)) {
-    $("#email").addClass("is-invalid").removeClass("is-valid");
-    valid = false;
-  } else {
-    $("#email").addClass("is-valid").removeClass("is-invalid");
-  }
-
-  // Passport
-  if (!passportPattern.test(passport)) {
-    $("#passport").addClass("is-invalid").removeClass("is-valid");
-    valid = false;
-  } else {
-    $("#passport").addClass("is-valid").removeClass("is-invalid");
-  }
-
-  return valid;
-}
-
-
-  // -------- Booking Confirmation --------
-  $("#confirmBooking").on("click", function () {
-    const isValid = validateInputs();
-
-    if (!isValid) return;
-
-    if (selected.length === 0) {
-      $("#formMessage").removeClass("text-success").addClass("text-danger").text("Please select at least one seat.");
-      return;
-    }
-
-    const total = $("#totalPrice").text();
-    const name = $("#name").val().trim();
-
-    $("#formMessage")
-      .removeClass("text-danger")
-      .addClass("text-success")
-      .html(`Booking confirmed for <strong>${name}</strong>! Total Price: ₱${total}`);
-
-    // Mark selected seats as occupied
-    selected.forEach(s => {
-      $(`.seat[data-id='${s.id}']`).removeClass("selected available").addClass("occupied").off("click");
-    });
-
-    selected = [];
-    updateSummary();
-  });
-
 });

@@ -61,21 +61,24 @@ router.get('/flights', async (req, res) => {
 });
 
 /* ===========================
-   🔍 GET Flight by ID
+   🔍 GET Flight by Flight Number
 =========================== */
-router.get('/flights/:id', async (req, res) => {
+router.get('/flights/:flightNumber', async (req, res) => {
+  const flightNumber = req.params.flightNumber;
   try {
-    const flight = await Flight.findById(req.params.id).lean();
+    const flight = await Flight.findOne({flightNumber: flightNumber}).lean();
     if (!flight) return res.status(404).json({ message: 'Flight not found.' });
 
     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
       return res.status(200).json(flight);
     }
 
-    res.render('flights/detail', {
-      layout: 'admin',
-      title: 'Flight Details',
-      flight
+    res.json({
+      flightNumber: flight.flightNumber,
+      origin: flight.origin,
+      destination: flight.destination,
+      date: flight.departureDate,
+      price: flight.price
     });
   } catch (error) {
     console.error('❌ Error retrieving flight:', error);

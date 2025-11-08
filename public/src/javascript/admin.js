@@ -1,4 +1,51 @@
 
 jQuery (function() {
 
+<<<<<<< HEAD
+=======
+  // Flight search form submission handling
+  $('#searchFlightForm').on('submit', function (e) {
+    e.preventDefault();
+    const query = $('#searchFlightInput').value.trim();
+
+    if (!query) return;
+  
+    const spinner = $('#loadingSpinner');
+    const results = $('#flightResults'); 
+
+    results.empty();
+    spinner.show();
+
+    $.ajax ({
+      url: `/admin/flights/${query}`,
+      method: 'GET',
+      dataType: 'json',
+      success: function(data, xhr) {
+        spinner.hide();
+        if (xhr.status === 200) {
+          results.html(`
+          <div class="card mx-auto mt-4 shadow-sm" style="max-width: 600px; border-radius:12px;">
+            <div class="card-body text-start">
+              <h5 class="card-title">Flight ${data.flightNumber}</h5>
+              <p><strong>From:</strong> ${data.origin} → <strong>To:</strong> ${data.destination}</p>
+              <p><strong>Date:</strong> ${new Date(data.date).toLocaleDateString()}</p>
+              <p><strong>Price:</strong> ₱${data.price}</p>
+            </div>
+          </div>
+        `);
+        }else {
+          results.html(`<p class="text-danger mt-3">${data.message}</p>`);
+        }
+
+      },
+      error: function(xhr) {
+        spinner.hide();
+        const message = xhr.responseJSON?.message || 'Error fetching flight data.';
+        results.html(`<p class="text-danger mt-3">${message}</p>`);
+      }
+    });
+  });
+
+  //
+>>>>>>> 9a7c67e7b748f1d2558c344f7d06d340a3e63f1b
 });

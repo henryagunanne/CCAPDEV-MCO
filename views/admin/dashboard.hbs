@@ -1,24 +1,135 @@
-<div class="container my-5 fullHeight">
-    <h1 class="text-center">Admin Dashboard</h1>
-    <br><br>
-    <div class="dashboard-overview text-center">
-        <p>Welcome, {{admin.firstName}} {{admin.lastName}}!</p>
-        <p>Here you can manage users, view reports, and configure system settings.</p>
+<div class="container my-5 fullHeight d-flex flex-column align-items-center justify-content-start">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center w-100 mb-3">
+    <h1 class="text-center flex-grow-1 fw-bold text-danger">Admin Dashboard</h1>
+    <a href="/logout" class="btn btn-outline-danger btn-sm shadow-sm">Logout</a>
+  </div>
+
+  <!-- Welcome Section -->
+  <div class="dashboard-overview text-center mb-4 w-100" style="max-width: 700px;">
+    <p class="fw-semibold fs-5">Welcome, {{admin.firstName}} {{admin.lastName}}!</p>
+    <p class="text-muted">Here you can manage users, view reports, and configure system settings.</p>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row text-center justify-content-center w-100" style="max-width:900px;margin:0 auto;">
+    <div class="col-md-4 mb-3">
+      <div class="card stat-card shadow-sm border-0">
+        <div class="card-body">
+          <h5 class="card-title">Total Flights</h5>
+          <h3 id="totalFlights">0</h3>
+        </div>
+      </div>
     </div>
-    <div class="dashboard-actions mt-4 text-center">
-        <form id="searchFlightForm">
-            <div class="input-group mt-3">
-                <input type="text" class="form-control" placeholder="Search Flights by Flight Number" aria-label="Search Flights" aria-describedby="searchFlightButton" id="searchFlightInput">
-                <button class="btn btn-danger" type="submit" id="searchFlightButton">Search</button>
-            </div>
-        </form>
-        <br>
-        <a class="btn btn-danger mx-2">View all Flights</a>
-        <a class="btn btn-danger mx-2">View all Reservationas</a>
-        <a class="btn btn-danger mx-2">Create Flight</a>
+    <div class="col-md-4 mb-3">
+      <div class="card stat-card shadow-sm border-0">
+        <div class="card-body">
+          <h5 class="card-title">Total Reservations</h5>
+          <h3 id="totalReservations">0</h3>
+        </div>
+      </div>
     </div>
-    <br>
-    <div id="flightResults" class="mt-4">
-        {{!-- Flight search results will be displayed here using AJAX --}}
+    <div class="col-md-4 mb-3">
+      <div class="card stat-card shadow-sm border-0">
+        <div class="card-body">
+          <h5 class="card-title">Active Users</h5>
+          <h3 id="totalUsers">0</h3>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <!-- Search Form + Action Buttons -->
+  <div class="dashboard-actions mt-4 text-center d-flex flex-column align-items-center w-100">
+    <form id="searchFlightForm" class="w-100 d-flex justify-content-center">
+      <div class="input-group mt-3 mx-auto" style="max-width: 500px; width:100%;">
+        <input type="text" class="form-control" placeholder="Search Flights by Flight Number"
+               aria-label="Search Flights" aria-describedby="searchFlightButton"
+               id="searchFlightInput">
+        <button class="btn btn-danger" type="submit" id="searchFlightButton">Search</button>
+      </div>
+    </form>
+    <div class="mt-4">
+      <a href="/admin/flights" class="btn btn-danger mx-2 shadow-sm">View all Flights</a>
+      <a href="/admin/reservations" class="btn btn-danger mx-2 shadow-sm">View all Reservations</a>
+      <a href="/admin/create" class="btn btn-danger mx-2 shadow-sm">Create Flight</a>
+    </div>
+  </div>
+
+  <!-- Search Results -->
+  <br>
+  <div id="flightResults" class="mt-4 text-center w-100" style="max-width:700px;">
+    <div id="loadingSpinner" class="text-center my-3" style="display:none;">
+      <div class="spinner-border text-danger" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    {{!-- Flight search results will be displayed here using AJAX --}}
+  </div>
 </div>
+
+<!-- Inline Styles -->
+<style>
+.fullHeight {
+  min-height: 85vh;
+}
+.dashboard-overview {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+.stat-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 16px;
+}
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(220, 53, 69, 0.2);
+}
+.card-title {
+  color: #dc3545;
+  font-weight: 600;
+}
+.btn-danger {
+  border-radius: 10px;
+}
+</style>
+
+<!-- AJAX Script for Search -->
+<script>
+document.getElementById('searchFlightForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const query = document.getElementById('searchFlightInput').value.trim();
+  if (!query) return;
+
+  const spinner = document.getElementById('loadingSpinner');
+  spinner.style.display = 'block';
+  const results = document.getElementById('flightResults');
+
+  try {
+    const res = await fetch(`/admin/flights/${query}`);
+    const data = await res.json();
+    spinner.style.display = 'none';
+
+    if (res.ok) {
+      results.innerHTML = `
+        <div class="card mx-auto mt-4 shadow-sm" style="max-width: 600px; border-radius:12px;">
+          <div class="card-body text-start">
+            <h5 class="card-title">Flight ${data.flightNumber}</h5>
+            <p><strong>From:</strong> ${data.origin} → <strong>To:</strong> ${data.destination}</p>
+            <p><strong>Date:</strong> ${new Date(data.date).toLocaleDateString()}</p>
+            <p><strong>Price:</strong> ₱${data.price}</p>
+          </div>
+        </div>
+      `;
+    } else {
+      results.innerHTML = `<p class="text-danger mt-3">${data.message}</p>`;
+    }
+  } catch (err) {
+    spinner.style.display = 'none';
+    results.innerHTML = `<p class="text-danger mt-3">Error fetching flight data.</p>`;
+  }
+});
+</script>

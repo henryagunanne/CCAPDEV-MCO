@@ -9,8 +9,10 @@ const router = express.Router();
    BOOK PAGE - Show booking form
 ============================= */
 router.get('/book/:flightId', async (req, res) => {
+  const flightId = req.params.flightId;
+
   try {
-    const flight = await Flight.findById(req.params.flightId).lean();
+    const flight = await Flight.findById(flightId).lean();
 
     if (!flight) {
       return res.status(404).send('Flight not found');
@@ -43,7 +45,7 @@ router.post('/create', async (req, res) => {
       baggageAllowance
     } = req.body;
 
-console.log("🧾 Form data received:", req.body);
+    console.log("🧾 Form data received:", req.body);
 
 
     // Validate required fields
@@ -67,18 +69,18 @@ console.log("🧾 Form data received:", req.body);
       status: 'Confirmed'
     });
 
-await newReservation.save();
-console.log(`✅ Reservation created for ${fullName} (${seatNumber})`);
+    await newReservation.save();
+    console.log(`✅ Reservation created for ${fullName} (${seatNumber})`);
 
-// Fetch the saved reservation again, now with full flight details
-const populatedReservation = await Reservation.findById(newReservation._id)
-  .populate('flight')
-  .lean();
+    // Fetch the saved reservation again, now with full flight details
+    const populatedReservation = await Reservation.findById(newReservation._id)
+      .populate('flight')
+      .lean();
 
-res.render('reservations/reservationSuccess', {
-  title: 'Booking Confirmed',
-  reservation: populatedReservation
-});
+    res.render('reservations/reservationSuccess', {
+      title: 'Booking Confirmed',
+      reservation: populatedReservation
+    });
 
 
 

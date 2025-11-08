@@ -236,7 +236,7 @@
                                         <p class="card-text mb-0">{{this.tripType}}/{{this.travelClass}}</p>
                                         <p class="card-text">Depart: {{this.flight.departureDate}}</p>
                                         <div class="mt-auto">
-                                            <a href="/reservations/book/{{this._id}}" class="btn btn-danger d-grid gap-2">Book Now</a>
+                                            <a href="/reservations/book/{{this.flight._id}}" class="btn btn-danger d-grid gap-2">Book Now</a>
                                         </div>
                                     </div>
                                 </div>
@@ -252,14 +252,14 @@
         {{/unless}}
         <!---------- Carousel Controls ---------->
         <div class="carousel-controls">
-        <button class="carousel-control-prev" type="button" data-bs-target="#popularDestCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true "></span>
-            <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#popularDestCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
-        </button>
+            <button class="carousel-control-prev" type="button" data-bs-target="#popularDestCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true "></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#popularDestCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
         </div>
     </div>
 

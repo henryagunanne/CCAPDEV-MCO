@@ -1,122 +1,154 @@
 // routes/admin.js
 const express = require('express');
-const Flight = require('../models/Flight');
 const router = express.Router();
+const Flight = require('../models/Flight');
 
-/* ===========================
-   ADMIN ROUTES FOR FLIGHTS
-=========================== */
-
-// Middleware to check if user is admin
+// ===========================
+// Middleware: Admin Auth
+// ===========================
 router.use((req, res, next) => {
     if (req.session.user && req.session.user.role === 'Admin') {
         next();
     } else {
-        res.status(403).render('error/access-denied', { 
-            title: 'Access Denied',
-            isAdmin: req.session.user?.role === 'Admin'
-        });  
+        res.status(403).json({ message: 'Access denied. Admins only.' });
     }
 });
 
-// GET / - Admin dashboard route
+// ===========================
+// Dashboard Route
+// ===========================
 router.get('/', (req, res) => {
-    res.render('admin/dashboard', { 
-        title: 'Admin Dashboard',
-        admin: req.session.user
-    });
+  res.render('admin/dashboard', {
+    layout: 'admin',
+    title: 'Admin Dashboard',
+    admin: req.session.user
+  });
 });
 
+// ===========================
+// Retrieve All Flights
+// ===========================
 // GET /admin/flights - Retrieve all flights
 router.get('/flights', async (req, res) => {
-    try {
-        const flights = await Flight.find().lean();
-        res.render('flights/list', { title: 'All Flights', flights });
-        res.status(200).json(flights);
-    } catch (error) {
-        res.status(500).json({ message: 'Error retrieving flights', error });
-    }
+  try {
+    const flights = await Flight.find().lean();
+    res.render('flights/list', {
+      layout: 'admin',
+      title: 'All Flights',
+      flights
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error retrieving flights', error });
+  }
 });
 
-// GET /admin/flights/:flightNumber - Retrieve a specific flight by flight number
+// ===========================
+// Retrieve Flight by Number
+// ===========================
 router.get('/flights/:flightNumber', async (req, res) => {
-    try {
-        const flight = await Flight.findOne({ flightNumber: req.params.flightNumber }).lean();
-        if (flight) {
-            res.render('flights/detail', { title: 'Flight Details', flight });
-            res.status(200).json(flight);
-        } else {
-            res.status(404).json({ message: 'find Flight not found' });
-        }
-    } catch (error) {
-        res.status(500).json({ message: 'Error retrieving flight', error });
+  try {
+    const flight = await Flight.findOne({ flightNumber: req.params.flightNumber }).lean();
+    if (!flight) {
+      return res.status(404).json({ message: 'Flight not found.' });
     }
+
+    // For AJAX (JSON)
+    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+      return res.status(200).json(flight);
+    }
+
+    // For template rendering
+    res.render('flights/detail', { layout: 'admin', title: 'Flight Details', flight });
+  } catch (error) {
+    console.error('Error retrieving flight:', error);
+    res.status(500).json({ message: 'Error retrieving flight', error });
+  }
 });
 
-// POST /admin/create - Create a new flight
+// ===========================
+// Create New Flight
+// ===========================
 router.post('/create', async (req, res) => {
-    try {
-        const newFlight = new Flight(req.body);
-        const savedFlight = await newFlight.save();
-        res.status(201).json(savedFlight);
-    } catch (error) {
-        res.status(400).json({ message: 'Error creating flight', error });
+  try {
+    const {
+      flightNumber,
+      origin,
+      destination,
+      departureDate,
+      departureTime,
+      arrivalTime,
+      aircraft,
+      seatCapacity,
+      price,
+      status
+    } = req.body;
+
+    // Basic validation
+    if (!flightNumber || !origin || !destination || !departureDate ||
+        !departureTime || !arrivalTime || !aircraft || !seatCapacity || !price) {
+      return res.status(400).json({ message: 'All required fields must be filled.' });
     }
+
+    const exists = await Flight.findOne({ flightNumber });
+    if (exists) {
+      return res.status(400).json({ message: 'Flight number already exists.' });
+    }
+
+    const newFlight = new Flight({
+      flightNumber,
+      origin,
+      destination,
+      departureDate,
+      departureTime,
+      arrivalTime,
+      aircraft,
+      seatCapacity,
+      price,
+      status: status || 'Scheduled'
+    });
+
+    const saved = await newFlight.save();
+    res.status(201).json({ message: 'Flight created successfully.', flight: saved });
+  } catch (error) {
+    console.error('Error creating flight:', error);
+    res.status(500).json({ message: 'Error creating flight.', error });
+  }
 });
 
-//  POST /admin/update - Update an existing flight
-router.post('/update', async (req, res) => {
-    try {
-        const updatedFlight = await Flight.findOneAndUpdate(
-            { flightNumber: req.body.flightNumber },
-            req.body,
-            { new: true }
-        ).lean();
+// ===========================
+// Update Existing Flight
+// ===========================
+router.put('/update/:id', async (req, res) => {
+  try {
+    const updatedFlight = await Flight.findByIdAndUpdate(req.params.id, req.body, { new: true }).lean();
 
-        if (updatedFlight) {
-            res.status(200).json(updatedFlight);
-        } else {
-            res.status(404).json({ message: 'Flight to Update not found' });
-        }
-    } catch (error) {
-        res.status(400).json({ message: 'Error updating flight', error });
+    if (!updatedFlight) {
+      return res.status(404).json({ message: 'Flight not found.' });
     }
+
+    res.status(200).json({ message: 'Flight updated successfully.', flight: updatedFlight });
+  } catch (error) {
+    console.error('Error updating flight:', error);
+    res.status(500).json({ message: 'Error updating flight.', error });
+  }
 });
 
-// POST /admin/update/:id - Update an existing flight by id
-router.post('/update/:id', async (req, res) => {
-    const flightId = req.params.id;
-    try {
-        const updatedFlight = await Flight.findByIdAndUpdate(
-            flightId,
-            req.body,
-            { new: true }
-        ).lean();
+// ===========================
+// Delete Flight
+// ===========================
+router.delete('/delete/:id', async (req, res) => {
+  try {
+    const deletedFlight = await Flight.findByIdAndDelete(req.params.id).lean();
 
-        if (updatedFlight) {
-            res.status(200).json(updatedFlight);
-        } else {
-            res.status(404).json({ message: 'Flight to Update not found' });
-        }
-    } catch (error) {
-        res.status(400).json({ message: 'Error updating flight', error });
+    if (!deletedFlight) {
+      return res.status(404).json({ message: 'Flight not found.' });
     }
+
+    res.status(200).json({ message: 'Flight deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting flight:', error);
+    res.status(500).json({ message: 'Error deleting flight.', error });
+  }
 });
 
-// POST /admin/delete - Delete a flight
-router.post('/delete', async (req, res) => {
-    try {
-        const deletedFlight = await Flight.findOneAndDelete({ flightNumber: req.body.flightNumber }).lean();
-
-        if (deletedFlight) {
-            res.status(200).json({ message: 'Flight deleted successfully' });
-        } else {
-            res.status(404).json({ message: 'Flight to Delete not found' });
-        }
-    } catch (error) {
-        res.status(400).json({ message: 'Error deleting flight', error });
-    }
-});
-
-// Export the router
 module.exports = router;

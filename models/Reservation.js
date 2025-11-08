@@ -18,7 +18,8 @@ const passengerSchema = new mongoose.Schema({
   passport: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
+    Unique: true
   },
   seatNumber: {
       type: String,

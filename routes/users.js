@@ -8,8 +8,11 @@ const router = express.Router();
 function isAuthenticated(req, res, next) {
     if (req.session.user) {
       return next();
-    }
-    res.status(401).send('Unauthorized: Please log in to access this resource');  
+    }else 
+    res.status(403).render('error/access-denied', { 
+      title: 'Access Denied',
+      isAdmin: req.session.user?.role === 'Admin'
+    });   
 }
 
 // POST /users/register - Handle user registration

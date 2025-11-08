@@ -30,25 +30,31 @@ $(document).ready(function () {
     });
   }
 
-  // -------- Seat Selection (Toggle) --------
-  $(document).on("click", ".seat", function () {
-    if ($(this).hasClass("occupied")) return; // disable occupied seats
+// -------- Seat Selection (Toggle + Hidden Input Update) --------
+$(document).on("click", ".seat", function () {
+  if ($(this).hasClass("occupied")) return; // disable occupied seats
 
-    const seatId = $(this).data("id");
-    const seatPrice = parseInt($(this).data("price"));
-    const seatClass = $(this).data("class");
+  const seatId = $(this).data("id");
+  const seatPrice = parseInt($(this).data("price"));
+  const seatClass = $(this).data("class");
 
-    // Toggle selection
-    if ($(this).hasClass("selected")) {
-      $(this).removeClass("selected").addClass("available");
-      selected = selected.filter(s => s.id !== seatId);
-    } else {
-      $(this).addClass("selected").removeClass("available");
-      selected.push({ id: seatId, price: seatPrice, seatClass });
-    }
+  // Deselect any previously selected seat
+  $(".seat.selected").removeClass("selected").addClass("available");
+  selected = [];
 
-    updateSummary();
-  });
+  // Select this seat
+  $(this).addClass("selected").removeClass("available");
+  selected.push({ id: seatId, price: seatPrice, seatClass });
+
+  // ✅ Update hidden form fields
+  $("#seatNumber").val(seatId);
+  $("#travelClass").val(seatClass.charAt(0).toUpperCase() + seatClass.slice(1));
+
+  console.log("✅ Seat selected:", seatId, "| Class:", seatClass);
+
+  updateSummary();
+});
+
 
   // -------- Update Summary --------
   function updateSummary() {

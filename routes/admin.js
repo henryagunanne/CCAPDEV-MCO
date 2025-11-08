@@ -12,7 +12,10 @@ router.use((req, res, next) => {
     if (req.session.user && req.session.user.role === 'Admin') {
         next();
     } else {
-        res.status(403).json({ message: 'Access denied. Admins only.' });
+        res.status(403).render('error/access-denied', { 
+            title: 'Access Denied',
+            isAdmin: req.session.user?.role === 'Admin'
+        });  
     }
 });
 

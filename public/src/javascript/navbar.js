@@ -82,7 +82,7 @@ jQuery(function() {
 
                     // Optionally redirect based on role
                     /* if (res.isAdmin) {
-                        window.location.href = "/admin/dashboard";
+                        window.location.href = "/admin";
                     } else {
                         location.reload();
                     }

@@ -2,6 +2,8 @@
 const express = require('express');
 const router = express.Router();
 const Flight = require('../models/Flight');
+const User = require('../models/User');
+const Reservation = require('../models/Reservation');
 
 /* ===========================
    🔒 Admin Access Middleware
@@ -10,21 +12,28 @@ router.use((req, res, next) => {
   if (req.session.user && req.session.user.role === 'Admin') {
     return next();
   }
-  // Temporary bypass for development
-  req.session.user = { role: 'Admin', firstName: 'Admin', lastName: 'User' };
-  next();
-  // Uncomment in production:
-  // return res.status(403).json({ message: 'Access denied. Admins only.' });
+  res.status(403).render('error/access-denied', { 
+    title: 'Access Denied',
+    isAdmin: req.session.user?.role === 'Admin'
+  });  
 });
 
 /* ===========================
    🏠 Admin Dashboard
 =========================== */
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
+    const flights = await Flight.find().lean();
+    const users = await User.find().lean(); 
+    const reservations = await Reservation.find().lean();
   res.render('admin/dashboard', {
     layout: 'admin',
     title: 'Admin Dashboard',
-    admin: req.session.user
+    admin: req.session.user,
+    stats: {
+      totalFlights: flights.length,
+      totalUsers: users.length,
+      totalReservations: reservations.length
+    }
   });
 });
 

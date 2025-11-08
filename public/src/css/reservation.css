@@ -7,7 +7,7 @@ body {
   display: grid;
   grid-template-columns: repeat(7, auto);
   gap: 5px;
-  max-width: 400px;
+  max-width: 600px;
   margin: 20px auto;
 }
 
@@ -64,12 +64,12 @@ body {
 
 /* Summary & Legend */
 #summary {
-  max-width: 400px;
+  max-width: 600px;
   margin: 0 auto;
 }
 
 #seatList {
-  max-height: 150px;
+  max-height: 200px;
   overflow-y: auto;
 }
 

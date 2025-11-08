@@ -1,8 +1,6 @@
 
 jQuery (function() {
 
-<<<<<<< HEAD
-=======
   // Flight search form submission handling
   $('#searchFlightForm').on('submit', function (e) {
     e.preventDefault();
@@ -46,5 +44,4 @@ jQuery (function() {
   });
 
   //
->>>>>>> 9a7c67e7b748f1d2558c344f7d06d340a3e63f1b
 });

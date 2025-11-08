@@ -9,7 +9,7 @@ function isAuthenticated(req, res, next) {
     if (req.session.user) {
       return next();
     }else 
-    res.status(401).send('Unauthorized: Please log in to access this resource');  
+    res.status(403).render('error/access-denied', { title: 'Access Denied' });   
 }
 
 // POST /users/register - Handle user registration

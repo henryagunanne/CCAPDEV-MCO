@@ -109,7 +109,7 @@
 
 <!-- ======= SCRIPT ======= -->
 <script>
-/* Toast utility */
+/* Toast utility 
 function showToast(message, success = true) {
   const toastEl = document.getElementById('toast');
   toastEl.classList.toggle('bg-success', success);
@@ -118,7 +118,7 @@ function showToast(message, success = true) {
   new bootstrap.Toast(toastEl).show();
 }
 
-/* Handle flight creation */
+/* Handle flight creation /
 document.getElementById('createFlightForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const form = e.target;
@@ -146,5 +146,5 @@ document.getElementById('createFlightForm').addEventListener('submit', async (e)
     console.error(err);
     showToast('Error connecting to server.', false);
   }
-});
+}); */
 </script>

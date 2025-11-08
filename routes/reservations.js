@@ -2,6 +2,7 @@
 const express = require('express');
 const Reservation = require('../models/Reservation');
 const Flight = require('../models/Flight');
+const User = require('../models/User');
 const router = express.Router();
 
 /* =============================

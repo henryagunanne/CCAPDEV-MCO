@@ -24,19 +24,21 @@ async function seedReservations() {
             {
                 userId: users[0]._id,
                 flight: flights.find(f => f.flightNumber === 'AA1001')._id,
-                travelClass: 'Economy',
                 tripType: 'One-Way',
+                travelClass: 'Economy',
                 seatNumber: '10A',
                 meal: 'Vegetarian',
+                passport: 'X1234567',
                 passengers: 1,
                 bookingDate: new Date('2024-06-01')
             },
             {
                 userId: users[1]._id,
                 flight: flights.find(f => f.flightNumber === 'AA1002')._id,
-                travelClass: 'Economy',
                 tripType: 'Round-Trip',
+                travelClass: 'Economy',
                 seatNumber: '8B',
+                passport: 'Y7654321',
                 meal: 'Non-Vegetarian',
                 passengers: 1,
                 bookingDate: new Date('2024-06-02')
@@ -44,9 +46,10 @@ async function seedReservations() {
             {
                 userId: users[1]._id,
                 flight: flights.find(f => f.flightNumber === 'AA9001')._id,
-                travelClass: 'Economy',
                 tripType: 'Round-Trip',
+                travelClass: 'Economy',
                 seatNumber: '10D',
+                passport: 'Y7654321',
                 meal: 'Non-Vegetarian',
                 passengers: 1,
                 bookingDate: new Date('2024-06-02')
@@ -54,9 +57,10 @@ async function seedReservations() {
             {
                 userId: users[2]._id,
                 flight: flights.find(f => f.flightNumber === 'AA1003')._id,
-                travelClass: 'Economy',
                 tripType: 'One-Way',
+                travelClass: 'Economy',
                 seatNumber: '10C',
+                passport: 'Z9876543',
                 meal: 'Vegan',
                 passengers: 2,
                 bookingDate: new Date('2024-06-03')
@@ -64,9 +68,10 @@ async function seedReservations() {
             {
                 userId: users[3]._id,
                 flight: flights.find(f => f.flightNumber === 'AA1004')._id,
-                travelClass: 'Premium Economy',
                 tripType: 'One-Way',
+                travelClass: 'Premium Economy',
                 seatNumber: '9D',
+                passport: 'W1234987',
                 meal: 'Gluten-Free',
                 passengers: 1,
                 baggageAllowance: 20,

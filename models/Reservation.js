@@ -1,40 +1,54 @@
 const mongoose = require('mongoose');
 
-// Define the schema for a Reservation
-const reservationSchema = new mongoose.Schema({
-  // Link to user (optional for guests)
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: false
-  },
-
-  // Passenger info
+const passengerSchema = new mongoose.Schema({
   fullName: {
-    type: String,
-    required: true,
-    trim: true
+      type: String,
+      required: true
   },
-  email: {
-    type: String,
-    required: true,
-    lowercase: true,
-    trim: true
+  age: {
+      type: Number,
+      required: true,
+      min: 0
+  },
+  gender: {
+      type: String,
+      enum: ['Male', 'Female', 'Other'],
+      required: true
   },
   passport: {
     type: String,
     required: true,
     trim: true
   },
+  seatNumber: {
+      type: String,
+      required: true
+  },
+  meal: {
+      type: String,
+      enum: ['None', 'Vegetarian', 'Non-Vegetarian', 'Vegan', 'Gluten-Free'],
+      default: 'None'
+  },
+  baggageAllowance: {
+      type: Number,
+      default: 0
+  }
+});
 
+// Define the schema for a Reservation
+const reservationSchema = new mongoose.Schema({
+  // Link to user (optional for guests)
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   // Flight reference
   flight: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Flight',
     required: true
   },
-
-  // Booking details
   tripType: {
     type: String,
     enum: ['One-Way', 'Round-Trip'],
@@ -45,23 +59,9 @@ const reservationSchema = new mongoose.Schema({
     enum: ['Economy', 'Premium Economy', 'Business', 'First'],
     default: 'Economy'
   },
-  seatNumber: {
-    type: String,
-    required: true
-  },
 
-  // Add-ons
-  meal: {
-    type: String,
-    enum: ['None', 'Vegetarian', 'Non-Vegetarian', 'Vegan', 'Gluten-Free'],
-    default: 'None'
-  },
-  baggageAllowance: {
-    type: Number,
-    default: 0
-  },
+  passengers: [passengerSchema],
 
-  // System-generated
   bookingDate: {
     type: Date,
     default: Date.now
@@ -69,8 +69,9 @@ const reservationSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ['Confirmed', 'Cancelled', 'Pending'],
-    default: 'Confirmed'
+    default: 'Pending'
   }
 });
 
+// Export the model for use in other files
 module.exports = mongoose.model('Reservation', reservationSchema);

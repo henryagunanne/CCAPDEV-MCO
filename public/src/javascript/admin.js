@@ -6,24 +6,24 @@ jQuery (function() {
   // Flight search form submission handling
   $('#searchFlightForm').on('submit', function (e) {
     e.preventDefault();
-    const query = $('#searchFlightInput').value.trim();
+    const query = $('#searchFlightInput').val().trim();
 
     if (!query) return;
   
-    const spinner = $('#loadingSpinner');
-    const results = $('#flightResults'); 
+    const $spinner = $('#loadingSpinner');
+    const $results = $('#flightResults'); 
 
-    results.empty();
-    spinner.show();
+    $results.empty();
+    $spinner.show();
 
     $.ajax ({
       url: `/admin/flights/${query}`,
       method: 'GET',
       dataType: 'json',
-      success: function(data, xhr) {
-        spinner.hide();
-        if (xhr.status === 200) {
-          results.html(`
+      success: function(data) {
+        $spinner.hide();
+        if (data.success) {
+          $results.html(`
           <div class="card mx-auto mt-4 shadow-sm" style="max-width: 600px; border-radius:12px;">
             <div class="card-body text-start">
               <h5 class="card-title">Flight ${data.flightNumber}</h5>
@@ -34,14 +34,13 @@ jQuery (function() {
           </div>
         `);
         }else {
-          results.html(`<p class="text-danger mt-3">${data.message}</p>`);
+          $results.html(`<p class="text-danger mt-3">${data.message}</p>`);
         }
 
       },
       error: function(xhr) {
-        spinner.hide();
-        const message = xhr.responseJSON?.message || 'Error fetching flight data.';
-        results.html(`<p class="text-danger mt-3">${message}</p>`);
+        $spinner.hide();
+        $results.html(`<p class="text-danger mt-3">Error fetching flight data.</p>`);
       }
     });
   });

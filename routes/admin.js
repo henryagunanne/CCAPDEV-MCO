@@ -69,16 +69,14 @@ router.get('/flights/:flightNumber', async (req, res) => {
     const flight = await Flight.findOne({flightNumber: flightNumber}).lean();
     if (!flight) return res.status(404).json({ message: 'Flight not found.' });
 
-    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-      return res.status(200).json(flight);
-    }
-
     res.json({
+      success: true,
       flightNumber: flight.flightNumber,
       origin: flight.origin,
       destination: flight.destination,
       date: flight.departureDate,
-      price: flight.price
+      price: flight.price,
+      message: 'Flight retrieved successfully.'
     });
   } catch (error) {
     console.error('❌ Error retrieving flight:', error);

@@ -10,7 +10,10 @@ function isAuthenticated(req, res, next) {
   if (req.session.user) {
     return next();
   }
-  res.status(403).render('error/access-denied', { title: 'Access Denied' });  
+  res.status(403).render('error/access-denied', { 
+    title: 'Access Denied',
+    isAdmin: req.session.user?.role === 'Admin'
+  });  
 }
 
 /* =============================

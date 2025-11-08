@@ -2,6 +2,8 @@
 const express = require('express');
 const router = express.Router();
 const Flight = require('../models/Flight');
+const User = require('../models/User');
+const Reservation = require('../models/Reservation');
 
 // ===========================
 // Middleware: Admin Auth
@@ -20,11 +22,19 @@ router.use((req, res, next) => {
 // ===========================
 // Dashboard Route
 // ===========================
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
+    const flights = await Flight.find().lean();
+    const users = await User.find().lean(); 
+    const reservations = await Reservation.find().lean();
   res.render('admin/dashboard', {
     layout: 'admin',
     title: 'Admin Dashboard',
-    admin: req.session.user
+    admin: req.session.user,
+    stats: {
+      totalFlights: flights.length,
+      totalUsers: users.length,
+      totalReservations: reservations.length
+    }
   });
 });
 

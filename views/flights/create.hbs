@@ -1,0 +1,168 @@
+<div class="container-fluid px-4 mt-3">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h1 class="fw-bold text-danger m-0">Create Flight</h1>
+    <a href="/admin/flights" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-2"></i> Back to Flights
+    </a>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form id="createFlightForm" class="needs-validation" novalidate>
+        <div class="row g-3">
+
+          <!-- Flight Number -->
+          <div class="col-md-4">
+            <label for="flightNumber" class="form-label fw-semibold">Flight Number</label>
+            <input type="text" class="form-control" id="flightNumber" name="flightNumber" placeholder="e.g. PR101" required>
+            <div class="invalid-feedback">Please enter a flight number.</div>
+          </div>
+
+          <!-- Aircraft -->
+          <div class="col-md-4">
+            <label for="aircraft" class="form-label fw-semibold">Aircraft</label>
+            <input type="text" class="form-control" id="aircraft" name="aircraft" placeholder="e.g. Airbus A320" required>
+            <div class="invalid-feedback">Please specify the aircraft model.</div>
+          </div>
+
+          <!-- Seat Capacity -->
+          <div class="col-md-4">
+            <label for="seatCapacity" class="form-label fw-semibold">Seat Capacity</label>
+            <input type="number" class="form-control" id="seatCapacity" name="seatCapacity" min="1" required>
+            <div class="invalid-feedback">Please enter a valid seat capacity.</div>
+          </div>
+
+          <!-- Origin -->
+          <div class="col-md-6">
+            <label for="origin" class="form-label fw-semibold">Origin</label>
+            <input type="text" class="form-control" id="origin" name="origin" placeholder="e.g. Manila" required>
+            <div class="invalid-feedback">Please enter the origin.</div>
+          </div>
+
+          <!-- Destination -->
+          <div class="col-md-6">
+            <label for="destination" class="form-label fw-semibold">Destination</label>
+            <input type="text" class="form-control" id="destination" name="destination" placeholder="e.g. Tokyo" required>
+            <div class="invalid-feedback">Please enter the destination.</div>
+          </div>
+
+          <!-- Departure Date -->
+          <div class="col-md-4">
+            <label for="departureDate" class="form-label fw-semibold">Departure Date</label>
+            <input type="date" class="form-control" id="departureDate" name="departureDate" required>
+            <div class="invalid-feedback">Please select a departure date.</div>
+          </div>
+
+          <!-- Departure Time -->
+          <div class="col-md-4">
+            <label for="departureTime" class="form-label fw-semibold">Departure Time</label>
+            <input type="time" class="form-control" id="departureTime" name="departureTime" required>
+            <div class="invalid-feedback">Please enter a departure time.</div>
+          </div>
+
+          <!-- Arrival Time -->
+          <div class="col-md-4">
+            <label for="arrivalTime" class="form-label fw-semibold">Arrival Time</label>
+            <input type="time" class="form-control" id="arrivalTime" name="arrivalTime" required>
+            <div class="invalid-feedback">Please enter an arrival time.</div>
+          </div>
+
+          <!-- Price -->
+          <div class="col-md-6">
+            <label for="price" class="form-label fw-semibold">Price (₱)</label>
+            <input type="number" class="form-control" id="price" name="price" min="0" required>
+            <div class="invalid-feedback">Please enter a valid price.</div>
+          </div>
+
+          <!-- Status -->
+          <div class="col-md-6">
+            <label for="status" class="form-label fw-semibold">Status</label>
+            <select class="form-select" id="status" name="status" required>
+              <option value="Scheduled" selected>Scheduled</option>
+              <option value="On Time">On Time</option>
+              <option value="Delayed">Delayed</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+            <div class="invalid-feedback">Please choose a status.</div>
+          </div>
+        </div>
+
+        <div class="text-end mt-4">
+          <button type="submit" class="btn btn-danger px-4">
+            <i class="bi bi-plus-circle me-2"></i> Create Flight
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ======= TOAST NOTIFICATION ======= -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+  <div id="toast" class="toast align-items-center text-white bg-success border-0" role="alert">
+    <div class="d-flex">
+      <div class="toast-body" id="toastBody"></div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ======= STYLE ======= -->
+<style>
+.card {
+  border-radius: 12px;
+  border: none;
+}
+input:invalid, select:invalid {
+  border-color: #dc3545 !important;
+}
+input:focus, select:focus {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 0.15rem rgba(220,53,69,.25);
+}
+.btn-danger:disabled {
+  opacity: 0.7;
+}
+</style>
+
+<!-- ======= SCRIPT ======= -->
+<script>
+/* Toast utility */
+function showToast(message, success = true) {
+  const toastEl = document.getElementById('toast');
+  toastEl.classList.toggle('bg-success', success);
+  toastEl.classList.toggle('bg-danger', !success);
+  document.getElementById('toastBody').innerText = message;
+  new bootstrap.Toast(toastEl).show();
+}
+
+/* Handle flight creation */
+document.getElementById('createFlightForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  form.classList.add('was-validated');
+  if (!form.checkValidity()) return;
+
+  const formData = Object.fromEntries(new FormData(form));
+  try {
+    const res = await fetch('/admin/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      showToast(data.message || 'Flight created successfully!', true);
+      form.reset();
+      form.classList.remove('was-validated');
+      setTimeout(() => window.location.href = '/admin/flights', 1500);
+    } else {
+      showToast(data.message || 'Error creating flight.', false);
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('Error connecting to server.', false);
+  }
+});
+</script>

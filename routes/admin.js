@@ -3,15 +3,23 @@ const express = require('express');
 const router = express.Router();
 const Flight = require('../models/Flight');
 
+/* ===========================
+ADMIN ROUTES FOR FLIGHTS
+=========================== */
+
 // ===========================
 // Middleware: Admin Auth
 // ===========================
 router.use((req, res, next) => {
-    if (req.session.user && req.session.user.role === 'Admin') {
-        next();
-    } else {
-        res.status(403).json({ message: 'Access denied. Admins only.' });
-    }
+  if (req.session.user && req.session.user.role === 'Admin') {
+    next();
+  } else {
+    // For local testing (temporary)
+    req.session.user = { role: 'Admin', firstName: 'Admin', lastName: 'User' };
+    next();
+    // Uncomment below in production:
+    // return res.status(403).json({ message: 'Access denied. Admins only.' });
+  }
 });
 
 // ===========================
@@ -28,7 +36,6 @@ router.get('/', (req, res) => {
 // ===========================
 // Retrieve All Flights
 // ===========================
-// GET /admin/flights - Retrieve all flights
 router.get('/flights', async (req, res) => {
   try {
     const flights = await Flight.find().lean();
@@ -38,26 +45,24 @@ router.get('/flights', async (req, res) => {
       flights
     });
   } catch (error) {
+    console.error('Error retrieving flights:', error);
     res.status(500).json({ message: 'Error retrieving flights', error });
   }
 });
 
 // ===========================
-// Retrieve Flight by Number
+// Retrieve Flight by Flight Number
 // ===========================
 router.get('/flights/:flightNumber', async (req, res) => {
   try {
     const flight = await Flight.findOne({ flightNumber: req.params.flightNumber }).lean();
-    if (!flight) {
-      return res.status(404).json({ message: 'Flight not found.' });
-    }
+    if (!flight) return res.status(404).json({ message: 'Flight not found.' });
 
-    // For AJAX (JSON)
+    // If AJAX, send JSON; otherwise render a detail page
     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
       return res.status(200).json(flight);
     }
 
-    // For template rendering
     res.render('flights/detail', { layout: 'admin', title: 'Flight Details', flight });
   } catch (error) {
     console.error('Error retrieving flight:', error);
@@ -66,7 +71,18 @@ router.get('/flights/:flightNumber', async (req, res) => {
 });
 
 // ===========================
-// Create New Flight
+// Create Flight Form (GET)
+// ===========================
+router.get('/create', (req, res) => {
+  res.render('flights/create', {
+    layout: 'admin',
+    title: 'Create Flight',
+    admin: req.session.user
+  });
+});
+
+// ===========================
+// Create New Flight (POST)
 // ===========================
 router.post('/create', async (req, res) => {
   try {
@@ -90,9 +106,7 @@ router.post('/create', async (req, res) => {
     }
 
     const exists = await Flight.findOne({ flightNumber });
-    if (exists) {
-      return res.status(400).json({ message: 'Flight number already exists.' });
-    }
+    if (exists) return res.status(400).json({ message: 'Flight number already exists.' });
 
     const newFlight = new Flight({
       flightNumber,
@@ -121,11 +135,7 @@ router.post('/create', async (req, res) => {
 router.put('/update/:id', async (req, res) => {
   try {
     const updatedFlight = await Flight.findByIdAndUpdate(req.params.id, req.body, { new: true }).lean();
-
-    if (!updatedFlight) {
-      return res.status(404).json({ message: 'Flight not found.' });
-    }
-
+    if (!updatedFlight) return res.status(404).json({ message: 'Flight not found.' });
     res.status(200).json({ message: 'Flight updated successfully.', flight: updatedFlight });
   } catch (error) {
     console.error('Error updating flight:', error);
@@ -139,11 +149,7 @@ router.put('/update/:id', async (req, res) => {
 router.delete('/delete/:id', async (req, res) => {
   try {
     const deletedFlight = await Flight.findByIdAndDelete(req.params.id).lean();
-
-    if (!deletedFlight) {
-      return res.status(404).json({ message: 'Flight not found.' });
-    }
-
+    if (!deletedFlight) return res.status(404).json({ message: 'Flight not found.' });
     res.status(200).json({ message: 'Flight deleted successfully.' });
   } catch (error) {
     console.error('Error deleting flight:', error);

@@ -1,13 +1,33 @@
-<div class="container-fluid px-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="fw-bold text-danger">All Flights</h1>
-    <a href="/admin/create" class="btn btn-danger">
-      <i class="bi bi-plus-circle me-2"></i> Add Flight
-    </a>
+<div class="container-fluid px-4 mt-3">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h1 class="fw-bold text-danger m-0">All Flights</h1>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-secondary" onclick="window.location.reload()">
+        <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+      </button>
+      <a href="/admin/create" class="btn btn-danger">
+        <i class="bi bi-plus-circle me-2"></i> Add Flight
+      </a>
+    </div>
+  </div>
+
+  <!-- Search + Stats -->
+  <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+    <div class="input-group" style="max-width:400px;">
+      <span class="input-group-text bg-danger text-white border-danger">
+        <i class="bi bi-search"></i>
+      </span>
+      <input type="text" id="flightSearch" class="form-control" placeholder="Search flight number, origin, or destination...">
+    </div>
+
+    <div class="text-muted small mt-2 mt-md-0">
+      Total Flights: <span class="fw-bold">{{flights.length}}</span>
+    </div>
   </div>
 
   {{#if flights.length}}
-    <div class="table-responsive">
+    <div class="table-responsive mt-3">
       <table class="table table-striped table-hover align-middle shadow-sm">
         <thead class="table-danger text-center">
           <tr>
@@ -23,7 +43,7 @@
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="flightTable">
           {{#each flights}}
           <tr id="flight-{{this._id}}" class="text-center">
             <td>{{this.flightNumber}}</td>
@@ -35,7 +55,7 @@
             <td>{{this.seatCapacity}}</td>
             <td>{{this.price}}</td>
             <td>
-              <span class="badge 
+              <span class="badge
                 {{#if (eq this.status 'On Time')}}bg-success{{/if}}
                 {{#if (eq this.status 'Delayed')}}bg-warning text-dark{{/if}}
                 {{#if (eq this.status 'Cancelled')}}bg-danger{{/if}}
@@ -44,10 +64,10 @@
               </span>
             </td>
             <td>
-              <a href="/admin/edit/{{this._id}}" class="btn btn-sm btn-outline-primary me-1">
+              <a href="/admin/edit/{{this._id}}" class="btn btn-sm btn-outline-primary me-1" title="Edit">
                 <i class="bi bi-pencil"></i>
               </a>
-              <button class="btn btn-sm btn-outline-danger" onclick="deleteFlight('{{this._id}}')">
+              <button class="btn btn-sm btn-outline-danger" title="Delete" onclick="deleteFlight('{{this._id}}')">
                 <i class="bi bi-trash"></i>
               </button>
             </td>
@@ -63,39 +83,81 @@
   {{/if}}
 </div>
 
-<!-- ========== STYLE ========== -->
+<!-- ======== TOAST (Bootstrap) ======== -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+  <div id="toast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body" id="toastBody"></div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ======== STYLE ======== -->
 <style>
-.table th, .table td {
-  vertical-align: middle;
+.container-fluid { max-width: 95%; margin: auto; }
+.table th, .table td { vertical-align: middle; }
+.table-hover tbody tr:hover { background-color: #fff5f5; transition: background-color 0.2s ease; }
+.table th { cursor: pointer; user-select: none; }
+.table th:hover { background-color: #ffe6e6; }
+.badge { font-size: 0.85rem; padding: 6px 10px; border-radius: 8px; }
+.input-group .form-control:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.15rem rgba(220,53,69,.25);
 }
-.table-hover tbody tr:hover {
-  background-color: #fff5f5;
-}
-.badge {
-  font-size: 0.85rem;
-  padding: 6px 10px;
-  border-radius: 8px;
-}
+.btn-outline-primary:hover { background-color:#0d6efd; color:white; }
+.btn-outline-danger:hover { background-color:#dc3545; color:white; }
 </style>
 
-<!-- ========== SCRIPT ========== -->
+<!-- ======== SCRIPT ======== -->
 <script>
+/* Toast helper */
+function showToast(message, success = true) {
+  const toastEl = document.getElementById('toast');
+  toastEl.classList.toggle('bg-danger', !success);
+  toastEl.classList.toggle('bg-success', success);
+  document.getElementById('toastBody').innerText = message;
+  new bootstrap.Toast(toastEl).show();
+}
+
+/* Delete flight */
 async function deleteFlight(id) {
   if (!confirm('Are you sure you want to delete this flight?')) return;
-
   try {
     const res = await fetch(`/admin/delete/${id}`, { method: 'DELETE' });
     const data = await res.json();
-
     if (res.ok) {
       document.getElementById(`flight-${id}`).remove();
-      alert(data.message || 'Flight deleted successfully');
+      showToast(data.message || 'Flight deleted successfully', true);
     } else {
-      alert(data.message || 'Failed to delete flight');
+      showToast(data.message || 'Failed to delete flight', false);
     }
   } catch (err) {
     console.error(err);
-    alert('Error deleting flight.');
+    showToast('Error deleting flight.', false);
   }
 }
+
+/* Search filter */
+document.getElementById('flightSearch').addEventListener('keyup', e => {
+  const query = e.target.value.toLowerCase();
+  document.querySelectorAll('#flightTable tr').forEach(row => {
+    const text = row.innerText.toLowerCase();
+    row.style.display = text.includes(query) ? '' : 'none';
+  });
+});
+
+/* Column sort */
+document.querySelectorAll('th').forEach(th => {
+  th.addEventListener('click', () => {
+    const index = Array.from(th.parentNode.children).indexOf(th);
+    const rows = Array.from(document.querySelectorAll('#flightTable tr'));
+    rows.sort((a, b) => {
+      const aText = a.children[index].innerText.toLowerCase();
+      const bText = b.children[index].innerText.toLowerCase();
+      return aText.localeCompare(bText, undefined, { numeric: true });
+    });
+    document.querySelector('#flightTable').append(...rows);
+  });
+});
 </script>

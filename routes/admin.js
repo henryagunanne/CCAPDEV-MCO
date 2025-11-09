@@ -84,6 +84,14 @@ router.get('/flights/:flightNumber', async (req, res) => {
   }
 });
 
+// GET /admin/create - Render create flight form
+router.get('/create', (req, res) => {
+  res.render('admin/create', {
+    layout: 'admin',
+    title: 'Create New Flight'
+  });
+});
+
 /* ===========================
    ➕ CREATE New Flight
 =========================== */

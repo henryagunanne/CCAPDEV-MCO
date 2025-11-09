@@ -107,3 +107,11 @@ input:focus, select:focus {
 .btn-danger:disabled {
   opacity: 0.7;
 }
+h3, h1, h5 {
+  font-weight: bold;
+  color: #dc3545;
+}
+#createFlightForm select.form-select,
+#createFlightForm input.form-control {
+  margin: 10px 0;
+}

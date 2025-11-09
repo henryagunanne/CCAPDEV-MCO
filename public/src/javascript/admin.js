@@ -102,18 +102,51 @@ jQuery (function() {
   });
 
   // create.hbs JS
-  /* Handle flight creation */
-  $('#createFlightForm').on('submit', async function(e) {
-    e.preventDefault();
-    const $form = $(this);
-    $form.addClass('was-validated');
-    
-    if (!$form[0].checkValidity()) return;
+  // Clone all origin options into destination
+  $('#destination').html($('#origin').html());
 
-    const formData = $form.serializeArray().reduce((obj, item) => {
-      obj[item.name] = item.value;
-      return obj;
-    }, {});
+  // When the origin changes
+  $('#origin').on('change', function() {
+    const selectedOrigin = $(this).val();
+
+    // Reset destination to full list
+    $('#destination').html($('#origin').html());
+
+    // Disable the same city in destination
+    if (selectedOrigin) {
+      $('#destination option').each(function() {
+        if ($(this).val() === selectedOrigin) {
+          $(this).attr('disabled', true).text($(this).text() + ' (Unavailable)');
+        }
+      });
+    }
+  });
+
+  /* Handle flight creation */
+  $('#createFlightForm').on('submit', function(e) {
+    e.preventDefault(); // Prevent default form submission
+    const $form = $(this);
+    
+    // Check form validity
+    if (this.checkValidity() === false) {
+      e.stopPropagation();
+      $form.addClass('was-validated');
+      return;
+    }
+
+    // Gather form data
+    const formData = {
+      flightNumber: $('#flightNumber').val(),
+      origin: $('#origin').val(),
+      destination: $('#destination').val(),
+      departureDate: $('#departureDate').val(),
+      departureTime: $('#departureTime').val(),
+      arrivalTime: $('#arrivalTime').val(),
+      aircraft: $('#aircraft').val(),
+      price: parseFloat($('#price').val()),
+      seatCapacity: parseInt($('#seatCapacity').val(), 10),
+      status: $('#status').val()
+    }
     
     $.ajax({
       url: '/admin/create',

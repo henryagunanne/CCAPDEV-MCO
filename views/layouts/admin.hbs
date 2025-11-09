@@ -32,7 +32,7 @@
             </a>
           </li>
           <li class="nav-item mb-2">
-            <a href="/admin/create" class="nav-link text-white {{#if (eq title 'Create Flight')}}active{{/if}}">
+            <a href="/admin/create" class="nav-link text-white {{#if (eq title 'Create New Flight')}}active{{/if}}">
               <i class="bi bi-plus-circle me-2"></i> Create Flight
             </a>
           </li>
@@ -56,6 +56,98 @@
     </main>
   </div>
 
-  
+    <!-- Create Flight Modal -->
+    <div class="modal fade" id="createFlightModal" tabindex="-1" aria-labelledby="createFlightModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+            <img class="text-center" src="../../assets/Logo/Logo-red.png">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="createFlightForm" class="needs-validation" method="POST" novalidate>
+            <header class="text-center">
+              <h1 class="modal-title fs-5" id="createFlightModalLabel">Create Flight</h1>
+            </header>
+            <br>
+            <div class="row g-3 justify-content-center">
+              <!-- Flight Number -->
+              <div class="col-md-6">
+                <label for="flightNo" class="form-label fw-semibold">Flight Number</label>
+                <input type="text" class="form-control" id="flightNo" name="flightNo" placeholder="e.g. AAXXXX" required>
+                <div class="invalid-feedback">Please enter a flight number.</div>
+              </div>
+              <!-- Origin -->
+              <div class="col-md-6">
+                <label for="originSelect" class="form-label fw-semibold">Origin</label>
+                {{> origin}}
+                <div class="invalid-feedback">Please enter the origin.</div>
+              </div>
+            <div class="row g-3 justify-content-center">  
+              <!-- Destination -->
+              <div class="col-md-6">
+                <label for="destSelect" class="form-label fw-semibold">Destination</label>
+                {{> destination}}
+                <div class="invalid-feedback">Please enter the destination.</div>
+              </div> 
+              <!-- Departure Date -->
+              <div class="col-md-6">
+                <label for="departureDate" class="form-label fw-semibold">Departure Date</label>
+                <input type="date" class="form-control" id="departureDate" name="departureDate" required>
+                <div class="invalid-feedback">Please select a departure date.</div>
+              </div>
+            </div>
+            <div class="row g3 justify-content-center">
+              <!-- Departure Time -->
+              <div class="col-md-6">
+                <label for="departureTime" class="form-label fw-semibold">Departure Time</label>
+                <input type="time" class="form-control" id="departureTime" name="departureTime" required>
+                <div class="invalid-feedback">Please enter a departure time.</div>
+              </div>
+              <!-- Arrival Time -->
+              <div class="col-md-6">
+                <label for="arrivalTime" class="form-label fw-semibold">Arrival Time</label>
+                <input type="time" class="form-control" id="arrivalTime" name="arrivalTime" required>
+                <div class="invalid-feedback">Please enter an arrival time.</div>
+              </div>
+            </div>
+            <div class="row g3 justify-content-center">
+              <!-- Aircraft -->
+              <div class="col-md-6">
+                <label for="aircraft" class="form-label fw-semibold">Aircraft</label>
+                {{> aircraft}}
+                <div class="invalid-feedback">Please specify the aircraft model.</div>
+              </div>
+              <!-- Seat Capacity -->
+              <div class="col-md-6">
+                <label for="seatCapacity" class="form-label fw-semibold">Seat Capacity</label>
+                <input type="number" class="form-control" id="seatCapacity" name="seatCapacity" min="1" required>
+                <div class="invalid-feedback">Please enter a valid seat capacity.</div>
+              </div>
+            </div>
+            <div class="row g3 justify-content-center">
+              <!-- Price -->
+              <div class="col-md-6">
+                <label for="price" class="form-label fw-semibold">Price ($)</label>
+                <input type="number" class="form-control" id="price" name="price" min="0" step="0.01" required>
+                <div class="invalid-feedback">Please enter a valid price.</div>
+              </div>
+              <!-- Status -->
+              <div class="col-md-6">
+                <label for="status" class="form-label fw-semibold">Status</label>
+                <select class="form-select" id="status" name="status" required>
+                  <option value="" disabled selected>Select status</option>
+                  <option value="Scheduled">Scheduled</option>
+                  <option value="On Time">On Time</option>
+                  <option value="Delayed">Delayed</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
+                <div class="invalid-feedback">Please select a status.</div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-danger">Create Flight</button>
+            </div>
 </body>
 </html>

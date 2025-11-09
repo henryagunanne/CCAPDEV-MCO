@@ -53,7 +53,7 @@ body { margin: 0; font-family: "Inter", sans-serif; background-color: #f9f9fb; }
   .admin-main { margin-left: 0; }
 }
 
-/* flight list */
+/* flight & reservation list */
 .container-fluid { 
   max-width: 95%; 
   margin: auto; 
@@ -90,7 +90,21 @@ body { margin: 0; font-family: "Inter", sans-serif; background-color: #f9f9fb; }
   background-color:#dc3545; 
   color:white; 
 }
+.table th, .table td { 
+  vertical-align: middle; 
+}
+.passengers-row td { 
+  background: #fafafa; 
+}
 
+.table-hover tbody tr:hover { 
+  background-color: #fff5f5; 
+}
+.badge { 
+  font-size: 0.85rem; 
+  padding: 6px 10px; 
+  border-radius: 8px; 
+}
 
 /* create flight */
 .card {

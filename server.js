@@ -1,5 +1,12 @@
+const express = require("express");
+const app = express();
+
+// 🟢 These two lines are critical!
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+
 // server.js - Express + Mongoose + Handlebars
-const express = require('express'); // Express framework
 const mongoose = require('mongoose'); // MongoDB ODM
 const exphbs = require('express-handlebars'); // Handlebars templating engine
 const session = require('express-session'); // Session management
@@ -9,7 +16,6 @@ const seedPopularFlights = require('./seeds/seedPopularFlights'); // Seed popula
 const seedFlights = require('./seeds/seedFlights'); // Seed flights
 const seedUsers = require('./seeds/seedUsers');
 const seedReservations = require('./seeds/seedReservations');
-const app = express();  // Initialize Express app
 const PORT = 3000;  // Server port
 
 // Connect to MongoDB

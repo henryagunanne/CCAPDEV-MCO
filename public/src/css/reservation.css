@@ -1,26 +1,37 @@
-body {
+html, body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   background-color: #f8f9fa;
+  margin: 0;
+}
+
+/* Make main take up full height before footer */
+main {
+  flex: 1;
+  padding-top: 30px;
 }
 
 /* Seat Map Layout */
 #seat-map {
   display: grid;
   grid-template-columns: repeat(7, auto);
-  gap: 5px;
-  max-width: 600px;
+  gap: 6px;
+  max-width: 650px;
   margin: 20px auto;
+  justify-content: center;
 }
 
 .seat {
   width: 45px;
   height: 45px;
-  margin: 6px;
+  margin: 5px;
   border-radius: 8px;
   text-align: center;
   line-height: 45px;
   font-weight: bold;
   cursor: pointer;
-  transition: 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
 }
 
 .seat:hover {
@@ -32,19 +43,19 @@ body {
 .economy.available {
   background: #0d6efd;
   color: white;
-  border: 3px solid #007bff;
+  border: 2px solid #007bff;
 }
 
 .business.available {
-  background: white;
+  background: #fff;
   color: black;
-  border: 3px solid #6610f2;
+  border: 2px solid #6610f2;
 }
 
 .first.available {
   background: #dc3545;
   color: white;
-  border: 3px solid #d63384;
+  border: 2px solid #b21f2d;
 }
 
 .occupied {
@@ -62,25 +73,23 @@ body {
   visibility: hidden;
 }
 
-/* Summary & Legend */
-#summary {
-  max-width: 600px;
-  margin: 0 auto;
+/* Summary Card */
+.summary-card {
+  max-width: 400px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-#seatList {
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-.badge.border {
-  background-color: white;
-  padding: 6px 10px;
-  font-weight: normal;
-}
-
+/* Footer fix */
 footer {
-  margin-top: 60px;
+  margin-top: auto;
+  background-color: #d32f2f;
+  color: white;
+  text-align: center;
+  padding: 20px 0;
+  width: 100%;
+  font-size: 0.9rem;
+  position: relative;
 }
 
 .is-valid {
@@ -89,4 +98,27 @@ footer {
 
 .is-invalid {
   border-color: #dc3545 !important;
+}
+
+/* Ensure booking layout fills full width but keeps elements centered */
+.booking-page {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Make the card stretch better for desktop */
+.booking-page .card {
+  width: 100%;
+}
+
+/* On larger screens, center seat map and summary side by side */
+@media (min-width: 992px) {
+  #seat-map {
+    max-width: 700px;
+  }
+
+  .summary-card {
+    max-width: 450px;
+  }
 }

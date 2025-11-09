@@ -18,9 +18,16 @@
     <p><strong>Arrival:</strong> {{reservation.flight.arrivalTime}}</p>
     <p><strong>Class:</strong> {{reservation.travelClass}}</p>
     <hr>
-    <p><strong>Seat:</strong> {{reservation.seatNumber}}</p>
-    <p><strong>Meal:</strong> {{reservation.meal}}</p>
-    <p><strong>Baggage:</strong> {{reservation.baggageAllowance}} kg</p>
+   <h4 class="text-danger mt-4">Passenger Details</h4>
+<ul class="list-group mb-4">
+  {{#each reservation.passengers}}
+  <li class="list-group-item">
+    <strong>{{this.fullName}}</strong> — {{this.email}} (Passport: {{this.passport}})<br>
+    Seat: {{this.seatNumber}} | Meal: {{this.meal}} | Baggage: {{this.baggageAllowance}} kg
+  </li>
+  {{/each}}
+</ul>
+
     <p><strong>Status:</strong> {{reservation.status}}</p>
   </div>
 

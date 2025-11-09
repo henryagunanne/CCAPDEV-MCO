@@ -1,10 +1,10 @@
-<div class="container my-5 d-flex justify-content-center">
-  <div class="card shadow-lg w-100" style="max-width: 900px;">
-    <div class="card-header bg-danger text-white text-center">
+<main class="booking-page container-fluid my-5 px-4">
+  <div class="card shadow-lg mx-auto" style="max-width: 900px;">
+    <div class="card-header bg-danger text-white text-center py-3">
       <h3>Book Your Flight – {{flight.flightNumber}}</h3>
-      <p>{{flight.origin}} → {{flight.destination}}</p>
-      <p>Departure: {{flight.departureTime}} | Arrival: {{flight.arrivalTime}}</p>
-      <p class="fw-bold">₱{{flight.price}}</p>
+      <p class="mb-0">{{flight.origin}} → {{flight.destination}}</p>
+      <p class="mb-0">Departure: {{flight.departureTime}} | Arrival: {{flight.arrivalTime}}</p>
+      <p class="fw-bold mb-0">₱{{flight.price}}</p>
     </div>
 
     <div class="card-body">
@@ -13,50 +13,51 @@
         <input type="hidden" name="flight" value="{{flight._id}}">
         <input type="hidden" name="tripType" value="One-Way">
         <input type="hidden" id="travelClass" name="travelClass" value="Economy">
-        <input type="hidden" id="seatNumber" name="seatNumber">
+        <input type="hidden" id="passengersData" name="passengers">
 
-<!-- Passenger Count -->
-<div class="row mb-3">
-  <div class="col-md-4">
-    <label for="passengerCount" class="form-label">Number of Passengers</label>
-    <input type="number" id="passengerCount" name="passengerCount" class="form-control" min="1" max="10" value="1" required>
+        <!-- Passenger Count -->
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label for="passengerCount" class="form-label fw-semibold">Number of Passengers</label>
+            <input type="number" id="passengerCount" name="passengerCount" class="form-control" min="1" max="10" value="1" required>
+          </div>
+        </div>
+
+        <!-- Dynamic Passenger Cards -->
+        <div id="passengerFields"></div>
+
+        <!-- Seat Selection -->
+        <h5 class="text-center text-danger mt-4">Seat Selection</h5>
+        <div id="seat-map" class="my-3"></div>
+
+        <!-- Legend -->
+        <div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
+          <span class="badge bg-danger">First Class</span>
+          <span class="badge bg-light text-dark border border-purple">Business</span>
+          <span class="badge bg-primary">Economy</span>
+          <span class="badge bg-secondary">Occupied</span>
+          <span class="badge bg-warning text-dark">Selected</span>
+        </div>
+
+        <!-- Price Summary -->
+        <div class="card bg-light p-3 mb-4 summary-card mx-auto">
+          <h5 class="text-danger fw-bold">Price Summary</h5>
+          <p>Base Fare: ₱<span id="baseFare">{{flight.price}}</span></p>
+          <p>Meal Total: ₱<span id="mealFee">0</span></p>
+          <p>Baggage Total: ₱<span id="baggageFee">0</span></p>
+          <p>Seat Total: ₱<span id="seatFee">0</span></p>
+          <hr>
+          <h5>Total: ₱<span id="totalPrice">{{flight.price}}</span></h5>
+        </div>
+
+        <div id="formMessage" class="text-danger mb-3"></div>
+
+        <!-- Buttons -->
+        <div class="d-flex justify-content-center gap-2">
+          <button type="submit" id="confirmBooking" class="btn btn-danger px-4">Confirm Booking</button>
+          <button type="reset" class="btn btn-outline-secondary px-4">Reset</button>
+        </div>
+      </form>
+    </div>
   </div>
-</div>
-
-<!-- Dynamic Passenger Cards -->
-<div id="passengerFields"></div>
-
-<!-- Seat Selection -->
-<h5 class="text-center text-danger mt-4">Seat Selection</h5>
-<div id="seat-map" class="my-3"></div>
-
-<!-- Legend -->
-<div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
-  <span class="badge bg-danger">First Class</span>
-  <span class="badge bg-light text-dark border border-purple">Business</span>
-  <span class="badge bg-primary">Economy</span>
-  <span class="badge bg-secondary">Occupied</span>
-  <span class="badge bg-warning text-dark">Selected</span>
-</div>
-
-<!-- Price Summary -->
-<div class="card bg-light p-3 mb-3">
-  <h5 class="text-danger">Price Summary</h5>
-  <p>Base Fare: ₱<span id="baseFare">{{flight.price}}</span></p>
-  <p>Meal Total: ₱<span id="mealFee">0</span></p>
-  <p>Baggage Total: ₱<span id="baggageFee">0</span></p>
-  <p>Seat Total: ₱<span id="seatFee">0</span></p>
-  <hr>
-  <h5>Total: ₱<span id="totalPrice">{{flight.price}}</span></h5>
-</div>
-
-<div id="formMessage" class="text-danger mb-3"></div>
-
-<div class="d-flex justify-content-center gap-2">
-  <button type="submit" id="confirmBooking" class="btn btn-danger">Confirm Booking</button>
-  <button type="reset" class="btn btn-outline-secondary">Reset</button>
-</div>
-
-  </div>
-</div>
-
+</main>

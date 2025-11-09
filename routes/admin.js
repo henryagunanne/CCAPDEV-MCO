@@ -210,11 +210,55 @@ router.get('/reservations', async (req, res) => {
       title: 'All Reservations',
       reservations
     });
-
-  } catch (err) {
-    console.error('❌ Reservations error:', err);
-    res.status(500).json({ message: 'Error retrieving reservations.' });
+  } catch (error) {
+    console.error('❌ Error retrieving reservations:', error);
+    res.status(500).json({ message: 'Error retrieving reservations', error });
   }
 });
 
+// POST /admin/edit-reservation/:id 
+router.post('/edit-reservation/:reservationId', async (req, res) => {
+  const { status } = req.body;
+  const { reservationId } = req.params;
+  try{
+    const updatedReservation = await Reservation.findByIdAndUpdate(
+      reservationId,
+      { status },
+      { new: true }
+    ).lean();
+
+
+    if (!updatedReservation) {
+      return res.status(404).send('Reservation not found');
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'Reservation updated successfully!',
+      updatedReservation
+    });
+  }catch (err) {
+    console.error('❌ Reservation update error:', err);
+    res.status(500).send('Server error during Reservation update');
+  }
+});
+
+// POST /admin/delete-reservation/:reservationId
+router.post('/delete-reservation/:reservationId', async (req, res) => {
+  const { reservationId } = req.params;
+  try {
+    const deletedReservation = await Reservation.findByIdAndDelete(reservationId);
+  
+    if (!deletedReservation) {
+      return res.status(404).send('Reservation not found');
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('❌ Reservation deletion error:', err);
+    res.status(500).send('Server error during Reservation deletion');
+  }
+});
+
+// Export the router
 module.exports = router;

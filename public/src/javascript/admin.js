@@ -188,6 +188,16 @@ jQuery (function() {
 
   // Reservations
 
+  //==== Reservation Filter ====
+  $('#reservationFilter').on('keyup', function () {
+    const query = $(this).val().toLowerCase();
+    $('#reservationTable tr').each(function () {
+      const text = $(this).text().toLowerCase();
+      $(this).toggle(text.includes(query));
+    });
+  });
+
+
   //show modal when edit button is clicked and assign the reservation id
   let selectedReservationId = null; 
 
@@ -246,31 +256,37 @@ jQuery (function() {
     $('#deleteToast').toast('show');
   });
 
-  $('deleteToastForm').on('submit', function(e) {
 
+  $('#deleteToastForm').on('submit', function(e) {
+    e.preventDefault();
     $.ajax({
-      url: `/delete-reservation/${selectedReservationId}`,
+      url: `/admin/delete-reservation/${selectedReservationId}`,
       type: 'POST',
-        success: function(res) {
-          if (res.success) {
-              $('#deleteToast').toast('hide');
-              $('#confirmToast .toast-body').text('Reservation Deleted Successfully');
-              $('#confimToast').toast('show');
-              location.reload();
-          } else {
-            $('#confimToast')
-              .removeClass('bg-success')
-              .addClass('bg-danger')
-            $('#confirmToast .toast-body').text(res.message);
-          }
-        },
-        error: function(err) {
-          // Handle errors
-          $('#confimToast')
+      success: function(res) {
+        if (res.success) {
+            $('#deleteToast').toast('hide');
+            alert('Reservation Deleted Successfully')
+            /*
+            $('#confirmToast .toast-body').text('Reservation Deleted Successfully');
+            $('#confirmToast').toast('show');
+            location.reload();*/
+            setTimeout(() => location.reload(), 1000);
+        } else {
+          alert(res.message)
+          /* $('#confirmToast')
             .removeClass('bg-success')
             .addClass('bg-danger')
-          $('#confirmToast .toast-body').text(res.message);
+          $('#confirmToast .toast-body').text(res.message); */
         }
+      },
+      error: function(err) {
+        // Handle errors
+        alert(err.message)
+        /* $('#confirmToast')
+          .removeClass('bg-success')
+          .addClass('bg-danger')
+        $('#confirmToast .toast-body').text(err.message); */
+      }
     });
   })
 

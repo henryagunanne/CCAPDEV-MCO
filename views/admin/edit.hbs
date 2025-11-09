@@ -1,0 +1,218 @@
+<div class="container-fluid px-4 mt-3">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <h1 class="fw-bold text-danger m-0">Edit Flight</h1>
+    <a href="/admin/flights" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left me-2"></i> Back to Flights
+    </a>
+  </div>
+
+  <!-- Flight Info Banner -->
+  <div class="alert alert-light border shadow-sm mb-4">
+    <h5 class="mb-1">
+      ✈️ Editing Flight: <strong>{{flight.flightNumber}}</strong>
+    </h5>
+    <small class="text-muted">
+      Last updated: {{formatDate flight.updatedAt}}
+    </small>
+  </div>
+
+  <!-- Edit Form -->
+  <div class="card shadow-sm">
+    <div class="card-body">
+
+      <form id="editFlightForm" class="needs-validation" novalidate>
+
+        <div class="row g-3">
+
+          <!-- Flight Number -->
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Flight Number</label>
+            <input type="text" class="form-control" id="flightNumber" name="flightNumber"
+              value="{{flight.flightNumber}}" required>
+            <div class="invalid-feedback">Flight number is required.</div>
+          </div>
+
+          <!-- Aircraft -->
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Aircraft</label>
+            <input type="text" class="form-control" id="aircraft" name="aircraft"
+              value="{{flight.aircraft}}" required>
+            <div class="invalid-feedback">Aircraft model is required.</div>
+          </div>
+
+          <!-- Seat Capacity -->
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Seat Capacity</label>
+            <input type="number" class="form-control" id="seatCapacity" name="seatCapacity"
+              value="{{flight.seatCapacity}}" min="1" required>
+            <div class="invalid-feedback">Seat capacity must be at least 1.</div>
+          </div>
+
+          <!-- Origin -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Origin</label>
+            <input type="text" class="form-control" id="origin" name="origin"
+              value="{{flight.origin}}" required>
+            <div class="invalid-feedback">Origin is required.</div>
+          </div>
+
+          <!-- Destination -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Destination</label>
+            <input type="text" class="form-control" id="destination" name="destination"
+              value="{{flight.destination}}" required>
+            <div class="invalid-feedback">Destination is required.</div>
+          </div>
+
+          <!-- Departure Date -->
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Departure Date</label>
+            <input type="date" class="form-control" id="departureDate" name="departureDate"
+              value="{{flight.departureDate}}" required>
+            <div class="invalid-feedback">Departure date is required.</div>
+          </div>
+
+          <!-- Departure Time -->
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Departure Time</label>
+            <input type="time" class="form-control" id="departureTime" name="departureTime"
+              value="{{flight.departureTime}}" required>
+            <div class="invalid-feedback">Departure time is required.</div>
+          </div>
+
+          <!-- Arrival Time -->
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Arrival Time</label>
+            <input type="time" class="form-control" id="arrivalTime" name="arrivalTime"
+              value="{{flight.arrivalTime}}" required>
+            <div class="invalid-feedback">Arrival time is required.</div>
+          </div>
+
+          <!-- Price -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Price ($)</label>
+            <input type="number" class="form-control" id="price" name="price"
+              value="{{flight.price}}" min="0" required>
+            <div class="invalid-feedback">Valid price is required.</div>
+          </div>
+
+          <!-- Status with Color Badge -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Status</label>
+            <select class="form-select" id="status" name="status" required>
+              <option value="Scheduled" {{#if (eq flight.status "Scheduled")}}selected{{/if}}>Scheduled</option>
+              <option value="On Time" {{#if (eq flight.status "On Time")}}selected{{/if}}>On Time</option>
+              <option value="Delayed" {{#if (eq flight.status "Delayed")}}selected{{/if}}>Delayed</option>
+              <option value="Cancelled" {{#if (eq flight.status "Cancelled")}}selected{{/if}}>Cancelled</option>
+            </select>
+
+            <div class="mt-2">
+              <span class="badge
+                {{#if (eq flight.status 'On Time')}}bg-success{{/if}}
+                {{#if (eq flight.status 'Delayed')}}bg-warning text-dark{{/if}}
+                {{#if (eq flight.status 'Cancelled')}}bg-danger{{/if}}
+                {{#if (eq flight.status 'Scheduled')}}bg-secondary{{/if}}">
+                {{flight.status}}
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="text-end mt-4">
+          <button type="submit" class="btn btn-danger px-4">
+            <i class="bi bi-save me-2"></i> Update Flight
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ CONFIRMATION MODAL -->
+<div class="modal fade" id="confirmEditModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body text-center">
+        <h5>Confirm Update?</h5>
+        <p class="text-muted">Are you sure you want to save these changes?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button id="confirmEditButton" class="btn btn-danger">Yes, Update</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ TOAST NOTIFICATION -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999;">
+  <div id="editToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive">
+    <div class="d-flex">
+      <div id="editToastBody" class="toast-body fw-semibold"></div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ SCRIPT -->
+<script>
+function showToast(message, success = true) {
+  const toastEl = document.getElementById("editToast");
+  const toastBody = document.getElementById("editToastBody");
+
+  toastEl.classList.remove("bg-danger", "bg-success");
+  toastEl.classList.add(success ? "bg-success" : "bg-danger");
+  toastBody.textContent = message;
+
+  const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+  toast.show();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("editFlightForm");
+  const confirmModalEl = document.getElementById("confirmEditModal");
+  const confirmBtn = document.getElementById("confirmEditButton");
+
+  let pendingData = null;
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    form.classList.add("was-validated");
+    if (!form.checkValidity()) return;
+
+    pendingData = Object.fromEntries(new FormData(form));
+    new bootstrap.Modal(confirmModalEl).show();
+  });
+
+  confirmBtn.addEventListener("click", async () => {
+    const modalInstance = bootstrap.Modal.getInstance(confirmModalEl);
+    modalInstance.hide();
+
+    const flightId = "{{flight._id}}";
+
+    try {
+      const res = await fetch(`/admin/update/${flightId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(pendingData)
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        showToast("Flight updated successfully!", true);
+        setTimeout(() => window.location.href = "/admin/flights", 1500);
+      } else {
+        showToast(data.message || "Update failed.", false);
+      }
+    } catch (err) {
+      console.error(err);
+      showToast("Server error occurred.", false);
+    }
+  });
+});
+</script>

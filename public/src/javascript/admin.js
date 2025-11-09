@@ -187,15 +187,18 @@ jQuery (function() {
 
 
   // Reservations
-  // show modal to update reservation Status
-  $('#editStatus').on('click', function() {
-    let statusModal = new bootstrap.Modal(document.getElementById("resevationStatusModal"));
-    statusModal.show();
+
+  //show modal when edit button is clicked and assign the reservation id
+  let selectedReservationId = null; 
+
+  $('.editStatus').on('click', function() {
+    selectedReservationId = $(this).data('id');
+    $('#resevationStatusModal').modal('show');
   });
 
   // handle status update form submission
   $('#statusUpdateForm').on('submit', function(e) {
-    e.preventDefault 
+    e.preventDefault(); 
 
     const $form = $(this);
 
@@ -206,14 +209,18 @@ jQuery (function() {
         return;
     }
 
+    if (!selectedReservationId) {
+      $('#updateError').text('No reservation selected!').show();
+      return;
+    }
+
     // Gather form data
-    const reservationId = $('#editStatus').data('id');
     const formData = {
-       status: $('updateStatus').val()
+       status: $('#updateStatus').val()
     };
 
     $.ajax ({
-      url: `/admin/edit-reservation/${reservationId}`,
+      url: `/admin/edit-reservation/${selectedReservationId}`,
       type: 'POST',
       data: JSON.stringify(formData),
       contentType: 'application/json',
@@ -226,9 +233,45 @@ jQuery (function() {
           location.reload();
         }
       },
-      error: function () {
-        $('#updateError').text(res.message).show();
+      error: function (xhr, status, error) {
+        const message = xhr.responseJSON?.message || 'Error updating reservation.';
+        $('#updateError').text(message).show();
+        console.error('Update failed:', message, error);
       }
     });
   })
+
+  $('.deleteReservationBtn').on('click', function() {
+    selectedReservationId = $(this).data('id');
+    $('#deleteToast').toast('show');
+  });
+
+  $('deleteToastForm').on('submit', function(e) {
+
+    $.ajax({
+      url: `/delete-reservation/${selectedReservationId}`,
+      type: 'POST',
+        success: function(res) {
+          if (res.success) {
+              $('#deleteToast').toast('hide');
+              $('#confirmToast .toast-body').text('Reservation Deleted Successfully');
+              $('#confimToast').toast('show');
+              location.reload();
+          } else {
+            $('#confimToast')
+              .removeClass('bg-success')
+              .addClass('bg-danger')
+            $('#confirmToast .toast-body').text(res.message);
+          }
+        },
+        error: function(err) {
+          // Handle errors
+          $('#confimToast')
+            .removeClass('bg-success')
+            .addClass('bg-danger')
+          $('#confirmToast .toast-body').text(res.message);
+        }
+    });
+  })
+
 });

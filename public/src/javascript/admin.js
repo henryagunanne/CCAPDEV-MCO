@@ -188,6 +188,16 @@ jQuery (function() {
 
   // Reservations
 
+  //==== Reservation Filter ====
+  $('#reservationFilter').on('keyup', function () {
+    const query = $(this).val().toLowerCase();
+    $('#reservationTable tr').each(function () {
+      const text = $(this).text().toLowerCase();
+      $(this).toggle(text.includes(query));
+    });
+  });
+
+
   //show modal when edit button is clicked and assign the reservation id
   let selectedReservationId = null; 
 

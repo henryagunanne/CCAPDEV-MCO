@@ -195,4 +195,30 @@ router.delete('/delete/:id', async (req, res) => {
   }
 });
 
+
+// GET /admin/reservations - View all reservations
+router.get('/reservations', async (req, res) => {
+  try {
+    const reservations = await Reservation.find()
+    .populate('flight')
+    .populate('userId')
+    .lean();
+
+    // JSON (for AJAX/API) vs Template Rendering
+    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+      return res.status(200).json(reservations);
+    }
+
+    res.render('admin/reservations', {
+      layout: 'admin',
+      title: 'All Reservations',
+      reservations
+    });
+  } catch (error) {
+    console.error('❌ Error retrieving reservations:', error);
+    res.status(500).json({ message: 'Error retrieving reservations', error });
+  }
+});
+
+// Export the router
 module.exports = router;

@@ -204,12 +204,7 @@ router.get('/reservations', async (req, res) => {
     .populate('userId')
     .lean();
 
-    // JSON (for AJAX/API) vs Template Rendering
-    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
-      return res.status(200).json(reservations);
-    }
-
-    res.render('admin/reservations', {
+    res.render('admin/bookings', {
       layout: 'admin',
       title: 'All Reservations',
       reservations

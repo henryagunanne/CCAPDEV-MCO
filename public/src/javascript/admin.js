@@ -57,7 +57,7 @@ jQuery (function() {
   }
 
   /* ======== Delete flight ======== */
-  function deleteFlight(id) {
+  $('#deleteFlightBtn').on('click', function () {
     if (!confirm('Are you sure you want to delete this flight?')) return;
 
     $.ajax({
@@ -76,7 +76,7 @@ jQuery (function() {
         showToast(msg, false);
       }
     });
-  }
+  });
 
   /* ======== Search filter ======== */
   $('#flightFilter').on('keyup', function () {

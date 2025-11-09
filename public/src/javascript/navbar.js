@@ -76,15 +76,14 @@ jQuery(function() {
                 if (res.success) {
                     $('#loginModal').modal('hide');
                     alert("Login successful!");
-                    location.reload();
-
-                    // Optionally redirect based on role
-                    /* if (res.isAdmin) {
+            
+                    // redirect based on role
+                    if (res.isAdmin) {
                         window.location.href = "/admin";
                     } else {
                         location.reload();
                     }
-                    */
+                    
                 } else {
                     $('#loginError').text(res.message).show();
                 }

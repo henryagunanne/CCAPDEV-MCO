@@ -66,7 +66,7 @@ router.post('/login', async (req, res) => {
       req.session.user = user; // store user in session
       return res.json({ 
         success: true, 
-        //isAdmin: req.session.user.role === 'Admin',
+        isAdmin: req.session.user.role === 'Admin',
         message: `Welcome, ${user.firstName}!` 
       });
 

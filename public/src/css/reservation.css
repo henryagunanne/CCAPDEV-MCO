@@ -6,11 +6,11 @@ html, body {
   margin: 0;
 }
 
-/* Make main take up full height before footer */
+/* Make main take up full height before footer (This is currently affecting the homepage so I commented it out)
 main {
   flex: 1;
   padding-top: 30px;
-}
+}*/
 
 /* Seat Map Layout */
 #seat-map {

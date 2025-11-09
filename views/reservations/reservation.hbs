@@ -13,11 +13,11 @@
 
     <!-- Flight Schedule Info -->
 <div class="alert alert-danger text-center fw-semibold mt-3">
-  {{#ifEquals tripType "Round-Trip"}}
+  {{#if  (eq tripType "Round-Trip")}}
      <strong>Round-Trip:</strong> {{departDate}} → {{returnDate}}
   {{else}}
      <strong>One-Way:</strong> {{departDate}}
-  {{/ifEquals}}
+  {{/if}}
   <br>
   <small class="text-muted">(Flight dates and class are pre-set for this route)</small>
 </div>

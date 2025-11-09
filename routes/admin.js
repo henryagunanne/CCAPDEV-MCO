@@ -215,5 +215,32 @@ router.get('/reservations', async (req, res) => {
   }
 });
 
+// POST /admin/edit-reservation/:id 
+router.post('/edit/:id', async (req, res) => {
+  const status = req.body;
+  const reservationId = req.params;
+  try{
+    const updatedReservation = await Reservation.findByIdAndUpdate(
+      reservationId,
+      status,
+      {new: true}
+    ).lean();
+
+
+    if (!updatedReservation) {
+      return res.status(404).send('Reservation not found');
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'Reservation updated successfully!',
+      updatedReservation
+    });
+  }catch (err) {
+    console.error('❌ Reservation update error:', err);
+    res.status(500).send('Server error during Reservation update');
+  }
+});
+
 // Export the router
 module.exports = router;

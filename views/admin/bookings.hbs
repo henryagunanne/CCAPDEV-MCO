@@ -46,11 +46,16 @@
             <td>{{this.userId.firstName}} {{this.userId.lastName}}</td>
             <td>{{this.flight.flightNumber}}</td>
             <td>{{this.flight.origin}}</td>
-            <td>{{this.flight.destination}} {{this.departureTime}}</td>
+            <td>{{this.flight.destination}}</td>
             <td>{{this.tripType}}</td>
             <td>{{this.travelClass}}</td>
-            <td>{{this.passengers.length}}</td>
-            <td>{{this.status}}</td>
+            <td>
+                {{this.passengers.length}}
+                 <a href="#" id="viewPassengers" class="btn btn-sm btn-outline-secondary me-1" title="Edit">
+                <i class="bi bi-eye"></i>
+                </a>
+            </td>
+            <td>{{formatDate this.bookingDate}}</td>
             <td>
               <span class="badge
                 {{#if (eq this.status 'Confirmed')}}bg-success{{/if}}
@@ -79,3 +84,35 @@
   {{/if}}
 </div>
  
+
+ <!-- Edit Reservation Status Button -->
+<div class="modal fade" id="resevationStatusModal" tabindex="-1" aria-labelledby="resevationStatusLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body">
+          <form id="statusUpdateForm" class="needs-validation" method="POST" novalidate>
+            <header class="text-center">
+              <h1 class="modal-title fs-5" id="resevationStatusLabel">Edit Reservation Status</h1>
+            </header>
+            <br>
+            <div class="mb-3">
+              <label for="updateStatus" class="form-label">Change Reservation Status</label>
+              <select class="form-select" id="updateStatus">
+                <option value="" disabled selected> --- Update Status ---</option>
+                <option value="Confirmed">Confirmed</option>
+                <option value="Cancelled">Cancelled</option>
+                <option value="Pending">Pending</option>
+              </select>
+            </div>
+            <div class="mb-3">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="submit" class="btn btn-danger float-end">Sign in</button>
+            </div>
+          </form>
+
+          <div><p id="updateError" class="error-message text-danger mt-2"></p></div>
+
+        </div>
+      </div>
+    </div>
+</div>

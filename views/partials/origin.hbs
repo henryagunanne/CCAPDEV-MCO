@@ -1,7 +1,11 @@
-<select id="origin" name="origin" class="form-select" required>
-  <option value="">-- Select a city --</option>
+<select {{#if (eq title 'Edit Flight')}} id="originSelect" {{else}} id="origin" {{/if}} name="origin" class="form-select" required>
+   {{#if (eq title 'Edit Flight')}}
+        <option value="{{flight.origin}}" selected>{{flight.origin}}</option>
+    {{else}}
+       <option value="">-- Select a city --</option>
+    {{/if}}
 
-  <optgroup label="Philippines">
+  <optgroup label="Philippines"> 
     <option value="Manila (MNL)">Manila (MNL)</option>
     <option value="Cebu (CEB)">Cebu (CEB)</option>
     <option value="Davao (DVO)">Davao (DVO)</option>

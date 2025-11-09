@@ -36,9 +36,8 @@
 
           <!-- Aircraft -->
           <div class="col-md-4">
-            <label class="form-label fw-semibold">Aircraft</label>
-            <input type="text" class="form-control" id="aircraft" name="aircraft"
-              value="{{flight.aircraft}}" required>
+            <label for="aircraft" class="form-label fw-semibold">Aircraft</label>
+            {{> aircraft}}
             <div class="invalid-feedback">Aircraft model is required.</div>
           </div>
 
@@ -53,16 +52,14 @@
           <!-- Origin -->
           <div class="col-md-6">
             <label class="form-label fw-semibold">Origin</label>
-            <input type="text" class="form-control" id="origin" name="origin"
-              value="{{flight.origin}}" required>
+            {{> origin}}
             <div class="invalid-feedback">Origin is required.</div>
           </div>
 
           <!-- Destination -->
           <div class="col-md-6">
             <label class="form-label fw-semibold">Destination</label>
-            <input type="text" class="form-control" id="destination" name="destination"
-              value="{{flight.destination}}" required>
+            {{> destination}}
             <div class="invalid-feedback">Destination is required.</div>
           </div>
 
@@ -181,6 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
+
     form.classList.add("was-validated");
     if (!form.checkValidity()) return;
 
@@ -215,4 +213,46 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+  // When the origin changes
+  document.getElementById('originSelect').addEventListener('change', function () {
+    const selectedOrigin = this.value;
+
+    // Disable the same city in destination
+    if (selectedOrigin) {
+      document.querySelectorAll('#destSelect option').forEach(option => {
+        if (option.value === selectedOrigin) {
+          option.disabled = true;
+          if (!option.text.includes('(Unavailable)')) {
+            option.text += ' (Unavailable)';
+          }
+        } else {
+          // Re-enable other options in case user changes origin
+          option.disabled = false;
+          option.text = option.text.replace(' (Unavailable)', '');
+        }
+      });
+  }
+  });
+
+  // When the destination changes
+  document.getElementById('destSelect').addEventListener('change', function () {
+    const selectedDest = this.value;
+
+    // Disable the same city in origin
+    if (selectedDest) {
+      document.querySelectorAll('#originSelect option').forEach(option => {
+        if (option.value === selectedDest) {
+          option.disabled = true;
+          if (!option.text.includes('(Unavailable)')) {
+            option.text += ' (Unavailable)';
+          }
+        } else {
+          // Re-enable other options in case user changes destination
+          option.disabled = false;
+          option.text = option.text.replace(' (Unavailable)', '');
+        }
+      });
+  }
+  });
 </script>

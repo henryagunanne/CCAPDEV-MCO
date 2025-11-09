@@ -1,5 +1,9 @@
-<select id="destination" name="destination" class="form-select" required>
-  <option value="">-- Select a city --</option>
+<select {{#if (eq title 'Edit Flight')}} id="destSelect" {{else}} id="destination" {{/if}} name="destination" class="form-select" required>
+  {{#if (eq title 'Edit Flight')}}
+        <option value="{{flight.destination}}" selected>{{flight.destination}}</option>
+    {{else}}
+       <option value="">-- Select a city --</option>
+    {{/if}}
 
   <optgroup label="Philippines">
     <option value="Manila (MNL)">Manila (MNL)</option>

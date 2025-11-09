@@ -1,5 +1,9 @@
 <select class="form-select" id="aircraft" name="aircraft" required>
-    <option value="" disabled selected>Select Aircraft</option>
+    {{#if (eq title 'Edit Flight')}}
+        <option value="{{flight.aircraft}}" selected>{{flight.aircraft}}</option>
+    {{else}}
+        <option value="" disabled selected>Select Aircraft</option>
+    {{/if}}
     <option value="Airbus A320">Airbus A320</option>
     <option value="Airbus A320neo">Airbus A320neo</option>
     <option value="Airbus A321">Airbus A321</option>

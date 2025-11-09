@@ -120,4 +120,46 @@ $(document).ready(function () {
     $("#seatFee").text(seatFee);
     $("#totalPrice").text(total);
   }
+
+// -------- Submit Booking --------
+$("#confirmBooking").on("click", function (e) {
+  e.preventDefault();
+
+  // Build passengers array from form cards
+  const passengerData = [];
+  $("#passengerFields .card").each(function () {
+    const passenger = {
+      fullName: $(this).find("input[name*='fullName']").val(),
+      email: $(this).find("input[name*='email']").val(),
+      passport: $(this).find("input[name*='passport']").val(),
+      seatNumber: $(this).find(".seat-info").text().replace("Seat: ", "").trim(),
+      meal: $(this).find("select[name*='meal']").val(),
+      baggageAllowance: parseInt($(this).find("input[name*='baggageAllowance']").val()) || 0
+    };
+    passengerData.push(passenger);
+  });
+
+  // Compute total from summary
+  const totalAmount = parseFloat($("#totalPrice").text()) || 0;
+
+  // ✅ FIXED JSON REQUEST
+  $.ajax({
+    url: "/reservations/create",
+    method: "POST",
+    contentType: "application/json", // send as JSON
+    data: JSON.stringify({
+      flight: $("input[name='flight']").val(),
+      travelClass: $("#travelClass").val(),
+      passengers: passengerData,
+      totalAmount: totalAmount
+    }),
+    success: function (response) {
+      window.location.href = response.redirect || window.location.href;
+    },
+    error: function (xhr, status, err) {
+      console.error("Error submitting reservation:", err);
+      alert("An error occurred while submitting your booking.");
+    }
+  });
+});
 });

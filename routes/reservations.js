@@ -39,51 +39,61 @@ router.get('/book/:flightId', isAuthenticated, async (req, res) => {
   }
 });
 
-router.post('/create', isAuthenticated, async (req, res) => {
+//create
+
+// ✅ Create Reservation Route
+router.post("/create", async (req, res) => {
   try {
-    const { flight, tripType, travelClass, passengers } = req.body;
+    const { flight, travelClass, passengers, totalAmount } = req.body;
 
-    if (!passengers || !Array.isArray(passengers) || passengers.length === 0) {
-      return res.status(400).send('Missing passenger information.');
-    }
+    // passengers is already an array since we send JSON
+    const parsedPassengers = Array.isArray(passengers)
+      ? passengers
+      : JSON.parse(passengers);
 
-    // Get logged in user
-    const userId = req.session?.user?._id || null;
+    const seatNumbers = parsedPassengers.map(p => p.seatNumber);
 
-    // Save one reservation per passenger
-    const createdReservations = [];
-    for (const p of passengers) {
-      const newReservation = new Reservation({
-        userId,
-        flight,
-        tripType: tripType || 'One-Way',
-        travelClass: travelClass || 'Economy',
-        fullName: p.fullName,
-        email: p.email,
-        passport: p.passport,
-        seatNumber: p.seatNumber,
-        meal: p.meal,
-        baggageAllowance: p.baggageAllowance || 0,
-        status: 'Confirmed',
-      });
-
-      await newReservation.save();
-      createdReservations.push(newReservation);
-    }
-
-    console.log(`✅ Created ${createdReservations.length} individual reservations.`);
-
-    res.render('reservations/reservationSuccess', {
-      title: 'Booking Confirmed',
-      reservations: createdReservations.map(r => r.toObject()),
+    const newReservation = new Reservation({
+      userId: req.session.user?._id || null,
+      flight,
+      travelClass,
+      passengers: parsedPassengers,
+      seatNumbers,
+      totalAmount: parseFloat(totalAmount) || 0,
+      status: "Confirmed"
     });
 
+    await newReservation.save();
+
+    console.log("✅ New reservation created:", newReservation);
+
+    res.json({ redirect: `/reservations/${newReservation._id}/confirmation` });
   } catch (err) {
-    console.error('Error creating reservation:', err);
-    res.status(500).send('Error creating reservation');
+    console.error("❌ Error creating reservation:", err);
+    res.status(500).send("Error creating reservation");
   }
 });
 
+
+// ✅ Confirmation Route 
+router.get("/:id/confirmation", async (req, res) => {
+  try {
+    const reservation = await Reservation.findById(req.params.id)
+      .populate("flight")      // get flight details
+      .populate("userId")      // optional, for user info
+      .lean();                 // convert to plain object
+
+    if (!reservation) return res.status(404).send("Reservation not found");
+
+    res.render("reservations/confirmation", { 
+      title: "Booking Confirmed",
+      reservation 
+    });
+  } catch (err) {
+    console.error("Error loading reservation:", err);
+    res.status(500).send("Error loading reservation");
+  }
+});
 
 
 /* =============================

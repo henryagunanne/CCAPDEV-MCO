@@ -246,8 +246,7 @@ jQuery (function() {
     $('#deleteToast').toast('show');
   });
 
-  $('deleteToastBtn').on('click', function(e) {
-    e.preventDefault();
+  $('deleteToastForm').on('submit', function(e) {
 
     $.ajax({
       url: `/delete-reservation/${selectedReservationId}`,

@@ -254,7 +254,7 @@ router.post('/delete-reservation/:reservationId', async (req, res) => {
 
     res.json({ success: true });
   } catch (error) {
-    console.error('❌ Reservation deletion error:', err);
+    console.error('❌ Reservation deletion error:', error);
     res.status(500).send('Server error during Reservation deletion');
   }
 });

@@ -21,23 +21,23 @@ function isAuthenticated(req, res, next) {
 ============================= */
 router.get('/book/:flightId', isAuthenticated, async (req, res) => {
   const flightId = req.params.flightId;
+  const promoClass = req.query.promoClass || "economy"; // default fallback
 
   try {
     const flight = await Flight.findById(flightId).lean();
-
-    if (!flight) {
-      return res.status(404).send('Flight not found');
-    }
+    if (!flight) return res.status(404).send('Flight not found');
 
     res.render('reservations/reservation', {
       title: 'Book Your Flight',
-      flight
+      flight,
+      promoClass // 🔥 Pass to template
     });
   } catch (err) {
     console.error('Error loading booking page:', err);
     res.status(500).send('Error loading booking page.');
   }
 });
+
 
 //create
 

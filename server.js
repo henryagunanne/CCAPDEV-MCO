@@ -35,63 +35,57 @@ app.engine('hbs', exphbs.engine({
     layoutsDir: 'views/layouts',       // Folder for layout files
     partialsDir: 'views/partials',     // Folder for partial files/reusable components
     helpers: {
-        array: (...args) => args.slice(0, -1),  // Collects all args into an array except the last one (Handlebars passes an options object as the last arg)
-        inc: (value) => parseInt(value) + 1,    // Increment helper
+    array: (...args) => args.slice(0, -1),
+    inc: (value) => parseInt(value) + 1,
 
-        // Date formatting helper
-        formatDate: (date) => {
-          if (!date) return '';
-          return new Date(date).toLocaleDateString('en-US', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric'
-          });
-        },
-        /*
-        formatDate: (date) => {
-            return new Date(date).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-            });
-        },*/
+    // Date formatting helper
+    formatDate: (date) => {
+      if (!date) return '';
+      return new Date(date).toLocaleDateString('en-US', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
+    },
 
-        // Chunk helper to group flights (e.g., 4 per slide)
-        chunk: function (array, size) {
-            if (!Array.isArray(array)) return [];
-            const chunks = [];
-            for (let i = 0; i < array.length; i += size) {
-              chunks.push(array.slice(i, i + size));
-            }
-            return chunks;
-        },
-        divide: (a, b) => Math.ceil(a / b), // Division helper with ceiling
+    // Chunk helper to group flights (e.g., 4 per slide)
+    chunk: function (array, size) {
+      if (!Array.isArray(array)) return [];
+      const chunks = [];
+      for (let i = 0; i < array.length; i += size) {
+        chunks.push(array.slice(i, i + size));
+      }
+      return chunks;
+    },
 
-        // Generates an array of numbers from start to end-1
-        range: function(start, end) {
-            const rangeArray = [];
-            for (let i = start; i < end; i++) {
-              rangeArray.push(i);
-            }
-            return rangeArray;
-        },
-        // --- Logic Helpers ---
-        eq: (a, b) => a === b,
-        ne: (a, b) => a !== b,
-        gt: (a, b) => a > b,
-        gte: (a, b) => a >= b,
-        lt: (a, b) => a < b,
-        lte: (a, b) => a <= b,
+    divide: (a, b) => Math.ceil(a / b),
 
-        // Allows multiple AND conditions
-        and: (...args) => args.slice(0, -1).every(Boolean),
+    range: function (start, end) {
+      const rangeArray = [];
+      for (let i = start; i < end; i++) {
+        rangeArray.push(i);
+      }
+      return rangeArray;
+    },
 
-        // Allows multiple OR conditions
-        or: (...args) => args.slice(0, -1).some(Boolean),
+    // --- Logic Helpers ---
+    eq: (a, b) => a === b,
+    ne: (a, b) => a !== b,
+    gt: (a, b) => a > b,
+    gte: (a, b) => a >= b,
+    lt: (a, b) => a < b,
+    lte: (a, b) => a <= b,
 
-        // Logical NOT
-        not: (a) => !a,
+    and: (...args) => args.slice(0, -1).every(Boolean),
+    or: (...args) => args.slice(0, -1).some(Boolean),
+    not: (a) => !a,
+
+    // 🧩 Equality helper (used in reservation.hbs)
+    ifEquals: function (a, b, options) {
+      return a === b ? options.fn(this) : options.inverse(this);
     }
+}
+
 }));
 app.set('view engine', 'hbs');  // Set Handlebars as the view engine
 app.set('views', './views'); // Set views directory

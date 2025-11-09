@@ -1,4 +1,4 @@
-const PopularFlight = require('../models/PopularFlight');
+const PopularFlight = require('../models/popularFlight'); // ✅ lowercase
 const Flight = require('../models/Flight');
 
 async function seedPopularFlights() {
@@ -7,14 +7,19 @@ async function seedPopularFlights() {
   if (count === 0) {
     console.log('🌱 Seeding Popular Flights collection...');
 
-    // Get flights from the database
+    // Fetch flights that match your seed criteria
     const flights = await Flight.find({
       flightNumber: { $in: [
         'AA1001', 'AA1002', 'AA1003', 'AA1004',
         'AA2015', 'AA1021', 'AA1022', 'AA1023',
         'AA1005', 'AA1020', 'AA2010', 'AA1009'
       ]}
-    });
+    }).lean(); // ✅ lean() for faster access
+
+    if (flights.length === 0) {
+      console.log('⚠️ No matching flights found in the Flight collection.');
+      return;
+    }
 
     await PopularFlight.insertMany([
       {

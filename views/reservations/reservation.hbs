@@ -2,10 +2,32 @@
   <div class="card shadow-lg mx-auto" style="max-width: 900px;">
     <div class="card-header bg-danger text-white text-center py-3">
       <h3>Book Your Flight – {{flight.flightNumber}}</h3>
-      <p class="mb-0">{{flight.origin}} → {{flight.destination}}</p>
-      <p class="mb-0">Departure: {{flight.departureTime}} | Arrival: {{flight.arrivalTime}}</p>
-      <p class="fw-bold mb-0">₱{{flight.price}}</p>
+      <h2 class="route-display mb-1">{{flight.origin}} → {{flight.destination}}</h2>
+      <p class="flight-details mb-0">
+  Departure: {{flight.departureTime}} | Arrival: {{flight.arrivalTime}}
+</p>
+<p class="flight-price mb-0">₱{{flight.price}}</p>
+
+
     </div>
+
+    <!-- Flight Schedule Info -->
+<div class="alert alert-danger text-center fw-semibold mt-3">
+  {{#ifEquals tripType "Round-Trip"}}
+     <strong>Round-Trip:</strong> {{departDate}} → {{returnDate}}
+  {{else}}
+     <strong>One-Way:</strong> {{departDate}}
+  {{/ifEquals}}
+  <br>
+  <small class="text-muted">(Flight dates and class are pre-set for this route)</small>
+</div>
+
+<!-- Hidden Inputs -->
+<input type="hidden" id="travelClass" name="travelClass" value="{{travelClass}}">
+<input type="hidden" id="tripType" name="tripType" value="{{tripType}}">
+<input type="hidden" id="departDate" name="departDate" value="{{departDate}}">
+<input type="hidden" id="returnDate" name="returnDate" value="{{returnDate}}">
+
 
     <div class="card-body">
       <form id="reservationForm" action="/reservations/create" method="POST">

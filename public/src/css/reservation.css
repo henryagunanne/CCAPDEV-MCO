@@ -122,3 +122,26 @@ footer {
     max-width: 450px;
   }
 }
+
+/* --- Flight Route Title (Booking Header) --- */
+.route-display {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: capitalize;
+  margin-bottom: 0.4rem;
+}
+
+/* --- Flight Details under route --- */
+.flight-details {
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;   /* make it readable */
+  margin-bottom: 5rem;
+}
+
+.flight-price {
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  margin-top: 0.3rem;
+  color: #fffbea;
+}

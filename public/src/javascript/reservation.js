@@ -1,4 +1,7 @@
 $(document).ready(function () {
+  // 🧭 Get travel class from hidden input (Economy / Business / First)
+  const travelClass = ($("#travelClass").val() || "Economy").toLowerCase();
+
   const baseFare = parseInt($("#baseFare").text());
   const mealPrice = 150;
   const bagPrice = 50;

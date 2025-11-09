@@ -236,7 +236,8 @@
                                         <p class="card-text mb-0">{{this.tripType}}/{{this.travelClass}}</p>
                                         <p class="card-text">Depart: {{this.flight.departureDate}}</p>
                                         <div class="mt-auto">
-                                            <a href="/reservations/book/{{this.flight._id}}" class="btn btn-danger d-grid gap-2">Book Now</a>
+                                            <a href="/reservations/book/{{this.flight._id}}?travelClass={{this.travelClass}}&tripType={{this.tripType}}&depart={{formatDate this.startDate}}&return={{formatDate this.endDate}}" 
+   class="btn btn-danger d-grid gap-2">Book Now</a>
                                         </div>
                                     </div>
                                 </div>

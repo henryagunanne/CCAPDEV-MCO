@@ -20,17 +20,24 @@ function isAuthenticated(req, res, next) {
    BOOK PAGE - Show booking form
 ============================= */
 router.get('/book/:flightId', isAuthenticated, async (req, res) => {
-  const flightId = req.params.flightId;
-  const promoClass = req.query.promoClass || "economy"; // default fallback
-
   try {
+    const flightId = req.params.flightId;
     const flight = await Flight.findById(flightId).lean();
     if (!flight) return res.status(404).send('Flight not found');
+
+    // Get details from query (passed from the flight card)
+    const travelClass = req.query.travelClass || "Economy";
+    const tripType = req.query.tripType || "One-Way";
+    const departDate = req.query.depart || "";
+    const returnDate = req.query.return || "";
 
     res.render('reservations/reservation', {
       title: 'Book Your Flight',
       flight,
-      promoClass // 🔥 Pass to template
+      travelClass,
+      tripType,
+      departDate,
+      returnDate
     });
   } catch (err) {
     console.error('Error loading booking page:', err);

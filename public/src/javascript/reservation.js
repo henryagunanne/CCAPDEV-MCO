@@ -99,23 +99,36 @@ $(document).ready(function () {
   }
 
   // -------- Seat Selection (1 per Passenger) --------
-  $(document).on("click", ".seat.available", function () {
-    const seatId = $(this).data("id");
-    const seatPrice = parseInt($(this).data("price"));
-    const seatClass = $(this).data("class");
+$(document).on("click", ".seat.available, .seat.selected", function () {
+  const seatId = $(this).data("id");
+  const seatPrice = parseInt($(this).data("price"));
+  const seatClass = $(this).data("class");
 
-    const nextPassenger = passengers.findIndex(p => p.seat === null);
-    if (nextPassenger === -1) {
-      alert("All passengers already have seats!");
-      return;
+  // If already selected, unselect it
+  if ($(this).hasClass("selected")) {
+    $(this).removeClass("selected").addClass("available");
+    const passengerIndex = passengers.findIndex(p => p.seat?.id === seatId);
+    if (passengerIndex !== -1) {
+      passengers[passengerIndex].seat = null;
+      $(`#passengerFields .card:eq(${passengerIndex}) .seat-info`).text("Seat: None");
     }
-
-    $(this).removeClass("available").addClass("selected");
-    passengers[nextPassenger].seat = { id: seatId, price: seatPrice, class: seatClass };
-    $(`#passengerFields .card:eq(${nextPassenger}) .seat-info`).text(`Seat: ${seatId}`);
-
     updateSummary();
-  });
+    return;
+  }
+
+  // Assign seat to next passenger without a seat
+  const nextPassenger = passengers.findIndex(p => p.seat === null);
+  if (nextPassenger === -1) {
+    alert("All passengers already have seats!");
+    return;
+  }
+
+  $(this).removeClass("available").addClass("selected");
+  passengers[nextPassenger].seat = { id: seatId, price: seatPrice, class: seatClass };
+  $(`#passengerFields .card:eq(${nextPassenger}) .seat-info`).text(`Seat: ${seatId}`);
+  updateSummary();
+});
+
 
   // -------- Meal/Baggage Change --------
   $(document).on("change input", ".meal-option, .baggage-input", function () {

@@ -1,39 +1,74 @@
-<div class="container text-center my-5">
-  <h2 class="text-success fw-bold mb-4">Booking Confirmed!</h2>
-  <p>Thank you for booking! Here are the passengers:</p>
-<ul class="list-group">
+<main class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+  <div class="card shadow-lg border-0" style="max-width: 700px; width: 100%;">
+    <div class="card-header bg-danger text-white text-center py-4 rounded-top">
+      <h2 class="fw-bold mb-1">✅ Booking Confirmed!</h2>
+      <p class="mb-0">
+        Your flight from <strong>{{reservation.flight.origin}}</strong>
+        to <strong>{{reservation.flight.destination}}</strong> is confirmed.
+      </p>
+    </div>
+
+    <div class="card-body px-5 py-4">
+      <h4 class="text-danger fw-bold mb-3 text-center">Flight Summary</h4>
+
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered align-middle text-center">
+          <tbody>
+            <tr>
+              <th>Flight No:</th>
+              <td>{{reservation.flight.flightNumber}}</td>
+            </tr>
+            <tr>
+              <th>Departure:</th>
+              <td>{{reservation.flight.departureTime}}</td>
+            </tr>
+            <tr>
+              <th>Arrival:</th>
+              <td>{{reservation.flight.arrivalTime}}</td>
+            </tr>
+            <tr>
+              <th>Class:</th>
+              <td>{{reservation.travelClass}}</td>
+            </tr>
+            <tr>
+              <th>Status:</th>
+              <td><span class="badge bg-success">{{reservation.status}}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4 class="text-danger fw-bold mb-3 text-center">Passenger Details</h4>
+
+      {{!-- Dynamically center or show in pairs --}}
+<div class="row {{#if (eq reservation.passengers.length 1)}}justify-content-center{{else}}row-cols-1 row-cols-md-2 g-3{{/if}}">
   {{#each reservation.passengers}}
-  <li class="list-group-item">
-    <strong>{{this.fullName}}</strong> — {{this.email}} ({{this.passport}})
-  </li>
-  {{/each}}
-</ul>
-  <p>Your flight from <strong>{{reservation.flight.origin}}</strong> 
-     to <strong>{{reservation.flight.destination}}</strong> is confirmed.</p>
-
-  <div class="card shadow-sm mt-4 p-4 mx-auto" style="max-width: 600px;">
-    <h4 class="text-danger mb-3">Flight Summary</h4>
-    <p><strong>Flight No:</strong> {{reservation.flight.flightNumber}}</p>
-    <p><strong>Departure:</strong> {{reservation.flight.departureTime}}</p>
-    <p><strong>Arrival:</strong> {{reservation.flight.arrivalTime}}</p>
-    <p><strong>Class:</strong> {{reservation.travelClass}}</p>
-    <hr>
-   <h4 class="text-danger mt-4">Passenger Details</h4>
-<ul class="list-group mb-4">
-  {{#each reservation.passengers}}
-  <li class="list-group-item">
-    <strong>{{this.fullName}}</strong> — {{this.email}} (Passport: {{this.passport}})<br>
-    Seat: {{this.seatNumber}} | Meal: {{this.meal}} | Baggage: {{this.baggageAllowance}} kg
-  </li>
-  {{/each}}
-</ul>
-
-    <p><strong>Status:</strong> {{reservation.status}}</p>
+  <div class="col d-flex justify-content-center">
+    <div class="card border-0 shadow-sm h-100" style="max-width: 300px; width: 100%;">
+      <div class="card-body text-center">
+        <h5 class="fw-bold text-dark mb-1">{{this.fullName}}</h5>
+        <p class="text-muted mb-1">{{this.gender}}, Age {{this.age}}</p>
+        <p class="mb-1"><strong>Passport:</strong> {{this.passport}}</p>
+        <p class="mb-1"><strong>Seat:</strong> {{this.seatNumber}}</p>
+        <p class="mb-1"><strong>Meal:</strong> {{this.meal}}</p>
+        <p class="mb-0"><strong>Baggage:</strong> {{this.baggageAllowance}} kg</p>
+      </div>
+    </div>
   </div>
-
-  <div class="mt-4">
-    <a href="/" class="btn btn-primary mx-2">Return to Home</a>
-    <a href="/reservations/myBookings" class="btn btn-outline-secondary mx-2">View My Reservations</a>
-    <a href="/reservations/book/{{reservation.flight._id}}" class="btn btn-danger mx-2">Add Another Passenger</a>
-  </div>
+  {{/each}}
 </div>
+
+
+      <div class="text-center mt-5">
+        <a href="/" class="btn btn-danger px-4 mx-2">Return to Home</a>
+        <a href="/reservations/myBookings" class="btn btn-outline-secondary px-4 mx-2">
+          View My Reservations
+        </a>
+      </div>
+    </div>
+
+    <div class="card-footer text-center text-muted small py-3">
+      Thank you for choosing <strong>Archers Airlines</strong> ✈️
+    </div>
+  </div>
+</main>

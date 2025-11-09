@@ -23,19 +23,36 @@ $(document).ready(function () {
           <div class="card-header bg-light"><strong>Passenger ${i}</strong></div>
           <div class="card-body">
             <div class="row mb-2">
-              <div class="col-md-4">
-                <label class="form-label">Full Name</label>
-                <input type="text" name="passengers[${i - 1}][fullName]" class="form-control" required>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Email</label>
-                <input type="email" name="passengers[${i - 1}][email]" class="form-control" required>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Passport Number</label>
-                <input type="text" name="passengers[${i - 1}][passport]" class="form-control" required>
-              </div>
-            </div>
+  <div class="col-md-4">
+    <label class="form-label">Full Name</label>
+    <input type="text" name="passengers[${i - 1}][fullName]" class="form-control" required>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Age</label>
+    <input type="number" name="passengers[${i - 1}][age]" class="form-control" min="0" required>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Gender</label>
+    <select name="passengers[${i - 1}][gender]" class="form-select" required>
+      <option value="">Select</option>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+      <option value="Other">Other</option>
+    </select>
+  </div>
+</div>
+
+<div class="row mb-2">
+  <div class="col-md-6">
+    <label class="form-label">Email</label>
+    <input type="email" name="passengers[${i - 1}][email]" class="form-control" required>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Passport Number</label>
+    <input type="text" name="passengers[${i - 1}][passport]" class="form-control" required>
+  </div>
+</div>
+
 
             <div class="row">
               <div class="col-md-6">
@@ -129,15 +146,21 @@ $("#confirmBooking").on("click", function (e) {
   const passengerData = [];
   $("#passengerFields .card").each(function () {
     const passenger = {
-      fullName: $(this).find("input[name*='fullName']").val(),
-      email: $(this).find("input[name*='email']").val(),
-      passport: $(this).find("input[name*='passport']").val(),
-      seatNumber: $(this).find(".seat-info").text().replace("Seat: ", "").trim(),
-      meal: $(this).find("select[name*='meal']").val(),
-      baggageAllowance: parseInt($(this).find("input[name*='baggageAllowance']").val()) || 0
-    };
+  fullName: $(this).find("input[name*='fullName']").val(),
+  age: parseInt($(this).find("input[name*='age']").val()) || 0,
+  gender: $(this).find("select[name*='gender']").val(),
+  email: $(this).find("input[name*='email']").val(),
+  passport: $(this).find("input[name*='passport']").val(),
+  seatNumber: $(this).find(".seat-info").text().replace("Seat: ", "").trim(),
+  meal: $(this).find("select[name*='meal']").val(),
+  baggageAllowance: parseInt($(this).find("input[name*='baggageAllowance']").val()) || 0
+};
+
     passengerData.push(passenger);
   });
+
+  console.log("📦 Passenger Data:", passengerData);
+
 
   // Compute total from summary
   const totalAmount = parseFloat($("#totalPrice").text()) || 0;

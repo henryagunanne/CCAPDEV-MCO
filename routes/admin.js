@@ -216,7 +216,7 @@ router.get('/reservations', async (req, res) => {
 });
 
 // POST /admin/edit-reservation/:id 
-router.post('/edit/:id', async (req, res) => {
+router.post('/edit-reservation/:id', async (req, res) => {
   const status = req.body;
   const reservationId = req.params;
   try{

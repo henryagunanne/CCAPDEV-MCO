@@ -187,7 +187,48 @@ jQuery (function() {
 
 
   // Reservations
-  $('#viewPassengers').on('click', function(e) {
-    
+  // show modal to update reservation Status
+  $('#editStatus').on('click', function() {
+    let statusModal = new bootstrap.Modal(document.getElementById("resevationStatusModal"));
+    statusModal.show();
   });
+
+  // handle status update form submission
+  $('#statusUpdateForm').on('submit', function(e) {
+    e.preventDefault 
+
+    const $form = $(this);
+
+    // Check form validity
+    if (this.checkValidity() === false) {
+        e.stopPropagation();
+        $form.addClass('was-validated');
+        return;
+    }
+
+    // Gather form data
+    const reservationId = $('#editStatus').data('id');
+    const formData = {
+       status: $('updateStatus').val()
+    };
+
+    $.ajax ({
+      url: `/admin/edit-reservation/${reservationId}`,
+      type: 'POST',
+      data: JSON.stringify(formData),
+      contentType: 'application/json',
+      success: function(res) {
+        if (res.success) {
+          $('#resevationStatusModal').modal('hide');
+          alert("Reservation updated successfully!");
+          $form[0].reset();
+          $form.removeClass('was-validated');
+          location.reload();
+        }
+      },
+      error: function () {
+        $('#updateError').text(res.message).show();
+      }
+    });
+  })
 });

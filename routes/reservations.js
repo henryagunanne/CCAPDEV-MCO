@@ -67,7 +67,7 @@ router.post("/create", async (req, res) => {
       passengers: parsedPassengers,
       seatNumbers,
       totalAmount: parseFloat(totalAmount) || 0,
-      status: "Confirmed"
+      status: "Pending"
     });
 
     await newReservation.save();

@@ -1,7 +1,7 @@
 
 jQuery (function() {
 
-  // Flight search form submission handling
+  // Admin Dashboard Flight search form submission handling
   $('#searchFlightForm').on('submit', function (e) {
     e.preventDefault();
     const query = $('#searchFlightInput').val().trim();
@@ -186,7 +186,7 @@ jQuery (function() {
   });
 
 
-  // Reservations
+  // ====== Reservations =======
 
   //==== Reservation Filter ====
   $('#reservationFilter').on('keyup', function () {
@@ -197,7 +197,7 @@ jQuery (function() {
     });
   });
 
-
+/*
   //show modal when edit button is clicked and assign the reservation id
   let selectedReservationId = null; 
 
@@ -269,14 +269,14 @@ jQuery (function() {
             /*
             $('#confirmToast .toast-body').text('Reservation Deleted Successfully');
             $('#confirmToast').toast('show');
-            location.reload();*/
+            location.reload(); /
             setTimeout(() => location.reload(), 1000);
         } else {
           alert(res.message)
           /* $('#confirmToast')
             .removeClass('bg-success')
             .addClass('bg-danger')
-          $('#confirmToast .toast-body').text(res.message); */
+          $('#confirmToast .toast-body').text(res.message); /
         }
       },
       error: function(err) {
@@ -285,9 +285,10 @@ jQuery (function() {
         /* $('#confirmToast')
           .removeClass('bg-success')
           .addClass('bg-danger')
-        $('#confirmToast .toast-body').text(err.message); */
+        $('#confirmToast .toast-body').text(err.message); /
       }
     });
   })
+  */
 
 });

@@ -1,5 +1,3 @@
-const e = require("express");
-
 jQuery(function() {
     'use strict';
 

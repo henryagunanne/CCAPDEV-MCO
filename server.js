@@ -1,12 +1,6 @@
+// server.js - Express + Mongoose + Handlebars
 const express = require("express");
 const app = express();
-
-// 🟢 These two lines are critical!
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-
-
-// server.js - Express + Mongoose + Handlebars
 const mongoose = require('mongoose'); // MongoDB ODM
 const exphbs = require('express-handlebars'); // Handlebars templating engine
 const session = require('express-session'); // Session management
@@ -18,6 +12,7 @@ const seedUsers = require('./seeds/seedUsers');
 const seedReservations = require('./seeds/seedReservations');
 const PORT = 3000;  // Server port
 
+
 // Connect to MongoDB
 mongoose.connect('mongodb://127.0.0.1:27017/airlineDB')
 .then(async () => {
@@ -28,6 +23,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/airlineDB')
     await seedReservations(); // 🌱 seed reservations if empty
   })
 .catch(err => console.error('❌ MongoDB connection error:', err));
+
 
 // Configure Handlebars and handlebars helpers
 app.engine('hbs', exphbs.engine({
@@ -90,11 +86,13 @@ app.engine('hbs', exphbs.engine({
 app.set('view engine', 'hbs');  // Set Handlebars as the view engine
 app.set('views', './views'); // Set views directory
 
+
 // Middleware
 app.use(express.urlencoded({ extended: true }));    // Parse URL-encoded bodies
 app.use(express.json());    // Parse JSON bodies
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static('public'));  // Serve static files
+
 
 // Session management
 app.use(session({
@@ -104,11 +102,13 @@ app.use(session({
     store: MongoStore.create({ mongoUrl: 'mongodb://127.0.0.1:27017/airlineDB' })   // Store sessions in MongoDB
 }));
 
+
 // Make user data available in all views
 app.use((req, res, next) => {
     res.locals.user = req.session.user;
     next();
 });
+
 
 // Routes
 app.use('/', require('./routes/index'));
@@ -121,6 +121,7 @@ app.use('/admin', require('./routes/admin'));
 app.use((req, res, next) => {
     res.status(404).render('error/404', { url: req.originalUrl });
 });
+
 
 // Start Server
 app.listen(PORT, () => {

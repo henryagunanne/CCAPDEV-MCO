@@ -49,7 +49,7 @@ router.get('/book/:flightId', isAuthenticated, async (req, res) => {
 //create
 
 // ✅ Create Reservation Route
-router.post("/create", async (req, res) => {
+router.post("/create", isAuthenticated, async (req, res) => {
   try {
     const { flight, travelClass, passengers, totalAmount } = req.body;
 
@@ -83,7 +83,7 @@ router.post("/create", async (req, res) => {
 
 
 // ✅ Confirmation Route 
-router.get("/:id/confirmation", async (req, res) => {
+router.get("/:id/confirmation", isAuthenticated,  async (req, res) => {
   try {
     const reservation = await Reservation.findById(req.params.id)
       .populate("flight")      // get flight details
@@ -97,6 +97,30 @@ router.get("/:id/confirmation", async (req, res) => {
       reservation 
     });
   } catch (err) {
+    console.error("Error loading reservation:", err);
+    res.status(500).send("Error loading reservation");
+  }
+});
+
+
+// GET reservations/my-bookings - render my reservations page
+router.get('/my-bookings', isAuthenticated, async (req, res) => {
+  const userId = req.session.user.userId;
+  try {
+    const reservation = await Reservation.find({userId: userId})
+      .populate("flight") 
+      .lean(); 
+      
+    if (reservation.length === 0) {
+      return;
+    }
+
+    res.render('reservations/myBookings', {
+      title: 'My Bookings',
+      reservation,
+      user: req.session.user
+    })
+  }catch (err){
     console.error("Error loading reservation:", err);
     res.status(500).send("Error loading reservation");
   }

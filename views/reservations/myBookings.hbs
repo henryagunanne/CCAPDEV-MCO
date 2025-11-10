@@ -1,7 +1,7 @@
 <div class="container mt-5 vh-100">
   <h2>My Bookings</h2>
 
-  {{#if reservations.length}}
+  {{#if reservation.length}}
     <table class="table table-striped">
       <thead>
         <tr>
@@ -17,7 +17,7 @@
         </tr>
       </thead>
       <tbody>
-        {{#each reservations}}
+        {{#each reservation}}
         <tr>
           <td>{{flight.flightNumber}}</td>
           <td>{{seatNumber}}</td>

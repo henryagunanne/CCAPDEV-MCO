@@ -6,10 +6,11 @@
     {{#if user}}
       {{#if (not user.isAdmin)}}
         <p class="">Administrator privileges are required to access this page.</p>
+            <a href="/" class="btn btn-danger mt-3">Return to Home</a>
       {{/if}}
     {{else}}
       <p class="">Please login to gain access.</p>
+      <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" class="btn btn-danger mt-3">Login</a>
     {{/if}}
-    <a href="/" class="btn btn-danger mt-3">Return to Home</a>
   </div>
 </div>

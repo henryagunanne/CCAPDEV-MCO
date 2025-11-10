@@ -55,6 +55,9 @@ app.engine('hbs', exphbs.engine({
     },
 
     divide: (a, b) => Math.ceil(a / b),
+    addOne: function (value) {
+      return value + 1;
+    },
 
     range: function (start, end) {
       const rangeArray = [];

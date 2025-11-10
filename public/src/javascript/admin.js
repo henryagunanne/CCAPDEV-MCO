@@ -57,7 +57,8 @@ jQuery (function() {
   }
 
   /* ======== Delete flight ======== */
-  $('#deleteFlightBtn').on('click', function () {
+  $(document).on('click', '.deleteFlightBtn', function() {
+    const id = $(this).data('id');
     if (!confirm('Are you sure you want to delete this flight?')) return;
 
     $.ajax({

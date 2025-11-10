@@ -124,17 +124,16 @@ router.get('/my-bookings', isAuthenticated, async (req, res) => {
 });
 
 
-// POST /reservations/cancel/:id - Cancel a
-router.post('/cancel/:id ', async (req, res) => {
-  const { status } = 'Cancelled';
+// POST /reservations/cancel/:reservationId - Cancel a reservation
+router.post('/cancel/:reservationId', isAuthenticated, async (req, res) => {
   const { reservationId } = req.params;
+
   try{
     const cancelledReservation = await Reservation.findByIdAndUpdate(
       reservationId,
-      { status },
+      { status: 'Cancelled' },
       { new: true }
-    ).lean();
-
+    );
 
     if (!cancelledReservation) {
       return res.status(404).send('Reservation not found');
@@ -143,11 +142,32 @@ router.post('/cancel/:id ', async (req, res) => {
     res.json({ 
       success: true, 
       message: 'Reservation Cancelled',
-      updatedReservation
+      cancelledReservation
     });
   }catch (err) {
     console.error('❌ Reservation update error:', err);
     res.status(500).send('Server error during Reservation update');
+  }
+});
+
+// GET /reservation/edit/:id 
+router.get('/edit/:id', isAuthenticated, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const reservation = await Reservation.findById(id)
+    .populate('flight')
+    .lean();
+
+    if (!reservation) return res.status(404).send('Flight not found');
+
+    res.render('reservations/edit-reservation', {
+      title: 'Edit Reservation',
+      reservation,
+      passengers: reservation.passengers.length > 0
+    });
+  } catch (err) {
+    console.error('Error loading booking page:', err);
+    res.status(500).send('Error loading booking page.');
   }
 });
 
@@ -166,7 +186,7 @@ router.get('/:id', isAuthenticated, async (req, res) => {
 });
 
 /* =============================
-   DELETE - Cancel reservation
+   DELETE - Cancel reservation - IMPORTANT: ONLY ADMINS CAN DELETE RESERVATIONS - USERS CAN ONLY CANCEL
 ============================= */
 router.post('/delete/:id', isAuthenticated, async (req, res) => {
   try {

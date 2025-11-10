@@ -154,51 +154,81 @@ $(document).on("click", ".seat.available, .seat.selected", function () {
     $("#totalPrice").text(total);
   }
 
-// -------- Submit Booking --------
-$("#confirmBooking").on("click", function (e) {
-  e.preventDefault();
+  // -------- Submit Booking --------
+  $("#confirmBooking").on("click", function (e) {
+    e.preventDefault();
 
-  // Build passengers array from form cards
-  const passengerData = [];
-  $("#passengerFields .card").each(function () {
-    const passenger = {
-  fullName: $(this).find("input[name*='fullName']").val(),
-  age: parseInt($(this).find("input[name*='age']").val()) || 0,
-  gender: $(this).find("select[name*='gender']").val(),
-  email: $(this).find("input[name*='email']").val(),
-  passport: $(this).find("input[name*='passport']").val(),
-  seatNumber: $(this).find(".seat-info").text().replace("Seat: ", "").trim(),
-  meal: $(this).find("select[name*='meal']").val(),
-  baggageAllowance: parseInt($(this).find("input[name*='baggageAllowance']").val()) || 0
-};
+    // Build passengers array from form cards
+    const passengerData = [];
+    $("#passengerFields .card").each(function () {
+      const passenger = {
+    fullName: $(this).find("input[name*='fullName']").val(),
+    age: parseInt($(this).find("input[name*='age']").val()) || 0,
+    gender: $(this).find("select[name*='gender']").val(),
+    email: $(this).find("input[name*='email']").val(),
+    passport: $(this).find("input[name*='passport']").val(),
+    seatNumber: $(this).find(".seat-info").text().replace("Seat: ", "").trim(),
+    meal: $(this).find("select[name*='meal']").val(),
+    baggageAllowance: parseInt($(this).find("input[name*='baggageAllowance']").val()) || 0
+  };
 
-    passengerData.push(passenger);
+      passengerData.push(passenger);
+    });
+
+    console.log("📦 Passenger Data:", passengerData);
+
+
+    // Compute total from summary
+    const totalAmount = parseFloat($("#totalPrice").text()) || 0;
+
+    // ✅ FIXED JSON REQUEST
+    $.ajax({
+      url: "/reservations/create",
+      method: "POST",
+      contentType: "application/json", // send as JSON
+      data: JSON.stringify({
+        flight: $("input[name='flight']").val(),
+        travelClass: $("#travelClass").val(),
+        passengers: passengerData,
+        totalAmount: totalAmount
+      }),
+      success: function (response) {
+        window.location.href = response.redirect || window.location.href;
+      },
+      error: function (xhr, status, err) {
+        console.error("Error submitting reservation:", err);
+        alert("An error occurred while submitting your booking.");
+      }
+    });
   });
 
-  console.log("📦 Passenger Data:", passengerData);
 
 
-  // Compute total from summary
-  const totalAmount = parseFloat($("#totalPrice").text()) || 0;
+  // ==== MY RESERVATIONS PAGE JS (myBooking.hbs)=====
+  $(document).on('click', '.cancelReservation', function() {
+    const id = $(this).data('id');
 
-  // ✅ FIXED JSON REQUEST
-  $.ajax({
-    url: "/reservations/create",
-    method: "POST",
-    contentType: "application/json", // send as JSON
-    data: JSON.stringify({
-      flight: $("input[name='flight']").val(),
-      travelClass: $("#travelClass").val(),
-      passengers: passengerData,
-      totalAmount: totalAmount
-    }),
-    success: function (response) {
-      window.location.href = response.redirect || window.location.href;
-    },
-    error: function (xhr, status, err) {
-      console.error("Error submitting reservation:", err);
-      alert("An error occurred while submitting your booking.");
-    }
+    if (!confirm("Are you sure you want to cancel this reservation?")) return;
+
+    $.ajax({
+      url: `/reservations/cancel/${id}`,
+      method: 'POST',
+      dataType: 'json',
+      success: function (res) {
+        if (res.success){
+          const main = $(`#reservation-${id}`);
+          const passengers = $(`#passengers-${id}`);
+          if (main) main.remove();
+          if (passengers) passengers.remove();
+          showToast("Reservation Cancelled.", true);
+        }else {
+          showToast("Failed to cancel reservation.", false);
+        }
+      },
+      error: function(err) {
+        console.log('AJAX error:', err)
+        showToast("An error occured", false);
+      }
+    });
   });
-});
 });

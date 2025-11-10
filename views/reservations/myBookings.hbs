@@ -43,7 +43,9 @@
                   </div>
                 </td>
                 <td>
-                  <a href="#" id="cancelReservation" data-id="{{this._id}}" class="btn btn-sm btn-outline-danger">Cancel</a>
+                  <a href="/reservations/edit/{{this._id}}" class="btn btn-sm btn-outline-primary me-1" title="Edit">
+                  <i class="bi bi-pencil"></i>
+                  <a href="#" data-id="{{this._id}}" class="btn btn-sm btn-outline-danger cancelReservation">Cancel</a>
                 </td>
               </tr>
 
@@ -58,8 +60,12 @@
                           <div class="col">
                             <div class="p-2 bg-white rounded border">
                               <div><strong>Name:</strong> {{this.fullName}}</div>
-                              {{#if this.age}}<div><strong>Age:</strong> {{this.age}}</div>{{/if}}
-                              {{#if this.passport}}<div><strong>Passport:</strong> {{this.passport}}</div>{{/if}}
+                              <div><strong>Age:</strong> {{this.age}}</div>
+                              <div><strong>Gender:</strong> {{this.gender}}</div>
+                              <div><strong>Passport:</strong> {{this.passport}}</div>
+                              <div><strong>Seat:</strong> {{this.seatNumber}}</div>
+                              <div><strong>Meal:</strong> {{this.meal}}</div>
+                              <div><strong>Baggage:</strong> {{this.baggageAllowance}}</div>
                             </div>
                           </div>
                         {{/each}}
@@ -116,26 +122,5 @@
       icon.classList.toggle("bi-eye");
       icon.classList.toggle("bi-eye-slash");
     }
-  });
-
-  $('#cancelReservation').on('click', function() {
-    const id = $(this).data('id');
-
-    if (!confirm("Are you sure you want to cancel this reservation?")) return;
-
-    $.ajax({
-      url: `reservations/cancel/${id}`,
-      method: 'POST',
-      success: function (res) {
-        const main = $(`#reservation-${id}`);
-        const passengers = $(`#passengers-${id}`);
-        if (main) main.remove();
-        if (passengers) passengers.remove();
-        showToast("Reservation Cancelled.", true);
-      },
-      error: function(err) {
-        showToast("Failed to cancel reservation.", false);
-      }
-    });
   });
 </script>

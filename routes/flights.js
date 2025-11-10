@@ -96,13 +96,11 @@ router.get('/:id/book', async (req, res) => {
     }
 
     // Render the booking form (details.hbs)
-res.render('reservations/reservation', {
-  title: 'Book Your Flight',
-  layout: 'main',
-  flight
-});
-
-
+    res.render('reservations/reservation', {
+        title: 'Book Your Flight',
+        layout: 'main',
+        flight
+    });
   } catch (err) {
     console.error('Error loading flight booking page:', err);
     res.status(500).send('Error loading flight booking page');

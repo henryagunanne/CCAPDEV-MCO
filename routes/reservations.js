@@ -105,15 +105,12 @@ router.get("/:id/confirmation", isAuthenticated,  async (req, res) => {
 
 // GET reservations/my-bookings - render my reservations page
 router.get('/my-bookings', isAuthenticated, async (req, res) => {
-  const userId = req.session.user.userId;
+  const userId = req.session.user._id;
+
   try {
-    const reservation = await Reservation.find({userId: userId})
+    const reservation = await Reservation.find({userId})
       .populate("flight") 
       .lean(); 
-      
-    if (reservation.length === 0) {
-      return;
-    }
 
     res.render('reservations/myBookings', {
       title: 'My Bookings',
@@ -123,6 +120,34 @@ router.get('/my-bookings', isAuthenticated, async (req, res) => {
   }catch (err){
     console.error("Error loading reservation:", err);
     res.status(500).send("Error loading reservation");
+  }
+});
+
+
+// POST /reservations/cancel/:id - Cancel a
+router.post('/cancel/:id ', async (req, res) => {
+  const { status } = 'Cancelled';
+  const { reservationId } = req.params;
+  try{
+    const cancelledReservation = await Reservation.findByIdAndUpdate(
+      reservationId,
+      { status },
+      { new: true }
+    ).lean();
+
+
+    if (!cancelledReservation) {
+      return res.status(404).send('Reservation not found');
+    }
+
+    res.json({ 
+      success: true, 
+      message: 'Reservation Cancelled',
+      updatedReservation
+    });
+  }catch (err) {
+    console.error('❌ Reservation update error:', err);
+    res.status(500).send('Server error during Reservation update');
   }
 });
 

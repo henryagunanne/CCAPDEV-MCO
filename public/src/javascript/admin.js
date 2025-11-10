@@ -186,7 +186,7 @@ jQuery (function() {
   });
 
 
-  // ====== Reservations =======
+  // ====== Reservations ======= 
 
   //==== Reservation Filter ====
   $('#reservationFilter').on('keyup', function () {

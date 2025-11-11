@@ -22,61 +22,62 @@ $(document).ready(function () {
       passengers.push({ seat: null, meal: "None", baggage: 0 });
 
       container.append(`
-        <div class="card my-3 shadow-sm">
-          <div class="card-header bg-light"><strong>Passenger ${i}</strong></div>
-          <div class="card-body">
-            <div class="row mb-2">
-  <div class="col-md-4">
-    <label class="form-label">Full Name</label>
-    <input type="text" name="passengers[${i - 1}][fullName]" class="form-control" required>
-  </div>
-  <div class="col-md-4">
-    <label class="form-label">Age</label>
-    <input type="number" name="passengers[${i - 1}][age]" class="form-control" min="0" required>
-  </div>
-  <div class="col-md-4">
-    <label class="form-label">Gender</label>
-    <select name="passengers[${i - 1}][gender]" class="form-select" required>
-      <option value="">Select</option>
-      <option value="Male">Male</option>
-      <option value="Female">Female</option>
-      <option value="Other">Other</option>
-    </select>
-  </div>
-</div>
-
-<div class="row mb-2">
-  <div class="col-md-6">
-    <label class="form-label">Email</label>
-    <input type="email" name="passengers[${i - 1}][email]" class="form-control" required>
-  </div>
-  <div class="col-md-6">
-    <label class="form-label">Passport Number</label>
-    <input type="text" name="passengers[${i - 1}][passport]" class="form-control" required>
-  </div>
-</div>
-
-
-            <div class="row">
-              <div class="col-md-6">
-                <label class="form-label">Meal Option</label>
-                <select name="passengers[${i - 1}][meal]" class="form-select meal-option" data-index="${i - 1}">
-                  <option value="None">None</option>
-                  <option value="Vegetarian">Vegetarian</option>
-                  <option value="Non-Vegetarian">Non-Vegetarian</option>
-                  <option value="Vegan">Vegan</option>
-                  <option value="Gluten-Free">Gluten-Free</option>
-                </select>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Baggage (kg)</label>
-                <input type="number" class="form-control baggage-input" data-index="${i - 1}" min="0" value="0" name="passengers[${i - 1}][baggageAllowance]">
-              </div>
-            </div>
-            <div class="mt-2 text-muted small seat-info">Seat: None</div>
-          </div>
+  <div class="card my-3 shadow-sm">
+    <div class="card-header bg-light"><strong>Passenger ${i}</strong></div>
+    <div class="card-body">
+      
+      <!-- Row 1: Full Name + Gender -->
+      <div class="row mb-2">
+        <div class="col-md-6">
+          <label class="form-label">Full Name</label>
+          <input type="text" name="passengers[${i - 1}][fullName]" class="form-control" required>
         </div>
-      `);
+        <div class="col-md-6">
+          <label class="form-label">Gender</label>
+          <select name="passengers[${i - 1}][gender]" class="form-select" required>
+            <option value="">Select</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Row 2: Age + Passport -->
+      <div class="row mb-2">
+        <div class="col-md-6">
+          <label class="form-label">Age</label>
+          <input type="number" name="passengers[${i - 1}][age]" class="form-control" min="0" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Passport Number</label>
+          <input type="text" name="passengers[${i - 1}][passport]" class="form-control" required>
+        </div>
+      </div>
+
+      <!-- Row 3: Meal + Baggage -->
+      <div class="row">
+        <div class="col-md-6">
+          <label class="form-label">Meal Option</label>
+          <select name="passengers[${i - 1}][meal]" class="form-select meal-option" data-index="${i - 1}">
+            <option value="None">None</option>
+            <option value="Vegetarian">Vegetarian</option>
+            <option value="Non-Vegetarian">Non-Vegetarian</option>
+            <option value="Vegan">Vegan</option>
+            <option value="Gluten-Free">Gluten-Free</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Baggage (kg)</label>
+          <input type="number" class="form-control baggage-input" data-index="${i - 1}" min="0" value="0" name="passengers[${i - 1}][baggageAllowance]">
+        </div>
+      </div>
+
+      <div class="mt-2 text-muted small seat-info">Seat: None</div>
+    </div>
+  </div>
+`);
+
     }
 
     updateSummary();
@@ -170,7 +171,6 @@ $(document).on("click", ".seat.available, .seat.selected", function () {
     fullName: $(this).find("input[name*='fullName']").val(),
     age: parseInt($(this).find("input[name*='age']").val()) || 0,
     gender: $(this).find("select[name*='gender']").val(),
-    email: $(this).find("input[name*='email']").val(),
     passport: $(this).find("input[name*='passport']").val(),
     seatNumber: $(this).find(".seat-info").text().replace("Seat: ", "").trim(),
     meal: $(this).find("select[name*='meal']").val(),

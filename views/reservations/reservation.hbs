@@ -96,18 +96,22 @@
           <span class="badge bg-warning text-dark">Selected</span>
         </div>
 
-        <!-- Price Summary -->
-        <div class="card bg-light p-3 mb-4 summary-card mx-auto">
-          <h5 class="text-danger fw-bold">Price Summary</h5>
-          <p>Base Fare: ₱<span id="baseFare">{{flight.price}}</span></p>
-          <p>Meal Total: ₱<span id="mealFee">0</span></p>
-          <p>Baggage Total: ₱<span id="baggageFee">0</span></p>
-          <p>Seat Total: ₱<span id="seatFee">0</span></p>
-          <hr>
-          <h5>Total: ₱<span id="totalPrice">{{flight.price}}</span></h5>
-        </div>
+      <!-- Price Summary -->
+<div class="card bg-light p-3 mb-4 summary-card mx-auto">
+  <h5 class="text-danger fw-bold">Price Summary</h5>
 
-        <div id="formMessage" class="text-danger mb-3"></div>
+  <p>Base Fare: ₱<span id="baseFare">{{flight.price}}</span></p>
+
+<p>Return Fare: ₱<span id="returnFare">0</span></p>
+
+
+  <p>Meal Total: ₱<span id="mealFee">0</span></p>
+  <p>Baggage Total: ₱<span id="baggageFee">0</span></p>
+  <p>Seat Total: ₱<span id="seatFee">0</span></p>
+  <hr>
+  <h5>Total: ₱<span id="totalPrice">{{flight.price}}</span></h5>
+</div>
+
 
         <!-- Buttons -->
         <div class="d-flex justify-content-center gap-2">
@@ -118,3 +122,31 @@
     </div>
   </div>
 </main>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const returnFlightSelect = document.getElementById("returnFlight");
+  const returnFareElement = document.getElementById("returnFare");
+  const baseFareElement = document.getElementById("baseFare");
+  const totalPriceElement = document.getElementById("totalPrice");
+
+  let baseFare = parseInt(baseFareElement.textContent) || 0;
+
+  // Update return fare and total when a return flight is chosen
+  returnFlightSelect.addEventListener("change", function () {
+    const selectedOption = returnFlightSelect.options[returnFlightSelect.selectedIndex];
+    const priceMatch = selectedOption.textContent.match(/₱(\d+)/);
+    const returnFare = priceMatch ? parseInt(priceMatch[1]) : 0;
+
+    returnFareElement.textContent = returnFare;
+
+    // Compute total (base + return + extras)
+    const meal = parseInt(document.getElementById("mealFee").textContent) || 0;
+    const baggage = parseInt(document.getElementById("baggageFee").textContent) || 0;
+    const seat = parseInt(document.getElementById("seatFee").textContent) || 0;
+
+    const total = baseFare + returnFare + meal + baggage + seat;
+    totalPriceElement.textContent = total;
+  });
+});
+</script>

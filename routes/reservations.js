@@ -183,19 +183,28 @@ router.post('/cancel/:reservationId', isAuthenticated, async (req, res) => {
   }
 });
 
-// GET /reservation/edit/:id 
+// GET /reservations/edit/:id
 router.get('/edit/:id', isAuthenticated, async (req, res) => {
   try {
     const id = req.params.id;
     const reservation = await Reservation.findById(id)
-    .populate('flight')
-    .lean();
+      .populate({
+        path: 'flight',
+        model: 'Flight'
+      })
+      .lean();
 
-    if (!reservation) return res.status(404).send('Flight not found');
+    if (!reservation) return res.status(404).send('Reservation not found');
+
+    const outboundFlight = reservation.flight?.[0] || reservation.flight;
+    const returnFlight   = reservation.flight?.[1] || null;
 
     res.render('reservations/edit-reservation', {
       title: 'Edit Reservation',
       reservation,
+      outboundFlight,
+      returnFlight,
+      hasReturn: !!returnFlight,
       passengers: reservation.passengers.length > 0
     });
   } catch (err) {
@@ -203,6 +212,7 @@ router.get('/edit/:id', isAuthenticated, async (req, res) => {
     res.status(500).send('Error loading booking page.');
   }
 });
+
 
 
 /* =============================

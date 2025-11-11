@@ -1,13 +1,32 @@
 <main class="booking-page container-fluid my-5 px-4">
   <div class="card shadow-lg mx-auto" style="max-width: 900px;">
     <div class="card-header bg-danger text-white text-center py-3">
-      <h3>Edit Reservation – {{reservation.flight.flightNumber}}</h3>
-      <h2 class="route-display mb-1">{{reservation.flight.origin}} → {{reservation.flight.destination}}</h2>
-      <p class="flight-details mb-0">
-        Departure: {{reservation.flight.departureTime}} | Arrival: {{reservation.flight.arrivalTime}}
-      </p>
-      <p class="flight-price mb-0">₱{{reservation.flight.price}}</p>
-    </div>
+  {{#if outboundFlight}}
+    <h3>Edit Reservation – 
+      {{outboundFlight.flightNumber}}
+      {{#if returnFlight}} / {{returnFlight.flightNumber}}{{/if}}
+    </h3>
+
+    <h2 class="route-display mb-1">
+      {{outboundFlight.origin}} → {{outboundFlight.destination}}
+      {{#if returnFlight}}
+        <br>
+        <small class="text-white-50">
+          Return: {{returnFlight.origin}} → {{returnFlight.destination}}
+        </small>
+      {{/if}}
+    </h2>
+
+    <p class="flight-details mb-0">
+      Departure: {{outboundFlight.departureTime}} | Arrival: {{outboundFlight.arrivalTime}}
+    </p>
+    <p class="flight-price mb-0">₱{{outboundFlight.price}}</p>
+  {{else}}
+    <h3>Edit Reservation</h3>
+    <p>No flight details available.</p>
+  {{/if}}
+</div>
+
 
     <!-- Reservation Info -->
     <div class="alert alert-danger text-center fw-semibold mt-3">
@@ -18,7 +37,12 @@
     <div class="card-body">
       <form id="editReservationForm" method="POST" action="/reservations/{{reservation._id}}/edit">
         <input type="hidden" name="reservationId" value="{{reservation._id}}">
-        <input type="hidden" name="flight" value="{{reservation.flight._id}}">
+        {{#if outboundFlight}}
+  <input type="hidden" name="flight" value="{{outboundFlight._id}}">
+{{/if}}
+{{#if returnFlight}}
+  <input type="hidden" name="returnFlight" value="{{returnFlight._id}}">
+{{/if}}
 
         <!-- Trip Type Selector -->
       <div class="row mb-3">

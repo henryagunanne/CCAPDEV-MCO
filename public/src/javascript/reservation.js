@@ -127,6 +127,8 @@ $(document).ready(function () {
     });
   }
 
+  
+
   // -------- Seat Selection (1 per Passenger) --------
 $(document).on("click", ".seat.available, .seat.selected", function () {
   const seatId = $(this).data("id");

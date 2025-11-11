@@ -107,7 +107,12 @@ $(document).ready(function () {
   for (let row = 1; row <= 10; row++) {
     ["A", "B", "C", "D", "E", "F"].forEach(function (col) {
       const seatClass = seatClasses[row] || "economy";
-      const occupied = Math.random() < 0.15;
+      const seatId = row + col;
+      // 🪄 keep real occupied seats but add random filler ones for realism
+      const isActuallyOccupied = occupiedSeats.includes(seatId);
+      const isRandomlyBlocked = Math.random() < 0.1 && !isActuallyOccupied; // 10% random seats
+      const occupied = isActuallyOccupied || isRandomlyBlocked;
+
 
       const seat = $("<div>")
         .addClass("seat")

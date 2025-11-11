@@ -91,20 +91,7 @@ router.post("/create", isAuthenticated, async (req, res) => {
     console.error("❌ Error creating reservation:", err);
     res.status(500).send("Error creating reservation");
   }
-
-  const existingSeats = await Reservation.find({
-  flights: req.body.flight,
-  "passengers.seatNumber": { $in: selectedSeatNumbers },
-  status: { $ne: "Cancelled" }
 });
-
-if (existingSeats.length > 0) {
-  return res.status(400).send("One or more selected seats are already booked.");
-}
-
-});
-
-
 
 
 
@@ -112,7 +99,7 @@ if (existingSeats.length > 0) {
 router.get("/:id/confirmation", isAuthenticated,  async (req, res) => {
   try {
     const reservation = await Reservation.findById(req.params.id)
-      .populate("flight")     // get flight details
+      .populate("flights")     // get flight details
       .populate("userId")      // optional, for user info
       .lean();                 // convert to plain object
 
@@ -135,7 +122,7 @@ router.get('/my-bookings', isAuthenticated, async (req, res) => {
 
   try {
     const reservation = await Reservation.find({userId})
-      .populate("flight")
+      .populate("flights")
       .lean(); 
 
     res.render('reservations/myBookings', {
@@ -181,7 +168,7 @@ router.get('/edit/:id', isAuthenticated, async (req, res) => {
   try {
     const id = req.params.id;
     const reservation = await Reservation.findById(id)
-    .populate('flight')
+    .populate('flights')
     .lean();
 
     if (!reservation) return res.status(404).send('Flight not found');
@@ -204,7 +191,7 @@ router.get('/edit/:id', isAuthenticated, async (req, res) => {
 router.get('/:id', isAuthenticated, async (req, res) => {
   try {
     const reservation = await Reservation.findById(req.params.id)
-      .populate('flight')  // ✅ plural
+      .populate('flights')  // ✅ plural
       .lean();
 
     if (!reservation) return res.status(404).send('Reservation not found');
@@ -228,26 +215,5 @@ router.post('/delete/:id', isAuthenticated, async (req, res) => {
     res.status(500).send('Error deleting reservation');
   }
 });
-
-//  API endpoint for fetching already-occupied seats for a flight
-router.get("/api/occupied-seats/:flightId", async (req, res) => {
-  try {
-    const reservations = await Reservation.find({
-      flights: req.params.flightId,
-      status: { $ne: "Cancelled" } // exclude cancelled reservations
-    });
-
-    // Collect seat numbers from passengers
-    const occupiedSeats = reservations.flatMap(r =>
-      r.passengers.map(p => p.seatNumber)
-    );
-
-    res.json({ occupied: occupiedSeats });
-  } catch (error) {
-    console.error("Error fetching occupied seats:", error);
-    res.status(500).json({ error: "Failed to fetch occupied seats" });
-  }
-});
-
 
 module.exports = router;

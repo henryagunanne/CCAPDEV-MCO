@@ -13,14 +13,15 @@
 
     <!-- Flight Schedule Info -->
 <div class="alert alert-danger text-center fw-semibold mt-3">
-  {{#if  (eq tripType "Round-Trip")}}
-     <strong>Round-Trip:</strong> {{departDate}} → {{returnDate}}
+  {{#if (eq tripType "Round-Trip")}}
+    <strong>{{formatDate departDate}}</strong> → <strong>{{formatDate returnDate}}</strong>
   {{else}}
-     <strong>One-Way:</strong> {{departDate}}
+    <strong>{{formatDate departDate}}</strong>
   {{/if}}
   <br>
   <small class="text-muted">(Flight dates and class are pre-set for this route)</small>
 </div>
+
 
 <!-- Hidden Inputs -->
 <input type="hidden" id="travelClass" name="travelClass" value="{{travelClass}}">

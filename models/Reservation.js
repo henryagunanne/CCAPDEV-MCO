@@ -66,7 +66,7 @@ const reservationSchema = new mongoose.Schema({
 
   passengers: [passengerSchema],
 
-  Price: {
+  price: {
     type: Number,
     required: true
   },

@@ -53,6 +53,8 @@ router.get('/book/:flightId', isAuthenticated, async (req, res) => {
 });
 
 
+
+
 /* =============================
    CREATE
 ============================= */
@@ -60,38 +62,37 @@ router.get('/book/:flightId', isAuthenticated, async (req, res) => {
 //  Create Reservation Route
 router.post("/create", isAuthenticated, async (req, res) => {
   try {
-    // 🧭 Include tripType here
     const { flight, returnFlight, travelClass, tripType, passengers, totalAmount } = req.body;
 
-    // passengers is already an array since we send JSON
     const parsedPassengers = Array.isArray(passengers)
       ? passengers
       : JSON.parse(passengers);
 
     const seatNumbers = parsedPassengers.map(p => p.seatNumber);
 
-    // ✅ Include tripType in Reservation object
+console.log("📦 Incoming reservation body:", req.body);
+
+
+    // ✅ Create new reservation with correct field names
     const newReservation = new Reservation({
       userId: req.session.user?._id || null,
-     flights: returnFlight ? [flight, returnFlight] : [flight],
+      flight: returnFlight ? [flight, returnFlight] : [flight], // ✅ field name matches schema
       travelClass,
-      tripType, // ✅ This was missing
+      tripType,
       passengers: parsedPassengers,
-      seatNumbers,
-      totalAmount: parseFloat(totalAmount) || 0,
+      Price: parseFloat(totalAmount) || 0, // ✅ required Price field
       status: "Pending"
     });
 
     await newReservation.save();
-
     console.log("✅ New reservation created:", newReservation);
-
     res.json({ redirect: `/reservations/${newReservation._id}/confirmation` });
   } catch (err) {
     console.error("❌ Error creating reservation:", err);
     res.status(500).send("Error creating reservation");
   }
 });
+
 
 
 

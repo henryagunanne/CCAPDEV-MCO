@@ -99,7 +99,7 @@ router.post("/create", isAuthenticated, async (req, res) => {
 router.get("/:id/confirmation", isAuthenticated,  async (req, res) => {
   try {
     const reservation = await Reservation.findById(req.params.id)
-      .populate("flights")     // get flight details
+      .populate("flight")     // get flight details
       .populate("userId")      // optional, for user info
       .lean();                 // convert to plain object
 
@@ -122,7 +122,7 @@ router.get('/my-bookings', isAuthenticated, async (req, res) => {
 
   try {
     const reservation = await Reservation.find({userId})
-      .populate("flights")
+      .populate("flight")
       .lean(); 
 
     res.render('reservations/myBookings', {
@@ -168,7 +168,7 @@ router.get('/edit/:id', isAuthenticated, async (req, res) => {
   try {
     const id = req.params.id;
     const reservation = await Reservation.findById(id)
-    .populate('flights')
+    .populate('flight')
     .lean();
 
     if (!reservation) return res.status(404).send('Flight not found');
@@ -191,7 +191,7 @@ router.get('/edit/:id', isAuthenticated, async (req, res) => {
 router.get('/:id', isAuthenticated, async (req, res) => {
   try {
     const reservation = await Reservation.findById(req.params.id)
-      .populate('flights')  // ✅ plural
+      .populate('flight')  // ✅ plural
       .lean();
 
     if (!reservation) return res.status(404).send('Reservation not found');

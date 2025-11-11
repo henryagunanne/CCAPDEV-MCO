@@ -31,9 +31,10 @@ router.get('/book/:flightId', isAuthenticated, async (req, res) => {
     const departDate = req.query.depart     || '';
     const returnDate = req.query.return     || '';
 
-    // 🔁 Load only return flights AFTER the chosen departure flight
+// 🔁 Load only return flights AFTER the chosen departure flight
 // Force UTC interpretation for reliability
-const departDate = new Date(`${flight.departureDate}T00:00:00Z`);
+const departDateObj = new Date(`${flight.departureDate}T00:00:00Z`);
+const today = new Date(); // current date
 
 // Fetch opposite-direction flights
 const allReturnFlights = await Flight.find({
@@ -41,14 +42,18 @@ const allReturnFlights = await Flight.find({
   destination: flight.origin
 }).lean();
 
-// Filter manually since departureDate is stored as string
+// Filter manually
 const returnFlights = allReturnFlights.filter(f => {
   const fDate = new Date(`${f.departureDate}T00:00:00Z`);
-  return fDate.getTime() > departDate.getTime(); // ensure numeric comparison
+  // ✅ Must be after BOTH today's date and the chosen departure date
+  return fDate.getTime() > today.getTime() && fDate.getTime() > departDateObj.getTime();
 });
 
 // Sort ascending by date
-returnFlights.sort((a, b) => new Date(`${a.departureDate}T00:00:00Z`) - new Date(`${b.departureDate}T00:00:00Z`));
+returnFlights.sort(
+  (a, b) => new Date(`${a.departureDate}T00:00:00Z`) - new Date(`${b.departureDate}T00:00:00Z`)
+);
+
 
 
     // ✅ Render booking page

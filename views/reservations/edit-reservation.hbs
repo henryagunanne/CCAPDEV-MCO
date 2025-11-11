@@ -24,7 +24,7 @@
         <div id="passengerFields">
           {{#each reservation.passengers}}
   <div class="card my-3 shadow-sm">
-    <div class="card-header bg-light"><strong>Passenger {{addOne @index}}</strong></div>
+    <div class="card-header bg-light"><strong>Passenger {{inc @index}}</strong></div>
     <div class="card-body">
 
       <!-- Row 1: Full Name + Gender -->

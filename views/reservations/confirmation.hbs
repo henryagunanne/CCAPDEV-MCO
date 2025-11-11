@@ -4,11 +4,11 @@
     <!-- HEADER -->
     <div class="card-header bg-danger text-white text-center py-4 rounded-top">
       <h2 class="fw-bold mb-1">Booking Confirmed</h2>
-      {{#if reservation.flights.[0]}}
-        <p class="mb-0">
-          Your flight from <strong>{{reservation.flights.[0].origin}}</strong>
-          to <strong>{{reservation.flights.[0].destination}}</strong> is confirmed.
-        </p>
+      {{#if reservation.flight}}
+          <p class="mb-0">
+            Your flight from <strong>{{reservation.flight.[0].origin}}</strong>
+            to <strong>{{reservation.flight.[0].destination}}</strong> is confirmed.
+          </p>
       {{/if}}
     </div>
 
@@ -25,30 +25,30 @@
       </h4>
 
       <!-- Departure Flight -->
-      {{#if reservation.flights.[0]}}
+      {{#if reservation.flight.[0]}}
       <div class="mb-4">
         <h5 class="fw-bold text-center text-dark mb-2">Departure Flight</h5>
         <table class="table table-bordered align-middle text-center">
           <tbody>
-            <tr><th>Flight No:</th><td>{{reservation.flights.[0].flightNumber}}</td></tr>
-            <tr><th>Route:</th><td>{{reservation.flights.[0].origin}} → {{reservation.flights.[0].destination}}</td></tr>
-            <tr><th>Departure:</th><td>{{reservation.flights.[0].departureTime}}</td></tr>
-            <tr><th>Arrival:</th><td>{{reservation.flights.[0].arrivalTime}}</td></tr>
+            <tr><th>Flight No:</th><td>{{reservation.flight.[0].flightNumber}}</td></tr>
+            <tr><th>Route:</th><td>{{reservation.flight.[0].origin}} → {{reservation.flight.[0].destination}}</td></tr>
+            <tr><th>Departure:</th><td>{{reservation.flight.[0].departureTime}}</td></tr>
+            <tr><th>Arrival:</th><td>{{reservation.flight.[0].arrivalTime}}</td></tr>
           </tbody>
         </table>
       </div>
       {{/if}}
 
       <!-- Return Flight -->
-      {{#if reservation.flights.[1]}}
+      {{#if reservation.flight.[1]}}
       <div class="mt-4">
         <h5 class="fw-bold text-center text-dark mb-2">Return Flight</h5>
         <table class="table table-bordered align-middle text-center">
           <tbody>
-            <tr><th>Flight No:</th><td>{{reservation.flights.[1].flightNumber}}</td></tr>
-            <tr><th>Route:</th><td>{{reservation.flights.[1].origin}} → {{reservation.flights.[1].destination}}</td></tr>
-            <tr><th>Departure:</th><td>{{reservation.flights.[1].departureTime}}</td></tr>
-            <tr><th>Arrival:</th><td>{{reservation.flights.[1].arrivalTime}}</td></tr>
+            <tr><th>Flight No:</th><td>{{reservation.flight.[1].flightNumber}}</td></tr>
+            <tr><th>Route:</th><td>{{reservation.flight.[1].origin}} → {{reservation.flight.[1].destination}}</td></tr>
+            <tr><th>Departure:</th><td>{{reservation.flight.[1].departureTime}}</td></tr>
+            <tr><th>Arrival:</th><td>{{reservation.flight.[1].arrivalTime}}</td></tr>
           </tbody>
         </table>
       </div>

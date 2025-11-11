@@ -45,13 +45,12 @@ const reservationSchema = new mongoose.Schema({
     required: true
   },
   // Flight reference
-  flights: [
+  flights: 
   {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Flight',
     required: true
-  }
-],
+  },
 
   tripType: {
     type: String,

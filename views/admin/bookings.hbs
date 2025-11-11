@@ -32,7 +32,6 @@
             <tr>
               <th>User</th>
               <th>Flight</th>
-              <th>Route</th>
               <th>Trip</th>
               <th>Class</th>
               <th>Passengers</th>
@@ -50,8 +49,14 @@
                 {{this.userId.firstName}} {{this.userId.lastName}}<br>
                 <small class="text-muted">{{this.userId.email}}</small>
               </td>
-              <td class="fw-semibold">{{this.flight.flightNumber}}</td>
-              <td>{{this.flight.origin}} → {{this.flight.destination}}</td>
+              <td class="fw-semibold">
+                {{#each this.flight}}
+                  {{this.flightNumber}}<br>
+                {{/each}}
+                <button class="btn btn-sm btn-outline-secondary ms-1 toggleRoute" data-id="{{this._id}}" title="View Route">
+                  <i class="bi bi-caret-down"></i>
+                </button>
+              </td>
               <td>{{this.tripType}}</td>
               <td>{{this.travelClass}}</td>
               <td>
@@ -96,6 +101,32 @@
                 </button>
               </td>
             </tr>
+
+            <!-- Expandable Route Row -->
+            <tr class="route-row d-none" id="route-{{this._id}}">
+              <td colspan="9">
+                <div class="p-3 bg-light rounded border">
+                  <div class="fw-semibold mb-2">Routes</div>
+                  {{#if this.flight.length}}
+                    <div class="row row-cols-1 row-cols-md-2 g-2">
+                      {{#each this.flight}}
+                        <div class="col">
+                          <div class="p-2 bg-white rounded border">
+                            <div><strong>Flight Number:</strong> {{this.flightNumber}}</div>
+                            <div><strong>Route:</strong> {{this.origin}} → {{this.destination}}</div>
+                            <div><strong>Aircraft:</strong> {{this.aircraft}}</div>
+                            <div><strong>Depart:</strong> {{this.departureDate}}</div>
+                          </div>
+                        </div>
+                      {{/each}}
+                    </div>
+                  {{else}}
+                    <div class="text-muted">No passenger details available.</div>
+                  {{/if}}
+                </div>
+              </td>
+            </tr>
+
 
             <!-- Expandable Passengers Row -->
             <tr class="passengers-row d-none" id="passengers-{{this._id}}">
@@ -226,6 +257,20 @@ document.addEventListener("click", (e) => {
     const btn = e.target.closest(".togglePassengers");
     const id = btn.dataset.id;
     const row = document.getElementById(`passengers-${id}`);
+    const icon = btn.querySelector("i");
+
+    row.classList.toggle("d-none");
+    icon.classList.toggle("bi-caret-down");
+    icon.classList.toggle("bi-caret-up");
+  }
+});
+
+// ✅ Toggle route row
+document.addEventListener("click", (e) => {
+  if (e.target.closest(".toggleRoute")) {
+    const btn = e.target.closest(".toggleRoute");
+    const id = btn.dataset.id;
+    const row = document.getElementById(`route-${id}`);
     const icon = btn.querySelector("i");
 
     row.classList.toggle("d-none");

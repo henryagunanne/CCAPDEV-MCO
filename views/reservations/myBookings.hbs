@@ -7,7 +7,7 @@
         <thead class="table-danger text-center">
           <tr>
             <th>Flight</th>
-            <th>Route</th>
+            <th></th>
             <th>Trip</th>
             <th>Class</th>
             <th>Passengers</th>
@@ -21,7 +21,16 @@
           {{#each reservation}}
             {{#if (ne this.status 'Cancelled')}}
               <tr id="reservation-{{this._id}}" class="text-center align-middle">
-                <td class="fw-semibold">{{this.flight.flightNumber}}</td>
+                <td class="fw-semibold">
+                {{#each this.flight}}
+                  {{this.flightNumber}}<br>
+                {{/each}}
+              </td>
+              <td>
+                <button class="btn btn-sm btn-outline-secondary ms-1 toggleRoute" data-id="{{this._id}}" title="View Route">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </td>
                 <td>{{this.flight.origin}} → {{this.flight.destination}}</td>
                 <td>{{this.tripType}}</td>
                 <td>{{this.travelClass}}</td>
@@ -46,6 +55,33 @@
                   <a href="/reservations/edit/{{this._id}}" class="btn btn-sm btn-outline-primary me-1" title="Edit">
                   <i class="bi bi-pencil"></i>
                   <a href="#" data-id="{{this._id}}" class="btn btn-sm btn-outline-danger cancelReservation">Cancel</a>
+                </td>
+              </tr>
+
+              <!-- Expandable Route Row -->
+              <tr class="route-row d-none" id="route-{{this._id}}">
+                <td colspan="9">
+                  <div class="p-3 bg-light rounded border">
+                    <div class="fw-semibold mb-2">Routes</div>
+                    {{#if this.flight.length}}
+                      <div class="row row-cols-1 row-cols-md-2 g-2">
+                        {{#each this.flight}}
+                          <div class="col">
+                            <div class="p-2 bg-white rounded border">
+                              <div><strong>Flight Number:</strong> {{this.flightNumber}}</div>
+                              <div><strong>Route:</strong> {{this.origin}} → {{this.destination}}</div>
+                              <div><strong>Aircraft:</strong> {{this.aircraft}}</div>
+                              <div><strong>Depart On:</strong> {{this.departureDate}}</div>
+                              <div><strong>Departure:</strong> {{this.departureTime}}</div>
+                              <div><strong>Arrival:</strong> {{this.arrivalTime}}</div>
+                            </div>
+                          </div>
+                        {{/each}}
+                      </div>
+                    {{else}}
+                      <div class="text-muted">No passenger details available.</div>
+                    {{/if}}
+                  </div>
                 </td>
               </tr>
 
@@ -116,6 +152,20 @@
       const btn = e.target.closest(".togglePassengers");
       const id = btn.dataset.id;
       const row = document.getElementById(`passengers-${id}`);
+      const icon = btn.querySelector("i");
+
+      row.classList.toggle("d-none");
+      icon.classList.toggle("bi-eye");
+      icon.classList.toggle("bi-eye-slash");
+    }
+  });
+
+  // ✅ Toggle route row
+  document.addEventListener("click", (e) => {
+    if (e.target.closest(".toggleRoute")) {
+      const btn = e.target.closest(".toggleRoute");
+      const id = btn.dataset.id;
+      const row = document.getElementById(`route-${id}`);
       const icon = btn.querySelector("i");
 
       row.classList.toggle("d-none");

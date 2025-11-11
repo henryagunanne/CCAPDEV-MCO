@@ -40,7 +40,7 @@ async function seedReservations() {
             baggageAllowance: 15
           }
         ],
-        Price: 1500,
+        price: 1500,
         bookingDate: new Date('2024-06-01'),
         status: 'Confirmed'
       },
@@ -63,7 +63,7 @@ async function seedReservations() {
             baggageAllowance: 20
           }
         ],
-        Price: 1600,
+        price: 1600,
         bookingDate: new Date('2024-06-02'),
         status: 'Confirmed'
       },
@@ -95,7 +95,7 @@ async function seedReservations() {
             baggageAllowance: 25
           }
         ],
-        Price: 3400, // 1700 * 2 (for both passengers)
+        price: 3400, // 1700 * 2 (for both passengers)
         bookingDate: new Date('2024-06-03'),
         status: 'Confirmed'
       },
@@ -115,7 +115,7 @@ async function seedReservations() {
             baggageAllowance: 30
           }
         ],
-        Price: 1800,
+        price: 1800,
         bookingDate: new Date('2024-06-04'),
         status: 'Confirmed'
       }

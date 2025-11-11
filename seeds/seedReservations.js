@@ -17,7 +17,7 @@ async function seedReservations() {
       flightNumber: {
         $in: [
           'AA1001', 'AA1002', 'AA1003', 'AA1004',
-          'AA9001', 'AA1021', 'AA1022', 'AA1023',
+          'AA9001', 'AA1021', 'AA1022', 'AA9002',
           'AA1005', 'AA1020', 'AA2010', 'AA1009'
         ]
       }
@@ -71,7 +71,7 @@ async function seedReservations() {
         userId: users[2]._id,
         flight: [
           flights.find(f => f.flightNumber === 'AA1003')._id, // outgoing
-          flights.find(f => f.flightNumber === 'AA1023')._id  // return flight
+          flights.find(f => f.flightNumber === 'AA9002')._id  // return flight
         ],
         tripType: 'Round-Trip',
         travelClass: 'Economy',

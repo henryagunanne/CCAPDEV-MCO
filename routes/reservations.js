@@ -31,12 +31,32 @@ router.get('/book/:flightId', isAuthenticated, async (req, res) => {
     const departDate = req.query.depart     || '';
     const returnDate = req.query.return     || '';
 
-    // 🔁 ALWAYS load possible return flights (same route, opposite direction)
-    const returnFlights = await Flight.find({
-      origin:      flight.destination,
-      destination: flight.origin
-    }).lean();
+// 🔁 Load only return flights AFTER the chosen departure flight
+// Force UTC interpretation for reliability
+const departDateObj = new Date(`${flight.departureDate}T00:00:00Z`);
+const today = new Date(); // current date
 
+// Fetch opposite-direction flights
+const allReturnFlights = await Flight.find({
+  origin: flight.destination,
+  destination: flight.origin
+}).lean();
+
+// Filter manually
+const returnFlights = allReturnFlights.filter(f => {
+  const fDate = new Date(`${f.departureDate}T00:00:00Z`);
+  // ✅ Must be after BOTH today's date and the chosen departure date
+  return fDate.getTime() > today.getTime() && fDate.getTime() > departDateObj.getTime();
+});
+
+// Sort ascending by date
+returnFlights.sort(
+  (a, b) => new Date(`${a.departureDate}T00:00:00Z`) - new Date(`${b.departureDate}T00:00:00Z`)
+);
+
+
+
+    // ✅ Render booking page
     res.render('reservations/reservation', {
       title: 'Book Your Flight',
       flight,
@@ -44,15 +64,14 @@ router.get('/book/:flightId', isAuthenticated, async (req, res) => {
       tripType,
       departDate,
       returnDate,
-      returnFlights            // 🔥 pass to template
+      returnFlights
     });
+
   } catch (err) {
     console.error('Error loading booking page:', err);
     res.status(500).send('Error loading booking page.');
   }
 });
-
-
 
 
 /* =============================

@@ -1,9 +1,9 @@
 <main class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
-  <div class="card shadow-lg border-0" style="max-width: 750px; width: 100%;">
+  <div class="card shadow-lg border-0" style="max-width: 850px; width: 100%;">
     
     <!-- HEADER -->
     <div class="card-header bg-danger text-white text-center py-4 rounded-top">
-      <h2 class="fw-bold mb-1"></i>Booking Confirmed!</h2>
+      <h2 class="fw-bold mb-1">Booking Confirmed</h2>
       {{#if reservation.flights.[0]}}
         <p class="mb-0">
           Your flight from <strong>{{reservation.flights.[0].origin}}</strong>
@@ -14,6 +14,8 @@
 
     <!-- BODY -->
     <div class="card-body px-5 py-4">
+
+      <!-- Title -->
       <h4 class="text-danger fw-bold mb-4 text-center">
         {{#if (eq reservation.tripType "Round-Trip")}}
           Round-Trip Summary
@@ -22,8 +24,8 @@
         {{/if}}
       </h4>
 
-      {{#if reservation.flights.[0]}}
       <!-- Departure Flight -->
+      {{#if reservation.flights.[0]}}
       <div class="mb-4">
         <h5 class="fw-bold text-center text-dark mb-2">Departure Flight</h5>
         <table class="table table-bordered align-middle text-center">
@@ -37,10 +39,10 @@
       </div>
       {{/if}}
 
-      {{#if reservation.flights.[1]}}
       <!-- Return Flight -->
+      {{#if reservation.flights.[1]}}
       <div class="mt-4">
-        <h5 class="fw-bold text-center text-dark mb-2"> Return Flight</h5>
+        <h5 class="fw-bold text-center text-dark mb-2">Return Flight</h5>
         <table class="table table-bordered align-middle text-center">
           <tbody>
             <tr><th>Flight No:</th><td>{{reservation.flights.[1].flightNumber}}</td></tr>
@@ -52,12 +54,47 @@
       </div>
       {{/if}}
 
-      <!-- Buttons -->
+      <!-- PASSENGER DETAILS -->
+      {{#if reservation.passengers.length}}
+      <div class="mt-5">
+        <h5 class="fw-bold text-center text-dark mb-3">Passenger Details</h5>
+        <div class="table-responsive">
+          <table class="table table-striped align-middle text-center border">
+            <thead class="table-danger">
+              <tr>
+                <th>#</th>
+                <th>Full Name</th>
+                <th>Gender</th>
+                <th>Age</th>
+                <th>Seat</th>
+                <th>Meal</th>
+                <th>Baggage (kg)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each reservation.passengers}}
+              <tr>
+                <td>{{inc @index}}</td>
+                <td>{{this.fullName}}</td>
+                <td>{{this.gender}}</td>
+                <td>{{this.age}}</td>
+                <td>{{this.seatNumber}}</td>
+                <td>{{this.meal}}</td>
+                <td>{{this.baggageAllowance}}</td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {{/if}}
+
+      <!-- BUTTONS -->
       <div class="text-center mt-5">
-        <a href="/" class="btn btn-danger px-4 mx-2"></i>Return to Home</a>
-        <a href="/reservations/myBookings" class="btn btn-outline-secondary px-4 mx-2">
-          </i>View My Reservations
-        </a>
+        <a href="/" class="btn btn-danger px-4 mx-2">Return to Home</a>
+        <a href="/reservations/my-bookings" class="btn btn-outline-secondary px-4 mx-2">
+  View My Reservations
+</a>
       </div>
     </div>
 

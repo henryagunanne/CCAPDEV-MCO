@@ -45,12 +45,13 @@ const reservationSchema = new mongoose.Schema({
     required: true
   },
   // Flight reference
-  flights: 
-  {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Flight',
-    required: true
-  },
+  flight: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Flight',
+      required: true
+    }
+  ],
 
   tripType: {
     type: String,
@@ -65,6 +66,10 @@ const reservationSchema = new mongoose.Schema({
 
   passengers: [passengerSchema],
 
+  Price: {
+    type: Number,
+    required: true
+  },
   bookingDate: {
     type: Date,
     default: Date.now

@@ -302,4 +302,59 @@
       icon.classList.toggle("bi-eye-slash");
     }
   });
+
+// ✅ Handle Cancel Reservation
+document.addEventListener("click", async (e) => {
+  if (!e.target.closest(".cancelReservation")) return;
+  e.preventDefault();
+
+  const btn = e.target.closest(".cancelReservation");
+  const id = btn.dataset.id;
+  if (!confirm("Are you sure you want to cancel this reservation?")) return;
+
+  try {
+    const res = await fetch(`/reservations/cancel/${id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }
+    });
+
+    const data = await res.json();
+    if (!data.success) throw new Error();
+
+    // Move the reservation to Past/Cancelled table visually
+    const row = document.getElementById(`reservation-${id}`);
+    const passengersRow = document.getElementById(`passengers-${id}`);
+    const routeRow = document.getElementById(`route-${id}`);
+
+    if (row) row.remove();
+    if (passengersRow) passengersRow.remove();
+    if (routeRow) routeRow.remove();
+
+    // ✅ Optional: append to the bottom "Past/Cancelled" table
+    const pastTable = document.getElementById("pastBookingTable");
+    if (pastTable) {
+      const cancelled = data.cancelledReservation;
+      const newRow = document.createElement("tr");
+      newRow.classList.add("text-center", "align-middle");
+      newRow.innerHTML = `
+        <td class="fw-semibold">
+          ${cancelled.flight.map(f => f.flightNumber).join("<br>")}
+        </td>
+        <td>-</td>
+        <td>${cancelled.tripType}</td>
+        <td>${cancelled.travelClass}</td>
+        <td>${cancelled.passengers.length}</td>
+        <td>${new Date(cancelled.bookingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+        <td><span class="badge bg-danger">Cancelled</span></td>
+      `;
+      pastTable.appendChild(newRow);
+    }
+
+    showToast("Reservation Cancelled.", true);
+  } catch (err) {
+    console.error("Cancel error:", err);
+    showToast("Failed to cancel reservation.", false);
+  }
+});
 </script>
+

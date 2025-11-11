@@ -107,6 +107,11 @@ $(document).on("click", ".seat.available, .seat.selected", function () {
   const seatPrice = parseInt($(this).data("price"));
   const seatClass = $(this).data("class");
 
+    // 🧩 Update travelClass hidden input based on clicked seat
+  $("#travelClass").val(seatClass.charAt(0).toUpperCase() + seatClass.slice(1));
+  console.log("✅ Travel Class Selected:", $("#travelClass").val());
+
+
   // If already selected, unselect it
   if ($(this).hasClass("selected")) {
     $(this).removeClass("selected").addClass("available");
@@ -189,6 +194,7 @@ $(document).on("click", ".seat.available, .seat.selected", function () {
       data: JSON.stringify({
         flight: $("input[name='flight']").val(),
         travelClass: $("#travelClass").val(),
+        tripType: $("#tripType").val(),
         passengers: passengerData,
         totalAmount: totalAmount
       }),

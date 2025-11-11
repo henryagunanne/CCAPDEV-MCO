@@ -46,12 +46,15 @@ router.get('/book/:flightId', isAuthenticated, async (req, res) => {
 });
 
 
-//create
+/* =============================
+   CREATE
+============================= */
 
-// ✅ Create Reservation Route
+//  Create Reservation Route
 router.post("/create", isAuthenticated, async (req, res) => {
   try {
-    const { flight, travelClass, passengers, totalAmount } = req.body;
+    // 🧭 Include tripType here
+    const { flight, travelClass, tripType, passengers, totalAmount } = req.body;
 
     // passengers is already an array since we send JSON
     const parsedPassengers = Array.isArray(passengers)
@@ -60,10 +63,12 @@ router.post("/create", isAuthenticated, async (req, res) => {
 
     const seatNumbers = parsedPassengers.map(p => p.seatNumber);
 
+    // ✅ Include tripType in Reservation object
     const newReservation = new Reservation({
       userId: req.session.user?._id || null,
       flight,
       travelClass,
+      tripType, // ✅ This was missing
       passengers: parsedPassengers,
       seatNumbers,
       totalAmount: parseFloat(totalAmount) || 0,
@@ -80,6 +85,7 @@ router.post("/create", isAuthenticated, async (req, res) => {
     res.status(500).send("Error creating reservation");
   }
 });
+
 
 
 // ✅ Confirmation Route 

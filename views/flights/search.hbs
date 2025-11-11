@@ -232,10 +232,10 @@
                                         <p class="card-subtitle mb-2 text-body-secondary">{{formatDate this.startDate}} - {{formatDate this.endDate}}</p>
                                         <p class="card-text mb-1">From</p>
                                         <h3 class="card-text mb-1">USD {{this.flight.price}}*</h3>
-                                        <p class="card-text mb-0">{{this.tripType}}/{{this.travelClass}}</p>
+                                        <p class="card-text mb-0">{{this.tripType}}</p>
                                         <p class="card-text">Depart: {{this.flight.departureDate}}</p>
                                         <div class="mt-auto">
-                                            <a href="/reservations/book/{{this.flight._id}}?travelClass={{this.travelClass}}&tripType={{this.tripType}}&depart={{formatDate this.startDate}}&return={{formatDate this.endDate}}" 
+                                            <a href="/reservations/book/{{this.flight._id}}?tripType={{this.tripType}}&depart={{formatDate this.startDate}}&return={{formatDate this.endDate}}" 
    class="btn btn-danger d-grid gap-2">Book Now</a>
                                         </div>
                                     </div>

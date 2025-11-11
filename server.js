@@ -70,9 +70,9 @@ app.engine('hbs', exphbs.engine({
     },
 
     divide: (a, b) => Math.ceil(a / b),
-    addOne: function (value) {
+    /* addOne: function (value) {
       return value + 1;
-    },
+    }, */
 
     range: function (start, end) {
       const rangeArray = [];
@@ -97,6 +97,14 @@ app.engine('hbs', exphbs.engine({
     // 🧩 Equality helper (used in reservation.hbs)
     ifEquals: function (a, b, options) {
       return a === b ? options.fn(this) : options.inverse(this);
+    },
+
+    currentDate: function () {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`; // → "2025-11-11"
     }
 }
 

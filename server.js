@@ -12,6 +12,21 @@ const seedUsers = require('./seeds/seedUsers');
 const seedReservations = require('./seeds/seedReservations');
 const PORT = 3000;  // Server port
 
+const hbs = exphbs.create({
+  helpers: {
+    formatDate: function(dateString) {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      const options = { month: 'short', day: 'numeric', year: 'numeric' };
+      return date.toLocaleDateString('en-US', options);
+    },
+    eq: (a, b) => a === b
+  }
+});
+app.engine('hbs', hbs.engine);
+app.set('view engine', 'hbs');
+
+
 
 // Connect to MongoDB
 mongoose.connect('mongodb://127.0.0.1:27017/airlineDB')

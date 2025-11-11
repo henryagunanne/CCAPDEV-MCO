@@ -45,11 +45,14 @@ const reservationSchema = new mongoose.Schema({
     required: true
   },
   // Flight reference
-  flight: {
+  flights: [
+  {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Flight',
     required: true
-  },
+  }
+],
+
   tripType: {
     type: String,
     enum: ['One-Way', 'Round-Trip'],

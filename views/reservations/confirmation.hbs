@@ -1,74 +1,69 @@
 <main class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
-  <div class="card shadow-lg border-0" style="max-width: 700px; width: 100%;">
+  <div class="card shadow-lg border-0" style="max-width: 750px; width: 100%;">
+    
+    <!-- HEADER -->
     <div class="card-header bg-danger text-white text-center py-4 rounded-top">
-      <h2 class="fw-bold mb-1">✅ Booking Confirmed!</h2>
-      <p class="mb-0">
-        Your flight from <strong>{{reservation.flight.origin}}</strong>
-        to <strong>{{reservation.flight.destination}}</strong> is confirmed.
-      </p>
+      <h2 class="fw-bold mb-1"></i>Booking Confirmed!</h2>
+      {{#if reservation.flights.[0]}}
+        <p class="mb-0">
+          Your flight from <strong>{{reservation.flights.[0].origin}}</strong>
+          to <strong>{{reservation.flights.[0].destination}}</strong> is confirmed.
+        </p>
+      {{/if}}
     </div>
 
+    <!-- BODY -->
     <div class="card-body px-5 py-4">
-      <h4 class="text-danger fw-bold mb-3 text-center">Flight Summary</h4>
+      <h4 class="text-danger fw-bold mb-4 text-center">
+        {{#if (eq reservation.tripType "Round-Trip")}}
+          Round-Trip Summary
+        {{else}}
+          Flight Summary
+        {{/if}}
+      </h4>
 
-      <div class="table-responsive mb-4">
+      {{#if reservation.flights.[0]}}
+      <!-- Departure Flight -->
+      <div class="mb-4">
+        <h5 class="fw-bold text-center text-dark mb-2">Departure Flight</h5>
         <table class="table table-bordered align-middle text-center">
           <tbody>
-            <tr>
-              <th>Flight No:</th>
-              <td>{{reservation.flight.flightNumber}}</td>
-            </tr>
-            <tr>
-              <th>Departure:</th>
-              <td>{{reservation.flight.departureTime}}</td>
-            </tr>
-            <tr>
-              <th>Arrival:</th>
-              <td>{{reservation.flight.arrivalTime}}</td>
-            </tr>
-            <tr>
-              <th>Class:</th>
-              <td>{{reservation.travelClass}}</td>
-            </tr>
-            <tr>
-              <th>Status:</th>
-              <td><span class="badge bg-success">{{reservation.status}}</span></td>
-            </tr>
+            <tr><th>Flight No:</th><td>{{reservation.flights.[0].flightNumber}}</td></tr>
+            <tr><th>Route:</th><td>{{reservation.flights.[0].origin}} → {{reservation.flights.[0].destination}}</td></tr>
+            <tr><th>Departure:</th><td>{{reservation.flights.[0].departureTime}}</td></tr>
+            <tr><th>Arrival:</th><td>{{reservation.flights.[0].arrivalTime}}</td></tr>
           </tbody>
         </table>
       </div>
+      {{/if}}
 
-      <h4 class="text-danger fw-bold mb-3 text-center">Passenger Details</h4>
-
-      {{!-- Dynamically center or show in pairs --}}
-<div class="row {{#if (eq reservation.passengers.length 1)}}justify-content-center{{else}}row-cols-1 row-cols-md-2 g-3{{/if}}">
-  {{#each reservation.passengers}}
-  <div class="col d-flex justify-content-center">
-    <div class="card border-0 shadow-sm h-100" style="max-width: 300px; width: 100%;">
-      <div class="card-body text-center">
-        <h5 class="fw-bold text-dark mb-1">{{this.fullName}}</h5>
-        <p class="text-muted mb-1">{{this.gender}}, Age {{this.age}}</p>
-        <p class="mb-1"><strong>Passport:</strong> {{this.passport}}</p>
-        <p class="mb-1"><strong>Seat:</strong> {{this.seatNumber}}</p>
-        <p class="mb-1"><strong>Meal:</strong> {{this.meal}}</p>
-        <p class="mb-0"><strong>Baggage:</strong> {{this.baggageAllowance}} kg</p>
+      {{#if reservation.flights.[1]}}
+      <!-- Return Flight -->
+      <div class="mt-4">
+        <h5 class="fw-bold text-center text-dark mb-2"> Return Flight</h5>
+        <table class="table table-bordered align-middle text-center">
+          <tbody>
+            <tr><th>Flight No:</th><td>{{reservation.flights.[1].flightNumber}}</td></tr>
+            <tr><th>Route:</th><td>{{reservation.flights.[1].origin}} → {{reservation.flights.[1].destination}}</td></tr>
+            <tr><th>Departure:</th><td>{{reservation.flights.[1].departureTime}}</td></tr>
+            <tr><th>Arrival:</th><td>{{reservation.flights.[1].arrivalTime}}</td></tr>
+          </tbody>
+        </table>
       </div>
-    </div>
-  </div>
-  {{/each}}
-</div>
+      {{/if}}
 
-
+      <!-- Buttons -->
       <div class="text-center mt-5">
-        <a href="/" class="btn btn-danger px-4 mx-2">Return to Home</a>
+        <a href="/" class="btn btn-danger px-4 mx-2"></i>Return to Home</a>
         <a href="/reservations/myBookings" class="btn btn-outline-secondary px-4 mx-2">
-          View My Reservations
+          </i>View My Reservations
         </a>
       </div>
     </div>
 
+    <!-- FOOTER -->
     <div class="card-footer text-center text-muted small py-3">
-      Thank you for choosing <strong>Archers Airlines</strong> ✈️
+      Thank you for choosing <strong>Archers Airlines</strong>
     </div>
   </div>
 </main>

@@ -25,11 +25,17 @@ router.get('/book/:flightId', isAuthenticated, async (req, res) => {
     const flight = await Flight.findById(flightId).lean();
     if (!flight) return res.status(404).send('Flight not found');
 
-    // Get details from query (passed from the flight card)
-    const travelClass = req.query.travelClass || "Economy";
-    const tripType = req.query.tripType || "One-Way";
-    const departDate = req.query.depart || "";
-    const returnDate = req.query.return || "";
+    // values coming from search / card (if any)
+    const travelClass = req.query.travelClass || 'Economy';
+    const tripType   = req.query.tripType   || 'One-Way';
+    const departDate = req.query.depart     || '';
+    const returnDate = req.query.return     || '';
+
+    // 🔁 ALWAYS load possible return flights (same route, opposite direction)
+    const returnFlights = await Flight.find({
+      origin:      flight.destination,
+      destination: flight.origin
+    }).lean();
 
     res.render('reservations/reservation', {
       title: 'Book Your Flight',
@@ -37,7 +43,8 @@ router.get('/book/:flightId', isAuthenticated, async (req, res) => {
       travelClass,
       tripType,
       departDate,
-      returnDate
+      returnDate,
+      returnFlights            // 🔥 pass to template
     });
   } catch (err) {
     console.error('Error loading booking page:', err);
@@ -54,7 +61,7 @@ router.get('/book/:flightId', isAuthenticated, async (req, res) => {
 router.post("/create", isAuthenticated, async (req, res) => {
   try {
     // 🧭 Include tripType here
-    const { flight, travelClass, tripType, passengers, totalAmount } = req.body;
+    const { flight, returnFlight, travelClass, tripType, passengers, totalAmount } = req.body;
 
     // passengers is already an array since we send JSON
     const parsedPassengers = Array.isArray(passengers)
@@ -66,7 +73,7 @@ router.post("/create", isAuthenticated, async (req, res) => {
     // ✅ Include tripType in Reservation object
     const newReservation = new Reservation({
       userId: req.session.user?._id || null,
-      flight,
+     flights: returnFlight ? [flight, returnFlight] : [flight],
       travelClass,
       tripType, // ✅ This was missing
       passengers: parsedPassengers,
@@ -92,7 +99,7 @@ router.post("/create", isAuthenticated, async (req, res) => {
 router.get("/:id/confirmation", isAuthenticated,  async (req, res) => {
   try {
     const reservation = await Reservation.findById(req.params.id)
-      .populate("flight")      // get flight details
+      .populate("flights")     // get flight details
       .populate("userId")      // optional, for user info
       .lean();                 // convert to plain object
 
@@ -115,7 +122,7 @@ router.get('/my-bookings', isAuthenticated, async (req, res) => {
 
   try {
     const reservation = await Reservation.find({userId})
-      .populate("flight") 
+      .populate("flights")
       .lean(); 
 
     res.render('reservations/myBookings', {
@@ -161,7 +168,7 @@ router.get('/edit/:id', isAuthenticated, async (req, res) => {
   try {
     const id = req.params.id;
     const reservation = await Reservation.findById(id)
-    .populate('flight')
+    .populate('flights')
     .lean();
 
     if (!reservation) return res.status(404).send('Flight not found');
@@ -183,13 +190,18 @@ router.get('/edit/:id', isAuthenticated, async (req, res) => {
 ============================= */
 router.get('/:id', isAuthenticated, async (req, res) => {
   try {
-    const reservation = await Reservation.findById(req.params.id).populate('flight').lean();
+    const reservation = await Reservation.findById(req.params.id)
+      .populate('flights')  // ✅ plural
+      .lean();
+
     if (!reservation) return res.status(404).send('Reservation not found');
     res.render('reservations/details', { title: 'Booking Details', reservation });
   } catch (err) {
+    console.error("Error loading reservation:", err);
     res.status(500).send('Error loading reservation');
   }
 });
+
 
 /* =============================
    DELETE - Cancel reservation - IMPORTANT: ONLY ADMINS CAN DELETE RESERVATIONS - USERS CAN ONLY CANCEL

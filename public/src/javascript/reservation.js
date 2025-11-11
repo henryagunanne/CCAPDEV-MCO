@@ -11,7 +11,27 @@ $(document).ready(function () {
   let passengers = [];
   let selectedSeats = [];
 
-  // -------- Passenger Generator --------
+    // -------- Trip type + return flight section --------
+    function toggleReturnSection() {
+      const isRoundTrip = $('#tripTypeSelect').val() === 'Round-Trip';
+      if (isRoundTrip) {
+        $('#returnFlightSection').removeClass('d-none');
+      } else {
+        $('#returnFlightSection').addClass('d-none');
+        $('#returnFlight').val('');
+      }
+      updateSummary(); // recalc price
+    }
+
+    toggleReturnSection();
+
+    $('#tripTypeSelect').on('change', function () {
+      $('#tripType').val($(this).val()); // keep hidden input synced
+      toggleReturnSection();
+    });
+
+
+    // -------- Passenger Generator --------
   $("#passengerCount").on("input", function () {
     const count = parseInt($(this).val());
     const container = $("#passengerFields");
@@ -147,18 +167,32 @@ $(document).on("click", ".seat.available, .seat.selected", function () {
     updateSummary();
   });
 
-  // -------- Price Summary --------
-  function updateSummary() {
-    const mealFee = passengers.reduce((sum, p) => sum + (p.meal !== "None" ? mealPrice : 0), 0);
-    const bagFee = passengers.reduce((sum, p) => sum + (p.baggage * bagPrice || 0), 0);
-    const seatFee = passengers.reduce((sum, p) => sum + (p.seat ? p.seat.price : 0), 0);
-    const total = (baseFare * passengers.length) + mealFee + bagFee + seatFee;
+  
+    // -------- Price Summary --------
+    function updateSummary() {
+      const mealFee = passengers.reduce((sum, p) => sum + (p.meal !== "None" ? mealPrice : 0), 0);
+      const bagFee  = passengers.reduce((sum, p) => sum + (p.baggage * bagPrice || 0), 0);
+      const seatFee = passengers.reduce((sum, p) => sum + (p.seat ? p.seat.price : 0), 0);
 
-    $("#mealFee").text(mealFee);
-    $("#baggageFee").text(bagFee);
-    $("#seatFee").text(seatFee);
-    $("#totalPrice").text(total);
-  }
+      // Parse return flight price (₱###)
+      const returnFlightPrice = parseInt(
+        $("#returnFlight option:selected").text().match(/₱(\d+)/)?.[1] || 0
+      );
+
+      const paxCount = passengers.length || 1;
+      const totalBase = (baseFare + returnFlightPrice) * paxCount;
+
+      const total = totalBase + mealFee + bagFee + seatFee;
+
+      $("#mealFee").text(mealFee);
+      $("#baggageFee").text(bagFee);
+      $("#seatFee").text(seatFee);
+      $("#totalPrice").text(total);
+    }
+
+    $('#returnFlight').on('change', updateSummary);
+
+
 
   // -------- Submit Booking --------
   $("#confirmBooking").on("click", function (e) {
@@ -192,12 +226,14 @@ $(document).on("click", ".seat.available, .seat.selected", function () {
       method: "POST",
       contentType: "application/json", // send as JSON
       data: JSON.stringify({
-        flight: $("input[name='flight']").val(),
-        travelClass: $("#travelClass").val(),
-        tripType: $("#tripType").val(),
-        passengers: passengerData,
-        totalAmount: totalAmount
-      }),
+  flight: $("input[name='flight']").val(),
+  returnFlight: $("#returnFlight").val() || null,
+  travelClass: $("#travelClass").val(),
+  tripType: $("#tripType").val(),
+  passengers: passengerData,
+  totalAmount: totalAmount
+}),
+
       success: function (response) {
         window.location.href = response.redirect || window.location.href;
       },

@@ -101,10 +101,17 @@ app.engine('hbs', exphbs.engine({
 
     currentDate: function () {
       const now = new Date();
-      const year = now.getFullYear();
-      const month = String(now.getMonth() + 1).padStart(2, '0');
-      const day = String(now.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`; // → "2025-11-11"
+      return now.toISOString().split('T')[0]; // → "2025-11-11"
+    },
+    
+    isUpcoming: function (flights) {
+      if (!flights || flights.length === 0) return false;
+
+      const today = new Date();
+      const latestFlight = flights[flights.length - 1]; // return flight if round-trip
+      const depDate = new Date(latestFlight.departureDate);
+
+      return depDate >= today; // true = upcoming, false = past
     }
 }
 

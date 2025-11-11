@@ -20,63 +20,83 @@
         <input type="hidden" name="reservationId" value="{{reservation._id}}">
         <input type="hidden" name="flight" value="{{reservation.flight._id}}">
 
+        <!-- Trip Type Selector -->
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Trip Type</label>
+            <select id="tripTypeSelect" name="tripType" class="form-select">
+                <option value="One-Way" {{#if (eq tripType "One-Way")}}selected{{/if}}>One-Way</option>
+                <option value="Round-Trip" {{#if (eq tripType "Round-Trip")}}selected{{/if}}>Round-Trip</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">Travel Class</label>
+            <select id="travelClassSelect" name="travelClassSelect" class="form-select">
+                <option value="Economy" {{#if (eq reservation.travelClass "Economy")}}selected{{/if}}>Economy</option>
+                <option value="Premium Economy" {{#if (eq reservation.travelClass "Premium Economy")}}selected{{/if}}>Premium Economy</option>
+                <option value="Business" {{#if (eq reservation.travelClass "Business")}}selected{{/if}}>Business</option>
+                <option value="First" {{#if (eq reservation.travelClass "First")}}selected{{/if}}>First</option>
+            </select>
+        </div>
+      </div>
+
         <!-- Passenger Cards -->
         <div id="passengerFields">
           {{#each reservation.passengers}}
-  <div class="card my-3 shadow-sm">
-    <div class="card-header bg-light"><strong>Passenger {{inc @index}}</strong></div>
-    <div class="card-body">
+            <div class="card my-3 shadow-sm">
+                <div class="card-header bg-light"><strong>Passenger {{inc @index}}</strong></div>
+                <div class="card-body">
 
-      <!-- Row 1: Full Name + Gender -->
-      <div class="row mb-2">
-        <div class="col-md-6">
-          <label class="form-label">Full Name</label>
-          <input type="text" name="passengers[{{@index}}][fullName]" class="form-control" value="{{this.fullName}}" required>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Gender</label>
-          <select name="passengers[{{@index}}][gender]" class="form-select" required>
-            <option value="Male" {{#if (eq this.gender "Male")}}selected{{/if}}>Male</option>
-            <option value="Female" {{#if (eq this.gender "Female")}}selected{{/if}}>Female</option>
-            <option value="Other" {{#if (eq this.gender "Other")}}selected{{/if}}>Other</option>
-          </select>
-        </div>
-      </div>
+                <!-- Row 1: Full Name + Gender -->
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" name="passengers[{{@index}}][fullName]" class="form-control" value="{{this.fullName}}" required>
+                    </div>
+                    <div class="col-md-6">
+                    <label class="form-label">Gender</label>
+                    <select name="passengers[{{@index}}][gender]" class="form-select" required>
+                        <option value="Male" {{#if (eq this.gender "Male")}}selected{{/if}}>Male</option>
+                        <option value="Female" {{#if (eq this.gender "Female")}}selected{{/if}}>Female</option>
+                        <option value="Other" {{#if (eq this.gender "Other")}}selected{{/if}}>Other</option>
+                    </select>
+                    </div>
+                </div>
 
-      <!-- Row 2: Age + Passport -->
-      <div class="row mb-2">
-        <div class="col-md-6">
-          <label class="form-label">Age</label>
-          <input type="number" name="passengers[{{@index}}][age]" class="form-control" value="{{this.age}}" min="0" required>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Passport Number</label>
-          <input type="text" name="passengers[{{@index}}][passport]" class="form-control" value="{{this.passport}}" required>
-        </div>
-      </div>
+                <!-- Row 2: Age + Passport -->
+                <div class="row mb-2">
+                    <div class="col-md-6">
+                    <label class="form-label">Age</label>
+                    <input type="number" name="passengers[{{@index}}][age]" class="form-control" value="{{this.age}}" min="0" required>
+                    </div>
+                    <div class="col-md-6">
+                    <label class="form-label">Passport Number</label>
+                    <input type="text" name="passengers[{{@index}}][passport]" class="form-control" value="{{this.passport}}" required>
+                    </div>
+                </div>
 
-      <!-- Row 3: Meal + Baggage -->
-      <div class="row">
-        <div class="col-md-6">
-          <label class="form-label">Meal Option</label>
-          <select name="passengers[{{@index}}][meal]" class="form-select meal-option" data-index="{{@index}}">
-            <option value="None" {{#if (eq this.meal "None")}}selected{{/if}}>None</option>
-            <option value="Vegetarian" {{#if (eq this.meal "Vegetarian")}}selected{{/if}}>Vegetarian</option>
-            <option value="Non-Vegetarian" {{#if (eq this.meal "Non-Vegetarian")}}selected{{/if}}>Non-Vegetarian</option>
-            <option value="Vegan" {{#if (eq this.meal "Vegan")}}selected{{/if}}>Vegan</option>
-            <option value="Gluten-Free" {{#if (eq this.meal "Gluten-Free")}}selected{{/if}}>Gluten-Free</option>
-          </select>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Baggage (kg)</label>
-          <input type="number" class="form-control baggage-input" data-index="{{@index}}" name="passengers[{{@index}}][baggageAllowance]" value="{{this.baggageAllowance}}" min="0">
-        </div>
-      </div>
+                <!-- Row 3: Meal + Baggage -->
+                <div class="row">
+                    <div class="col-md-6">
+                    <label class="form-label">Meal Option</label>
+                    <select name="passengers[{{@index}}][meal]" class="form-select meal-option" data-index="{{@index}}">
+                        <option value="None" {{#if (eq this.meal "None")}}selected{{/if}}>None</option>
+                        <option value="Vegetarian" {{#if (eq this.meal "Vegetarian")}}selected{{/if}}>Vegetarian</option>
+                        <option value="Non-Vegetarian" {{#if (eq this.meal "Non-Vegetarian")}}selected{{/if}}>Non-Vegetarian</option>
+                        <option value="Vegan" {{#if (eq this.meal "Vegan")}}selected{{/if}}>Vegan</option>
+                        <option value="Gluten-Free" {{#if (eq this.meal "Gluten-Free")}}selected{{/if}}>Gluten-Free</option>
+                    </select>
+                    </div>
+                    <div class="col-md-6">
+                    <label class="form-label">Baggage (kg)</label>
+                    <input type="number" class="form-control baggage-input" data-index="{{@index}}" name="passengers[{{@index}}][baggageAllowance]" value="{{this.baggageAllowance}}" min="0">
+                    </div>
+                </div>
 
-      <div class="mt-2 text-muted small seat-info">Seat: {{this.seatNumber}}</div>
-    </div>
-  </div>
-{{/each}}
+                <div class="mt-2 text-muted small seat-info">Seat: {{this.seatNumber}}</div>
+                </div>
+            </div>
+          {{/each}}
 
         </div>
 

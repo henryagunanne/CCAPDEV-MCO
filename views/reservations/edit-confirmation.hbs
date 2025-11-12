@@ -3,11 +3,11 @@
     
     <!-- HEADER -->
     <div class="card-header bg-danger text-white text-center py-4 rounded-top">
-      <h2 class="fw-bold mb-1">Booking Confirmed</h2>
+      <h2 class="fw-bold mb-1">Reservation Updated</h2>
       {{#if reservation.flight}}
           <p class="mb-0">
-            Your flight from <strong>{{reservation.flight.[0].origin}}</strong>
-            to <strong>{{reservation.flight.[0].destination}}</strong> is confirmed.
+            Your updated flight from <strong>{{reservation.flight.[0].origin}}</strong>
+            to <strong>{{reservation.flight.[0].destination}}</strong> has been saved.
           </p>
       {{/if}}
     </div>
@@ -18,9 +18,9 @@
       <!-- Title -->
       <h4 class="text-danger fw-bold mb-4 text-center">
         {{#if (eq reservation.tripType "Round-Trip")}}
-          Round-Trip Summary
+          Updated Round-Trip Summary
         {{else}}
-          Flight Summary
+          Updated Flight Summary
         {{/if}}
       </h4>
 
@@ -57,7 +57,7 @@
       <!-- PASSENGER DETAILS -->
       {{#if reservation.passengers.length}}
       <div class="mt-5">
-        <h5 class="fw-bold text-center text-dark mb-3">Passenger Details</h5>
+        <h5 class="fw-bold text-center text-dark mb-3">Updated Passenger Details</h5>
         <div class="table-responsive">
           <table class="table table-striped align-middle text-center border">
             <thead class="table-danger">
@@ -87,55 +87,55 @@
           </table>
         </div>
       </div>
-
       {{/if}}
 
       <!-- PRICE SUMMARY -->
-<div class="mt-5">
-  <h5 class="fw-bold text-center text-dark mb-3">Price Summary</h5>
-  <div class="table-responsive">
-    <table class="table table-bordered text-center align-middle border-danger">
-      <tbody>
-        <tr>
-          <th class="bg-danger-subtle text-dark">Base Fare</th>
-          <td>₱{{reservation.flight.[0].price}}</td>
-        </tr>
-        {{#if reservation.flight.[1]}}
-        <tr>
-          <th class="bg-danger-subtle text-dark">Return Fare</th>
-          <td>₱{{reservation.flight.[1].price}}</td>
-        </tr>
-        {{/if}}
-        <tr>
-          <th class="bg-danger-subtle text-dark">Meal Total</th>
-          <td>₱{{reservation.mealTotal}}</td>
-        </tr>
-        <tr>
-          <th class="bg-danger-subtle text-dark">Baggage Total</th>
-          <td>₱{{reservation.baggageTotal}}</td>
-        </tr>
-        <tr class="table-danger fw-bold">
-          <th>Total Price</th>
-          <td>₱{{reservation.price}}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
+      <h5 class="fw-bold text-center text-dark mb-3">Updated Price Summary</h5>
+      <div class="table-responsive">
+        <table class="table table-bordered text-center align-middle border-danger">
+          <tbody>
+            <tr>
+              <th class="bg-danger-subtle text-dark">Base Fare</th>
+              <td>₱{{reservation.flight.[0].price}}</td>
+            </tr>
+            {{#if reservation.flight.[1]}}
+            <tr>
+              <th class="bg-danger-subtle text-dark">Return Fare</th>
+              <td>₱{{reservation.flight.[1].price}}</td>
+            </tr>
+            {{/if}}
+            <tr>
+              <th class="bg-danger-subtle text-dark">Meal Total</th>
+              <td>₱{{reservation.mealTotal}}</td>
+            </tr>
+            <tr>
+              <th class="bg-danger-subtle text-dark">Baggage Total</th>
+              <td>₱{{reservation.baggageTotal}}</td>
+            </tr>
+            <tr>
+              <th class="bg-danger-subtle text-dark">Seat Total</th>
+              <td>₱{{reservation.seatTotal}}</td>
+            </tr>
+            <tr class="table-danger fw-bold">
+              <th>Total Price</th>
+              <td>₱{{reservation.totalFinalPrice}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <!-- BUTTONS -->
       <div class="text-center mt-5">
-        <a href="/" class="btn btn-danger px-4 mx-2">Return to Home</a>
+        <a href="/" class="btn btn-danger text-white px-4 mx-2">Return to Home</a>
         <a href="/reservations/my-bookings" class="btn btn-outline-secondary px-4 mx-2">
-  View My Bookings
-</a>
+          View My Bookings
+        </a>
       </div>
     </div>
 
     <!-- FOOTER -->
     <div class="card-footer text-center text-muted small py-3">
-      Thank you for choosing <strong>Archers Airlines</strong>
+      Changes saved successfully — thank you for flying with <strong>Archers Airlines</strong>
     </div>
   </div>
 </main>

@@ -1,124 +1,254 @@
 <div class="container mt-5">
-  <h2>My Bookings</h2>
+  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h2 class="fw-bold m-0">My Bookings</h2>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-secondary" onclick="window.location.reload()">
+        <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+      </button>
+    </div>
+  </div>
 
   {{#if reservation.length}}
-    <div class="table-responsive">
-      <table class="table table-striped table-hover align-middle">
-        <thead class="table-danger text-center">
-          <tr>
-            <th>Flight</th>
-            <th>Routes</th>
-            <th>Trip</th>
-            <th>Class</th>
-            <th>Passengers</th>
-            <th>Date Booked</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
+      <br>
+      <h5>Upcoming Bookings</h5>
+      <hr>
+      <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+          <thead class="table-danger text-center">
+            <tr>
+              <th>Flight</th>
+              <th>Routes</th>
+              <th>Trip</th>
+              <th>Class</th>
+              <th>Passengers</th>
+              <th>Date Booked</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
 
-        <tbody id="myBookingsTable">
-          {{#each reservation}}
-            {{#if (ne this.status 'Cancelled')}}
-              <tr id="reservation-{{this._id}}" class="text-center align-middle">
-                <td class="fw-semibold">
-                {{#each this.flight}}
-                  {{this.flightNumber}}<br>
-                {{/each}}
-              </td>
-              <td>
-                <button class="btn btn-sm btn-outline-secondary ms-1 toggleRoute" data-id="{{this._id}}" title="View Route">
-                  <i class="bi bi-eye"></i>
-                </button>
-              </td>
-                <td>{{this.tripType}}</td>
-                <td>{{this.travelClass}}</td>
-                <td>
-                  {{this.passengers.length}}
-                    <button class="btn btn-sm btn-outline-secondary ms-1 togglePassengers" data-id="{{this._id}}" title="View Passengers">
-                      <i class="bi bi-eye"></i>
-                    </button>
-                </td>
-                <td>{{formatDate this.bookingDate}}</td>
-                <td>
-                  <div class="status-display" id="statusDisplay-{{this._id}}">
-                    <span class="badge
-                      {{#if (eq this.status 'Confirmed')}}bg-success{{/if}}
-                      {{#if (eq this.status 'Cancelled')}}bg-danger{{/if}}
-                      {{#if (eq this.status 'Pending')}}bg-secondary{{/if}}">
-                      {{this.status}}
-                    </span>
-                  </div>
+          <tbody id="upComingBookingTable">
+            {{#each reservation}}
+              {{#if (and (ne this.status 'Cancelled') (isUpcoming this.flight))}}
+                <tr id="reservation-{{this._id}}" class="text-center align-middle">
+                  <td class="fw-semibold">
+                  {{#each this.flight}}
+                    {{this.flightNumber}}<br>
+                  {{/each}}
                 </td>
                 <td>
-                  <a href="/reservations/edit/{{this._id}}" class="btn btn-sm btn-outline-primary me-1" title="Edit">
-                  <i class="bi bi-pencil"></i>
-                  <a href="#" data-id="{{this._id}}" class="btn btn-sm btn-outline-danger cancelReservation">Cancel</a>
+                  <button class="btn btn-sm btn-outline-secondary ms-1 toggleRoute" data-id="{{this._id}}" title="View Route">
+                    <i class="bi bi-eye"></i>
+                  </button>
                 </td>
-              </tr>
+                  <td>{{this.tripType}}</td>
+                  <td>{{this.travelClass}}</td>
+                  <td>
+                    {{this.passengers.length}}
+                      <button class="btn btn-sm btn-outline-secondary ms-1 togglePassengers" data-id="{{this._id}}" title="View Passengers">
+                        <i class="bi bi-eye"></i>
+                      </button>
+                  </td>
+                  <td>{{formatDate this.bookingDate}}</td>
+                  <td>
+                    <div class="status-display" id="statusDisplay-{{this._id}}">
+                      <span class="badge
+                        {{#if (eq this.status 'Confirmed')}}bg-success{{/if}}
+                        {{#if (eq this.status 'Cancelled')}}bg-danger{{/if}}
+                        {{#if (eq this.status 'Pending')}}bg-secondary{{/if}}">
+                        {{this.status}}
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <a href="/reservations/{{this._id}}/edit" class="btn btn-sm btn-outline-primary me-1" title="Edit">
+  <i class="bi bi-pencil"></i>
+                    <a href="#" data-id="{{this._id}}" class="btn btn-sm btn-outline-danger cancelReservation">Cancel</a>
+                  </td>
+                </tr>
 
-              <!-- Expandable Route Row -->
-              <tr class="route-row d-none" id="route-{{this._id}}">
-                <td colspan="9">
-                  <div class="p-3 bg-light rounded border">
-                    <div class="fw-semibold mb-2">Routes</div>
-                    {{#if this.flight.length}}
-                      <div class="row row-cols-1 row-cols-md-2 g-2">
-                        {{#each this.flight}}
-                          <div class="col">
-                            <div class="p-2 bg-white rounded border">
-                              <div><strong>Flight Number:</strong> {{this.flightNumber}}</div>
-                              <div><strong>Route:</strong> {{this.origin}} → {{this.destination}}</div>
-                              <div><strong>Aircraft:</strong> {{this.aircraft}}</div>
-                              <div><strong>Depart On:</strong> {{this.departureDate}}</div>
-                              <div><strong>Departure:</strong> {{this.departureTime}}</div>
-                              <div><strong>Arrival:</strong> {{this.arrivalTime}}</div>
+                <!-- Expandable Route Row -->
+                <tr class="route-row d-none" id="route-{{this._id}}">
+                  <td colspan="9">
+                    <div class="p-3 bg-light rounded border">
+                      <div class="fw-semibold mb-2">Routes</div>
+                      {{#if this.flight.length}}
+                        <div class="row row-cols-1 row-cols-md-2 g-2">
+                          {{#each this.flight}}
+                            <div class="col">
+                              <div class="p-2 bg-white rounded border">
+                                <div><strong>Flight Number:</strong> {{this.flightNumber}}</div>
+                                <div><strong>Route:</strong> {{this.origin}} → {{this.destination}}</div>
+                                <div><strong>Aircraft:</strong> {{this.aircraft}}</div>
+                                <div><strong>Depart On:</strong> {{this.departureDate}}</div>
+                                <div><strong>Departure:</strong> {{this.departureTime}}</div>
+                                <div><strong>Arrival:</strong> {{this.arrivalTime}}</div>
+                              </div>
                             </div>
-                          </div>
-                        {{/each}}
-                      </div>
-                    {{else}}
-                      <div class="text-muted">No passenger details available.</div>
-                    {{/if}}
-                  </div>
-                </td>
-              </tr>
+                          {{/each}}
+                        </div>
+                      {{else}}
+                        <div class="text-muted">No passenger details available.</div>
+                      {{/if}}
+                    </div>
+                  </td>
+                </tr>
 
-              <!-- Expandable Passengers Row -->
-              <tr class="passengers-row d-none" id="passengers-{{this._id}}">
-                <td colspan="9">
-                  <div class="p-3 bg-light rounded border">
-                    <div class="fw-semibold mb-2">Passengers</div>
-                    {{#if this.passengers.length}}
-                      <div class="row row-cols-1 row-cols-md-2 g-2">
-                        {{#each this.passengers}}
-                          <div class="col">
-                            <div class="p-2 bg-white rounded border">
-                              <div><strong>Name:</strong> {{this.fullName}}</div>
-                              <div><strong>Age:</strong> {{this.age}}</div>
-                              <div><strong>Gender:</strong> {{this.gender}}</div>
-                              <div><strong>Passport:</strong> {{this.passport}}</div>
-                              <div><strong>Seat:</strong> {{this.seatNumber}}</div>
-                              <div><strong>Meal:</strong> {{this.meal}}</div>
-                              <div><strong>Baggage:</strong> {{this.baggageAllowance}}</div>
+                <!-- Expandable Passengers Row -->
+                <tr class="passengers-row d-none" id="passengers-{{this._id}}">
+                  <td colspan="9">
+                    <div class="p-3 bg-light rounded border">
+                      <div class="fw-semibold mb-2">Passengers</div>
+                      {{#if this.passengers.length}}
+                        <div class="row row-cols-1 row-cols-md-2 g-2">
+                          {{#each this.passengers}}
+                            <div class="col">
+                              <div class="p-2 bg-white rounded border">
+                                <div><strong>Name:</strong> {{this.fullName}}</div>
+                                <div><strong>Age:</strong> {{this.age}}</div>
+                                <div><strong>Gender:</strong> {{this.gender}}</div>
+                                <div><strong>Passport:</strong> {{this.passport}}</div>
+                                <div><strong>Seat:</strong> {{this.seatNumber}}</div>
+                                <div><strong>Meal:</strong> {{this.meal}}</div>
+                                <div><strong>Baggage:</strong> {{this.baggageAllowance}}</div>
+                              </div>
                             </div>
-                          </div>
-                        {{/each}}
-                      </div>
-                    {{else}}
-                      <div class="text-muted">No passenger details available.</div>
-                    {{/if}}
-                  </div>
-                </td>
-              </tr>
-            {{/if}}
-          {{/each}}
-        </tbody>
-      </table>
-    </div>
+                          {{/each}}
+                        </div>
+                      {{else}}
+                        <div class="text-muted">No passenger details available.</div>
+                      {{/if}}
+                    </div>
+                  </td>
+                </tr>
+              {{/if}}
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
   {{else}}
     <div class="alert alert-info mt-4">You have no upcoming bookings yet.</div>
   {{/if}}
+
+<br><br><hr><br><br>
+
+  <!-- Past/Cancelled Bookings table -->
+  {{#if reservation.length}}
+      <br>
+      <h5>Past/Cancelled Bookings</h5>
+      <hr>
+      <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+          <thead class="table-danger text-center">
+            <tr>
+              <th>Flight</th>
+              <th>Routes</th>
+              <th>Trip</th>
+              <th>Class</th>
+              <th>Passengers</th>
+              <th>Date Booked</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+
+          <tbody id="pastBookingTable">
+            {{#each reservation}}
+              {{#if (and (eq this.status 'Cancelled') (not isUpcoming this.flight))}}
+                <tr id="reservation-{{this._id}}" class="text-center align-middle">
+                  <td class="fw-semibold">
+                  {{#each this.flight}}
+                    {{this.flightNumber}}<br>
+                  {{/each}}
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-outline-secondary ms-1 toggleRoute" data-id="{{this._id}}" title="View Route">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                </td>
+                  <td>{{this.tripType}}</td>
+                  <td>{{this.travelClass}}</td>
+                  <td>
+                    {{this.passengers.length}}
+                      <button class="btn btn-sm btn-outline-secondary ms-1 togglePassengers" data-id="{{this._id}}" title="View Passengers">
+                        <i class="bi bi-eye"></i>
+                      </button>
+                  </td>
+                  <td>{{formatDate this.bookingDate}}</td>
+                  <td>
+                    <div class="status-display" id="status-{{this._id}}">
+                      <span class="badge
+                        {{#if (eq this.status 'Confirmed')}}bg-success{{/if}}
+                        {{#if (eq this.status 'Cancelled')}}bg-danger{{/if}}
+                        {{#if (eq this.status 'Pending')}}bg-secondary{{/if}}">
+                        {{this.status}}
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Expandable Route Row -->
+                <tr class="route-row d-none" id="route-{{this._id}}">
+                  <td colspan="9">
+                    <div class="p-3 bg-light rounded border">
+                      <div class="fw-semibold mb-2">Routes</div>
+                      {{#if this.flight.length}}
+                        <div class="row row-cols-1 row-cols-md-2 g-2">
+                          {{#each this.flight}}
+                            <div class="col">
+                              <div class="p-2 bg-white rounded border">
+                                <div><strong>Flight Number:</strong> {{this.flightNumber}}</div>
+                                <div><strong>Route:</strong> {{this.origin}} → {{this.destination}}</div>
+                                <div><strong>Aircraft:</strong> {{this.aircraft}}</div>
+                                <div><strong>Depart On:</strong> {{this.departureDate}}</div>
+                                <div><strong>Departure:</strong> {{this.departureTime}}</div>
+                                <div><strong>Arrival:</strong> {{this.arrivalTime}}</div>
+                              </div>
+                            </div>
+                          {{/each}}
+                        </div>
+                      {{else}}
+                        <div class="text-muted">No passenger details available.</div>
+                      {{/if}}
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Expandable Passengers Row -->
+                <tr class="passengers-row d-none" id="passengers-{{this._id}}">
+                  <td colspan="9">
+                    <div class="p-3 bg-light rounded border">
+                      <div class="fw-semibold mb-2">Passengers</div>
+                      {{#if this.passengers.length}}
+                        <div class="row row-cols-1 row-cols-md-2 g-2">
+                          {{#each this.passengers}}
+                            <div class="col">
+                              <div class="p-2 bg-white rounded border">
+                                <div><strong>Name:</strong> {{this.fullName}}</div>
+                                <div><strong>Age:</strong> {{this.age}}</div>
+                                <div><strong>Gender:</strong> {{this.gender}}</div>
+                                <div><strong>Passport:</strong> {{this.passport}}</div>
+                                <div><strong>Seat:</strong> {{this.seatNumber}}</div>
+                                <div><strong>Meal:</strong> {{this.meal}}</div>
+                                <div><strong>Baggage:</strong> {{this.baggageAllowance}}</div>
+                              </div>
+                            </div>
+                          {{/each}}
+                        </div>
+                      {{else}}
+                        <div class="text-muted">No passenger details available.</div>
+                      {{/if}}
+                    </div>
+                  </td>
+                </tr>
+              {{/if}}
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+  {{else}}
+    <div class="alert alert-info mt-4">You have no past/cancelled bookings yet.</div>
+  {{/if}}
+
 </div>
 
 <!-- confirmation toast -->
@@ -145,31 +275,92 @@
     new bootstrap.Toast(toastEl, { delay: 2500 }).show();
   }
 
-  // ✅ Toggle passengers row
+  // ✅ Toggle passengers and route row
   document.addEventListener("click", (e) => {
-    if (e.target.closest(".togglePassengers")) {
-      const btn = e.target.closest(".togglePassengers");
-      const id = btn.dataset.id;
-      const row = document.getElementById(`passengers-${id}`);
-      const icon = btn.querySelector("i");
+   const toggleBtn = e.target.closest(".togglePassengers, .toggleRoute");
+    if (!toggleBtn) return;
 
-      row.classList.toggle("d-none");
-      icon.classList.toggle("bi-eye");
-      icon.classList.toggle("bi-eye-slash");
-    }
+    const id = toggleBtn.dataset.id;
+    const icon = toggleBtn.querySelector("i");
+    const isPassenger = toggleBtn.classList.contains("togglePassengers");
+    const rowType = isPassenger ? "passengers" : "route";
+    const row = document.getElementById(`${rowType}-${id}`);
+
+    // 🧹 1️⃣ Close all other opened rows (both passengers and routes)
+    document.querySelectorAll(".passengers-row, .route-row").forEach((r) => {
+      if (r.id !== `${rowType}-${id}`) {
+        r.classList.add("d-none");
+      }
+    });
+
+    // 🧹 2️⃣ Reset all other icons to closed state
+    document.querySelectorAll(".togglePassengers i, .toggleRoute i").forEach((i) => {
+      if (i !== icon) {
+        i.classList.remove("bi-eye-slash");
+        i.classList.add("bi-eye");
+      }
+    });
+
+    // 🎯 3️⃣ Toggle the clicked one
+    const isOpen = !row.classList.contains("d-none");
+    row.classList.toggle("d-none", isOpen); // close if open, open if closed
+    icon.classList.toggle("bi-eye", isOpen);
+    icon.classList.toggle("bi-eye-slash", !isOpen);
   });
 
-  // ✅ Toggle route row
-  document.addEventListener("click", (e) => {
-    if (e.target.closest(".toggleRoute")) {
-      const btn = e.target.closest(".toggleRoute");
-      const id = btn.dataset.id;
-      const row = document.getElementById(`route-${id}`);
-      const icon = btn.querySelector("i");
 
-      row.classList.toggle("d-none");
-      icon.classList.toggle("bi-eye");
-      icon.classList.toggle("bi-eye-slash");
+// ✅ Handle Cancel Reservation
+document.addEventListener("click", async (e) => {
+  if (!e.target.closest(".cancelReservation")) return;
+  e.preventDefault();
+
+  const btn = e.target.closest(".cancelReservation");
+  const id = btn.dataset.id;
+  if (!confirm("Are you sure you want to cancel this reservation?")) return;
+
+  try {
+    const res = await fetch(`/reservations/cancel/${id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }
+    });
+
+    const data = await res.json();
+    if (!data.success) throw new Error();
+
+    // Move the reservation to Past/Cancelled table visually
+    const row = document.getElementById(`reservation-${id}`);
+    const passengersRow = document.getElementById(`passengers-${id}`);
+    const routeRow = document.getElementById(`route-${id}`);
+
+    if (row) row.remove();
+    if (passengersRow) passengersRow.remove();
+    if (routeRow) routeRow.remove();
+
+    // ✅ Optional: append to the bottom "Past/Cancelled" table
+    const pastTable = document.getElementById("pastBookingTable");
+    if (pastTable) {
+      const cancelled = data.cancelledReservation;
+      const newRow = document.createElement("tr");
+      newRow.classList.add("text-center", "align-middle");
+      newRow.innerHTML = `
+        <td class="fw-semibold">
+          ${cancelled.flight.map(f => f.flightNumber).join("<br>")}
+        </td>
+        <td>-</td>
+        <td>${cancelled.tripType}</td>
+        <td>${cancelled.travelClass}</td>
+        <td>${cancelled.passengers.length}</td>
+        <td>${new Date(cancelled.bookingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+        <td><span class="badge bg-danger">Cancelled</span></td>
+      `;
+      pastTable.appendChild(newRow);
     }
-  });
+
+    showToast("Reservation Cancelled.", true);
+  } catch (err) {
+    console.error("Cancel error:", err);
+    showToast("Failed to cancel reservation.", false);
+  }
+});
 </script>
+

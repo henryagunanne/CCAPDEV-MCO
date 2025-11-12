@@ -70,9 +70,9 @@ app.engine('hbs', exphbs.engine({
     },
 
     divide: (a, b) => Math.ceil(a / b),
-    addOne: function (value) {
+    /* addOne: function (value) {
       return value + 1;
-    },
+    }, */
 
     range: function (start, end) {
       const rangeArray = [];
@@ -97,6 +97,21 @@ app.engine('hbs', exphbs.engine({
     // 🧩 Equality helper (used in reservation.hbs)
     ifEquals: function (a, b, options) {
       return a === b ? options.fn(this) : options.inverse(this);
+    },
+
+    currentDate: function () {
+      const now = new Date();
+      return now.toISOString().split('T')[0]; // → "2025-11-11"
+    },
+    
+    isUpcoming: function (flights) {
+      if (!flights || flights.length === 0) return false;
+
+      const today = new Date();
+      const latestFlight = flights[flights.length - 1]; // return flight if round-trip
+      const depDate = new Date(latestFlight.departureDate);
+
+      return depDate >= today; // true = upcoming, false = past
     }
 }
 

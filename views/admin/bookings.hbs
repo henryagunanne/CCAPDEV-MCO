@@ -255,31 +255,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ✅ Toggle passengers row
 document.addEventListener("click", (e) => {
-  if (e.target.closest(".togglePassengers")) {
-    const btn = e.target.closest(".togglePassengers");
-    const id = btn.dataset.id;
-    const row = document.getElementById(`passengers-${id}`);
-    const icon = btn.querySelector("i");
+  const toggleBtn = e.target.closest(".togglePassengers, .toggleRoute");
+  if (!toggleBtn) return;
 
-    row.classList.toggle("d-none");
-    icon.classList.toggle("bi-caret-down");
-    icon.classList.toggle("bi-caret-up");
-  }
+  const id = toggleBtn.dataset.id;
+  const icon = toggleBtn.querySelector("i");
+  const isPassenger = toggleBtn.classList.contains("togglePassengers");
+  const rowType = isPassenger ? "passengers" : "route";
+  const row = document.getElementById(`${rowType}-${id}`);
+
+  // 🧹 1️⃣ Close all other opened rows (both passengers and routes)
+  document.querySelectorAll(".passengers-row, .route-row").forEach((r) => {
+    if (r.id !== `${rowType}-${id}`) {
+      r.classList.add("d-none");
+    }
+  });
+
+  // 🧹 2️⃣ Reset all other icons to closed state
+  document.querySelectorAll(".togglePassengers i, .toggleRoute i").forEach((i) => {
+    if (i !== icon) {
+      i.classList.remove("bi-caret-up");
+      i.classList.add("bi-caret-down");
+    }
+  });
+
+  // 🎯 3️⃣ Toggle the clicked one
+  const isOpen = !row.classList.contains("d-none");
+  row.classList.toggle("d-none", isOpen); // close if open, open if closed
+  icon.classList.toggle("bi-caret-down", isOpen);
+  icon.classList.toggle("bi-caret-up", !isOpen);
 });
 
-// ✅ Toggle route row
-document.addEventListener("click", (e) => {
-  if (e.target.closest(".toggleRoute")) {
-    const btn = e.target.closest(".toggleRoute");
-    const id = btn.dataset.id;
-    const row = document.getElementById(`route-${id}`);
-    const icon = btn.querySelector("i");
-
-    row.classList.toggle("d-none");
-    icon.classList.toggle("bi-caret-down");
-    icon.classList.toggle("bi-caret-up");
-  }
-});
 
 // ✅ Inline status edit: enter edit mode
 document.addEventListener("click", (e) => {

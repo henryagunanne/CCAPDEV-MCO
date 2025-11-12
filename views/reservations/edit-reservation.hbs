@@ -156,28 +156,26 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("🧩 Edit Reservation Script Loaded");
 
   const mealPrice = 150;
-  const bagPrice = 50;
+  const bagPrice  = 50;
   const seatPricing = { first: 5000, business: 3000, economy: 1500 };
   const seatClasses = { 1: "first", 2: "first", 3: "business", 4: "business" };
 
-  // --- Get fares from DOM ---
-  const baseFareEl = document.querySelector("#baseFare");
+  // Fare elements (keep references so we can set text later)
+  const baseFareEl   = document.querySelector("#baseFare");
   const returnFareEl = document.querySelector("#returnFare");
-  const baseFareVal = parseInt(baseFareEl?.dataset.fare) || 0;
-  const returnFareVal = parseInt(returnFareEl?.dataset.fare) || 0;
 
-  // --- Passenger data ---
+  // Build passengers model from existing cards
   const passengers = Array.from(document.querySelectorAll("#passengerFields .card")).map(card => ({
-    seat: card.querySelector(".seat-info").textContent.replace("Seat: ", "").trim(),
-    meal: card.querySelector(".meal-option").value,
-    baggage: parseInt(card.querySelector(".baggage-input").value) || 0
+    seat:     card.querySelector(".seat-info").textContent.replace("Seat: ", "").trim(),
+    meal:     card.querySelector(".meal-option").value,
+    baggage:  parseInt(card.querySelector(".baggage-input").value) || 0
   }));
 
+  // Seat map (unchanged from yours)
   const occupiedSeats = {{{occupiedSeats}}} || [];
   const seatMap = document.querySelector("#seat-map");
   seatMap.innerHTML = "";
 
-  // --- Build seat map ---
   for (let row = 1; row <= 10; row++) {
     const rowDiv = document.createElement("div");
     rowDiv.classList.add("seat-row");
@@ -193,10 +191,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const seat = document.createElement("div");
       seat.classList.add("seat");
-      seat.textContent = seatId;
-      seat.dataset.id = seatId;
-      seat.dataset.price = seatPricing[seatClass];
-      seat.dataset.class = seatClass;
+      seat.textContent  = seatId;
+      seat.dataset.id   = seatId;
+      seat.dataset.price= seatPricing[seatClass];
+      seat.dataset.class= seatClass;
 
       if (isOccupied) seat.classList.add("occupied");
       else seat.classList.add(seatClass, "available");
@@ -212,7 +210,8 @@ document.addEventListener("DOMContentLoaded", () => {
             passengers[idx].seat = null;
             document.querySelectorAll("#passengerFields .seat-info")[idx].textContent = "Seat: None";
           }
-          return updateSummary();
+          updateSummary();
+          return;
         }
 
         const next = passengers.findIndex(p => !p.seat);
@@ -231,16 +230,18 @@ document.addEventListener("DOMContentLoaded", () => {
         rowDiv.appendChild(gap);
       }
     });
+
     seatMap.appendChild(rowDiv);
   }
 
-  // --- Meal & baggage listeners ---
+  // Listeners for meal/baggage
   document.querySelectorAll(".meal-option").forEach((sel, i) => {
     sel.addEventListener("change", e => {
       passengers[i].meal = e.target.value;
       updateSummary();
     });
   });
+
   document.querySelectorAll(".baggage-input").forEach((inp, i) => {
     inp.addEventListener("input", e => {
       passengers[i].baggage = parseInt(e.target.value) || 0;
@@ -248,42 +249,43 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // --- Update Summary ---
+  // ---- Summary ----
+  function readFare(selector) {
+    const el = document.querySelector(selector);
+    if (!el) return 0;
+    // prefer data-fare; fallback to text content; strip non-digits just in case
+    const raw = el.dataset.fare ?? el.textContent ?? "0";
+    const num = parseInt(String(raw).replace(/[^\d]/g, ""), 10);
+    return isNaN(num) ? 0 : num;
+  }
+
+  function getSeatClass(seatId) {
+    const row = parseInt(seatId, 10);
+    return seatClasses[row] || "economy";
+  }
+
   function updateSummary() {
-  // --- Recalculate fares each time to ensure DOM is up-to-date
-  const baseFareEl = document.querySelector("#baseFare");
-  const returnFareEl = document.querySelector("#returnFare");
+    const base  = readFare("#baseFare");
+    const ret   = readFare("#returnFare");
 
-  const baseFareVal = parseInt(baseFareEl?.dataset.fare || baseFareEl?.textContent || 0);
-  const returnFareVal = parseInt(returnFareEl?.dataset.fare || returnFareEl?.textContent || 0);
+    const mealFee = passengers.reduce((t, p) => t + (p.meal && p.meal !== "None" ? mealPrice : 0), 0);
+    const bagFee  = passengers.reduce((t, p) => t + ((p.baggage || 0) * bagPrice), 0);
+    const seatFee = passengers.reduce((t, p) => t + (p.seat ? seatPricing[getSeatClass(p.seat)] : 0), 0);
 
-  // --- Compute dynamic passenger fees
-  const mealFee = passengers.reduce((t, p) => t + (p.meal && p.meal !== "None" ? mealPrice : 0), 0);
-  const bagFee  = passengers.reduce((t, p) => t + ((p.baggage || 0) * bagPrice), 0);
-  const seatFee = passengers.reduce((t, p) => t + (p.seat ? seatPricing[getSeatClass(p.seat)] : 0), 0);
+    const total = base + ret + mealFee + bagFee + seatFee;
 
-  // --- Compute total
-  const total = baseFareVal + returnFareVal + mealFee + bagFee + seatFee;
+    if (baseFareEl)   baseFareEl.textContent   = base;
+    if (returnFareEl) returnFareEl.textContent = ret;
+    document.querySelector("#mealFee").textContent    = mealFee;
+    document.querySelector("#baggageFee").textContent = bagFee;
+    document.querySelector("#seatFee").textContent    = seatFee;
+    document.querySelector("#totalPrice").textContent = total;
+  }
 
-  // --- Update DOM
-  if (baseFareEl) baseFareEl.textContent = baseFareVal;
-  if (returnFareEl) returnFareEl.textContent = returnFareVal;
-
-  document.querySelector("#mealFee").textContent = mealFee;
-  document.querySelector("#baggageFee").textContent = bagFee;
-  document.querySelector("#seatFee").textContent = seatFee;
-  document.querySelector("#totalPrice").textContent = total;
-}
-
-function getSeatClass(seatId) {
-  const row = parseInt(seatId);
-  return seatClasses[row] || "economy";
-}
-
-// ✅ Compute totals on first load
-updateSummary();
-
+  // 👉 Wait for DOM hydration to complete before first calculation
+setTimeout(() => {
+  updateSummary();
+}, 100);
 
 });
 </script>
-

@@ -185,8 +185,9 @@ router.post('/:id/edit', isAuthenticated, async (req, res) => {
       ? passengers
       : JSON.parse(passengers);
 
-  } catch (error) {
-    
+  } catch (err) {
+    console.error('❌ Reservation update error:', err);
+    res.status(500).send('Server error during Reservation update');
   }
 });
 

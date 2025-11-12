@@ -287,7 +287,7 @@ router.post('/update/:id', isAuthenticated, async (req, res) => {
 
 /* =============================
    DELETE - Cancel reservation - IMPORTANT: ONLY ADMINS CAN DELETE RESERVATIONS - USERS CAN ONLY CANCEL
-============================= */
+============================= /
 router.post('/delete/:id', isAuthenticated, async (req, res) => {
   try {
     await Reservation.findByIdAndDelete(req.params.id);
@@ -296,6 +296,6 @@ router.post('/delete/:id', isAuthenticated, async (req, res) => {
   } catch (err) {
     res.status(500).send('Error deleting reservation');
   }
-});
+}); */
 
 module.exports = router;

@@ -21,7 +21,7 @@ function isAuthenticated(req, res, next) {
 /* =============================
    BOOK PAGE - Flight Selection (navbar "Book" link)
 ============================= */
-router.get('/book-select', async (req, res) => {
+router.get('/book', async (req, res) => {
   try {
     console.log("🧭 /reservations/book-select accessed");
 

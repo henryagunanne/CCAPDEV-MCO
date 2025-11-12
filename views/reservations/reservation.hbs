@@ -36,37 +36,37 @@
         <input type="hidden" name="flight" value="{{flight._id}}">
         <input type="hidden" id="passengersData" name="passengers">
 
-      <!-- Trip Type Selector -->
-      <div class="row mb-3">
-        <div class="col-md-4">
-          <label class="form-label fw-semibold">Trip Type</label>
-          <select id="tripTypeSelect" name="tripType" class="form-select">
-          <option value="One-Way" {{#if (eq tripType "One-Way")}}selected{{/if}}>One-Way</option>
-          <option value="Round-Trip" {{#if (eq tripType "Round-Trip")}}selected{{/if}}>Round-Trip</option>
-        </select>
+        <!-- Trip Type Selector -->
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Trip Type</label>
+            <select id="tripTypeSelect" name="tripType" class="form-select">
+            <option value="One-Way" {{#if (eq tripType "One-Way")}}selected{{/if}}>One-Way</option>
+            <option value="Round-Trip" {{#if (eq tripType "Round-Trip")}}selected{{/if}}>Round-Trip</option>
+          </select>
 
+          </div>
         </div>
-      </div>
 
       
-      <!-- Return Flight Section (hidden for One-Way, shown for Round-Trip) -->
-      <div id="returnFlightSection" class="alert alert-info text-center fw-semibold {{#unless (eq tripType "Round-Trip")}}d-none{{/unless}}">
-        <h5 class="text-danger fw-bold mb-3">Select Return Flight</h5>
-        
-        <select 
-          id="returnFlight" 
-          name="returnFlight" 
-          class="form-select text-center mx-auto return-flight-dropdown"
-        >
-          <option value="">-- Choose Return Flight --</option>
-          {{#each returnFlights}}
-            <option value="{{this._id}}">
-              {{this.origin}} → {{this.destination}} | ₱{{this.price}} 
-              ({{formatDate this.departureDate}} {{this.departureTime}} → {{formatDate this.arrivalDate}} {{this.arrivalTime}})
-            </option>
-          {{/each}}
-        </select>
-      </div>
+        <!-- Return Flight Section (hidden for One-Way, shown for Round-Trip) -->
+        <div id="returnFlightSection" class="alert alert-info text-center fw-semibold {{#unless (eq tripType "Round-Trip")}}d-none{{/unless}}">
+          <h5 class="text-danger fw-bold mb-3">Select Return Flight</h5>
+          
+          <select 
+            id="returnFlight" 
+            name="returnFlight" 
+            class="form-select text-center mx-auto return-flight-dropdown"
+          >
+            <option value="">-- Choose Return Flight --</option>
+            {{#each returnFlights}}
+              <option value="{{this._id}}">
+                {{this.origin}} → {{this.destination}} | ₱{{this.price}} 
+                ({{formatDate this.departureDate}} {{this.departureTime}} → {{formatDate this.arrivalDate}} {{this.arrivalTime}})
+              </option>
+            {{/each}}
+          </select>
+        </div>
 
 
 
@@ -97,21 +97,21 @@
           <span class="badge bg-warning text-dark">Selected</span>
         </div>
 
-      <!-- Price Summary -->
-<div class="card bg-light p-3 mb-4 summary-card mx-auto">
-  <h5 class="text-danger fw-bold">Price Summary</h5>
+        <!-- Price Summary -->
+        <div class="card bg-light p-3 mb-4 summary-card mx-auto">
+          <h5 class="text-danger fw-bold">Price Summary</h5>
 
-  <p>Base Fare: ₱<span id="baseFare">{{flight.price}}</span></p>
+          <p>Base Fare: ₱<span id="baseFare">{{flight.price}}</span></p>
 
-<p>Return Fare: ₱<span id="returnFare">0</span></p>
+        <p>Return Fare: ₱<span id="returnFare">0</span></p>
 
 
-  <p>Meal Total: ₱<span id="mealFee">0</span></p>
-  <p>Baggage Total: ₱<span id="baggageFee">0</span></p>
-  <p>Seat Total: ₱<span id="seatFee">0</span></p>
-  <hr>
-  <h5>Total: ₱<span id="totalPrice">{{flight.price}}</span></h5>
-</div>
+          <p>Meal Total: ₱<span id="mealFee">0</span></p>
+          <p>Baggage Total: ₱<span id="baggageFee">0</span></p>
+          <p>Seat Total: ₱<span id="seatFee">0</span></p>
+          <hr>
+          <h5>Total: ₱<span id="totalPrice">{{flight.price}}</span></h5>
+        </div>
 
 
         <!-- Buttons -->
@@ -150,8 +150,8 @@ document.addEventListener("DOMContentLoaded", function () {
     totalPriceElement.textContent = total;
   });
 });
+
+
+const occupiedSeats = {{{occupiedSeats}}} || [];
 </script>
 
-<script>
-  const occupiedSeats = {{{occupiedSeats}}} || [];
-</script>

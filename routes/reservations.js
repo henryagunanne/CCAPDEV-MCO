@@ -171,7 +171,23 @@ router.get('/:id/edit', isAuthenticated, async (req, res) => {
 
 // POST reservations/:id/edit - Handle edit submission
 router.post('/:id/edit', isAuthenticated, async (req, res) => {
-  
+  try {
+    const {id} = req.params.id;
+    const {passengers, price} = req.body;
+
+    const updatedReservation = await Reservation.findByIdAndUpdate(
+      id,
+      {passengers, price},
+      {new: true}
+    ).lean();
+
+    const parsedPassengers = Array.isArray(passengers)
+      ? passengers
+      : JSON.parse(passengers);
+
+  } catch (error) {
+    
+  }
 });
 
 

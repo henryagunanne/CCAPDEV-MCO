@@ -275,63 +275,37 @@
     new bootstrap.Toast(toastEl, { delay: 2500 }).show();
   }
 
-  // ✅ Toggle passengers row
+  // ✅ Toggle passengers and route row
   document.addEventListener("click", (e) => {
-    // Passengers Toggle
-    if (e.target.closest(".togglePassengers")) {
-      const btn = e.target.closest(".togglePassengers");
-      const id = btn.dataset.id;
-      const row = document.getElementById(`passengers-${id}`);
-      const icon = btn.querySelector("i");
+   const toggleBtn = e.target.closest(".togglePassengers, .toggleRoute");
+    if (!toggleBtn) return;
 
-      // Close any other opened passengers rows
-      document.querySelectorAll(".passengers-row").forEach(r => {
-        if (r.id !== `passengers-${id}`) {
-          r.classList.add("d-none");
-        }
-      });
+    const id = toggleBtn.dataset.id;
+    const icon = toggleBtn.querySelector("i");
+    const isPassenger = toggleBtn.classList.contains("togglePassengers");
+    const rowType = isPassenger ? "passengers" : "route";
+    const row = document.getElementById(`${rowType}-${id}`);
 
-      // Reset all other passenger icons
-      document.querySelectorAll(".togglePassengers i").forEach(i => {
-        if (i !== icon) {
-          i.classList.remove("bi-eye-slash");
-          i.classList.add("bi-eye");
-        }
-      });
+    // 🧹 1️⃣ Close all other opened rows (both passengers and routes)
+    document.querySelectorAll(".passengers-row, .route-row").forEach((r) => {
+      if (r.id !== `${rowType}-${id}`) {
+        r.classList.add("d-none");
+      }
+    });
 
-      // Toggle the clicked one
-      row.classList.toggle("d-none");
-      icon.classList.toggle("bi-eye");
-      icon.classList.toggle("bi-eye-slash");
-    }
+    // 🧹 2️⃣ Reset all other icons to closed state
+    document.querySelectorAll(".togglePassengers i, .toggleRoute i").forEach((i) => {
+      if (i !== icon) {
+        i.classList.remove("bi-eye-slash");
+        i.classList.add("bi-eye");
+      }
+    });
 
-      // Route Toggle
-     if (e.target.closest(".toggleRoute")) {
-      const btn = e.target.closest(".toggleRoute");
-      const id = btn.dataset.id;
-      const row = document.getElementById(`route-${id}`);
-      const icon = btn.querySelector("i");
-
-       // Close any other opened route rows
-      document.querySelectorAll(".route-row").forEach(r => {
-        if (r.id !== `route-${id}`) {
-          r.classList.add("d-none");
-        }
-      });
-
-      // Reset all other route icons
-      document.querySelectorAll(".toggleRoute i").forEach(i => {
-        if (i !== icon) {
-          i.classList.remove("bi-eye-slash");
-          i.classList.add("bi-eye");
-        }
-      });
-
-      // Toggle the clicked one
-      row.classList.toggle("d-none");
-      icon.classList.toggle("bi-eye");
-      icon.classList.toggle("bi-eye-slash");
-    }
+    // 🎯 3️⃣ Toggle the clicked one
+    const isOpen = !row.classList.contains("d-none");
+    row.classList.toggle("d-none", isOpen); // close if open, open if closed
+    icon.classList.toggle("bi-eye", isOpen);
+    icon.classList.toggle("bi-eye-slash", !isOpen);
   });
 
 

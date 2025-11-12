@@ -341,15 +341,26 @@ document.addEventListener("click", async (e) => {
     if (pastTable) {
       const cancelled = data.cancelledReservation;
       const newRow = document.createElement("tr");
+      const flightNumbers = cancelled.flight.map(f => f.flightNumber);
+      console.log(flightNumbers); // Log flight numbers to see what's returned
       newRow.classList.add("text-center", "align-middle");
       newRow.innerHTML = `
         <td class="fw-semibold">
-          ${cancelled.flight.map(f => f.flightNumber).join("<br>")}
+          ${flightNumbers.join("<br>")}
         </td>
-        <td>-</td>
+        <td>
+          <button class="btn btn-sm btn-outline-secondary ms-1 toggleRoute" data-id="${cancelled._id}" title="View Route">
+            <i class="bi bi-eye"></i>
+          </button>
+        </td>
         <td>${cancelled.tripType}</td>
         <td>${cancelled.travelClass}</td>
-        <td>${cancelled.passengers.length}</td>
+        <td>
+          ${cancelled.passengers.length}
+          <button class="btn btn-sm btn-outline-secondary ms-1 togglePassengers" data-id="${cancelled._id}" title="View Passengers">
+            <i class="bi bi-eye"></i>
+          </button>
+        </td>
         <td>${new Date(cancelled.bookingDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
         <td><span class="badge bg-danger">Cancelled</span></td>
       `;

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Flight | Archers Airlines</title>
+  <link rel="stylesheet" href="/css/book.css">
+</head>
+<body>
+  {{> navbar}} <!-- ✅ Includes the red navbar you pasted -->
+
+  <main class="container my-5">
+    <h2 class="text-center text-danger mb-4">Book Your Flight</h2>
+
+    <form id="bookForm" action="/reservations/confirm" method="POST" class="mx-auto" style="max-width: 500px;">
+      <div class="mb-3">
+        <label for="origin" class="form-label fw-semibold">Origin</label>
+        <select id="origin" name="origin" class="form-select" required>
+          <option value="" selected disabled>Select Origin</option>
+          {{#each flights}}
+            <option value="{{this.origin}}">{{this.origin}}</option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="destination" class="form-label fw-semibold">Destination</label>
+        <select id="destination" name="destination" class="form-select" required>
+          <option value="" selected disabled>Select Destination</option>
+          {{#each flights}}
+            <option value="{{this.destination}}">{{this.destination}}</option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="date" class="form-label fw-semibold">Departure Date</label>
+        <input type="date" id="date" name="date" class="form-control" required>
+      </div>
+
+      <button type="submit" class="btn btn-danger w-100">Find Flights</button>
+    </form>
+  </main>
+
+  <script src="/js/book.js"></script>
+</body>
+</html>

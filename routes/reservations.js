@@ -183,35 +183,52 @@ router.post('/cancel/:reservationId', isAuthenticated, async (req, res) => {
   }
 });
 
-// GET /reservations/edit/:id
-router.get('/edit/:id', isAuthenticated, async (req, res) => {
+//edit
+router.get('/:id/edit', isAuthenticated, async (req, res) => {
   try {
-    const id = req.params.id;
-    const reservation = await Reservation.findById(id)
-      .populate({
-        path: 'flight',
-        model: 'Flight'
-      })
+    const reservation = await Reservation.findById(req.params.id)
+      .populate('flight')
       .lean();
 
     if (!reservation) return res.status(404).send('Reservation not found');
 
-    const outboundFlight = reservation.flight?.[0] || reservation.flight;
-    const returnFlight   = reservation.flight?.[1] || null;
+    // Handle outbound/return flights correctly
+    const outboundFlight = Array.isArray(reservation.flight)
+      ? reservation.flight[0]
+      : reservation.flight;
+    const returnFlight = Array.isArray(reservation.flight) && reservation.flight[1]
+      ? reservation.flight[1]
+      : null;
 
+    // ✅ Fetch all occupied seats for the same flight, excluding current reservation
+    const otherReservations = await Reservation.find({
+      flight: outboundFlight._id,
+      _id: { $ne: reservation._id },
+      status: { $ne: 'Cancelled' }
+    }).lean();
+
+    const occupiedSeats = otherReservations.flatMap(r =>
+      r.passengers.map(p => p.seatNumber)
+    );
+
+    console.log("✅ OCCUPIED SEATS (edit page):", occupiedSeats);
+
+    // ✅ Pass to Handlebars properly as JSON string
     res.render('reservations/edit-reservation', {
       title: 'Edit Reservation',
       reservation,
       outboundFlight,
       returnFlight,
-      hasReturn: !!returnFlight,
-      passengers: reservation.passengers.length > 0
+      occupiedSeats: JSON.stringify(occupiedSeats || []), // keep valid JSON
     });
+
   } catch (err) {
-    console.error('Error loading booking page:', err);
-    res.status(500).send('Error loading booking page.');
+    console.error("❌ Error loading edit page:", err);
+    res.status(500).send('Server error loading edit page.');
   }
 });
+
+
 
 
 
@@ -229,6 +246,25 @@ router.get('/:id', isAuthenticated, async (req, res) => {
   } catch (err) {
     console.error("Error loading reservation:", err);
     res.status(500).send('Error loading reservation');
+  }
+});
+
+// ✅ Update Reservation (POST)
+router.post('/update/:id', isAuthenticated, async (req, res) => {
+  try {
+    const { passengers, totalPrice } = req.body;
+    const updated = await Reservation.findByIdAndUpdate(
+      req.params.id,
+      {
+        passengers,
+        price: totalPrice
+      },
+      { new: true }
+    );
+    res.json({ success: true, updated });
+  } catch (err) {
+    console.error("❌ Error updating reservation:", err);
+    res.status(500).send("Error updating reservation");
   }
 });
 

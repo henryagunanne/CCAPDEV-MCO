@@ -7,25 +7,31 @@
       {{#if returnFlight}} / {{returnFlight.flightNumber}}{{/if}}
     </h3>
 
+    <!-- Outbound Flight -->
     <h2 class="route-display mb-1">
       {{outboundFlight.origin}} → {{outboundFlight.destination}}
-      {{#if returnFlight}}
-        <br>
-        <small class="text-white-50">
-          Return: {{returnFlight.origin}} → {{returnFlight.destination}}
-        </small>
-      {{/if}}
     </h2>
-
     <p class="flight-details mb-0">
       Departure: {{outboundFlight.departureTime}} | Arrival: {{outboundFlight.arrivalTime}}
     </p>
-    <p class="flight-price mb-0">₱{{outboundFlight.price}}</p>
+
+    <!-- Return Flight -->
+    {{#if returnFlight}}
+      <br>
+      <h2 class="route-display mb-1">
+        {{returnFlight.origin}} → {{returnFlight.destination}}
+      </h2>
+      <p class="flight-details mb-0">
+        Departure: {{returnFlight.departureTime}} | Arrival: {{returnFlight.arrivalTime}}
+      </p>
+    {{/if}}
   {{else}}
     <h3>Edit Reservation</h3>
     <p>No flight details available.</p>
   {{/if}}
 </div>
+
+
 
 
     <!-- Reservation Info -->
@@ -43,26 +49,6 @@
 {{#if returnFlight}}
   <input type="hidden" name="returnFlight" value="{{returnFlight._id}}">
 {{/if}}
-
-        <!-- Trip Type Selector -->
-      <div class="row mb-3">
-        <div class="col-md-4">
-          <label class="form-label fw-semibold">Trip Type</label>
-            <select id="tripTypeSelect" name="tripType" class="form-select">
-                <option value="One-Way" {{#if (eq tripType "One-Way")}}selected{{/if}}>One-Way</option>
-                <option value="Round-Trip" {{#if (eq tripType "Round-Trip")}}selected{{/if}}>Round-Trip</option>
-            </select>
-        </div>
-        <div class="col-md-4">
-            <label class="form-label fw-semibold">Travel Class</label>
-            <select id="travelClassSelect" name="travelClassSelect" class="form-select">
-                <option value="Economy" {{#if (eq reservation.travelClass "Economy")}}selected{{/if}}>Economy</option>
-                <option value="Premium Economy" {{#if (eq reservation.travelClass "Premium Economy")}}selected{{/if}}>Premium Economy</option>
-                <option value="Business" {{#if (eq reservation.travelClass "Business")}}selected{{/if}}>Business</option>
-                <option value="First" {{#if (eq reservation.travelClass "First")}}selected{{/if}}>First</option>
-            </select>
-        </div>
-      </div>
 
         <!-- Passenger Cards -->
         <div id="passengerFields">
@@ -124,18 +110,19 @@
 
         </div>
 
-        <!-- Seat Map -->
-        <h5 class="text-center text-danger mt-4">Seat Selection</h5>
-        <div id="seat-map" class="my-3"></div>
+ <!-- Seat Selection Section -->
+<h5 class="text-center text-danger mt-4">Seat Selection</h5>
+<div id="seat-map" class="my-3 d-flex flex-wrap justify-content-center"></div>
 
-        <!-- Legend -->
-        <div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
-          <span class="badge bg-danger">First Class</span>
-          <span class="badge bg-light text-dark border border-purple">Business</span>
-          <span class="badge bg-primary">Economy</span>
-          <span class="badge bg-secondary">Occupied</span>
-          <span class="badge bg-warning text-dark">Selected</span>
-        </div>
+<!-- Legend -->
+<div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
+  <span class="badge bg-danger">First Class</span>
+  <span class="badge bg-light text-dark border border-purple">Business</span>
+  <span class="badge bg-primary">Economy</span>
+  <span class="badge bg-secondary">Occupied</span>
+  <span class="badge bg-warning text-dark">Selected</span>
+</div>
+     
 
         <!-- Price Summary -->
         <div class="card bg-light p-3 mb-4 summary-card mx-auto">
@@ -158,3 +145,8 @@
     </div>
   </div>
 </main>
+
+<script>
+  const occupiedSeats = {{{occupiedSeats}}} || [];
+</script>
+<script src="/src/javascript/edit-reservation.js"></script>

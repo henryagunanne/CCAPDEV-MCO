@@ -70,14 +70,9 @@ router.get('/book/:flightId', isAuthenticated, async (req, res) => {
 
     // ✅ 1. Fetch reserved seats for this flight
     const existingReservations = await Reservation.find({
-  flight: flightId,
-  status: { $ne: 'Cancelled' }
-}).lean();
-
-const occupiedSeats = existingReservations.flatMap(r =>
-  r.passengers.map(p => p.seatNumber)
-);
-
+      flight: flightId,
+      status: { $ne: 'Cancelled' } // exclude cancelled
+    }).lean();
 
     // Flatten seat numbers from all passengers
     const occupiedSeats = existingReservations.flatMap(r =>

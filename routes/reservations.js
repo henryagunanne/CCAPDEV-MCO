@@ -179,20 +179,25 @@ router.post('/cancel/:reservationId', isAuthenticated, async (req, res) => {
   try {
     const { reservationId } = req.params;
 
-    const cancelledReservation = await Reservation.findByIdAndUpdate(
+    const cancelled = await Reservation.findByIdAndUpdate(
       reservationId,
       { status: 'Cancelled' },
       { new: true }
     );
 
-    if (!cancelledReservation) {
+    if (!cancelled) {
       return res.status(404).send('Reservation not found');
     }
+
+    const cancelledReservation = await cancelled.populate('flight');
+
+    // ✅ If you need a plain JS object (for res.json)
+    const plainCancelled = cancelledReservation.toObject();
 
     res.json({ 
       success: true, 
       message: 'Reservation Cancelled',
-      cancelledReservation
+      cancelledReservation: plainCancelled
     });
   } catch (err) {
     console.error('❌ Reservation update error:', err);

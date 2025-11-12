@@ -341,12 +341,11 @@ document.addEventListener("click", async (e) => {
     if (pastTable) {
       const cancelled = data.cancelledReservation;
       const newRow = document.createElement("tr");
-      const flightNumbers = cancelled.flight.map(f => f.flightNumber);
-      console.log(flightNumbers); // Log flight numbers to see what's returned
+      
       newRow.classList.add("text-center", "align-middle");
       newRow.innerHTML = `
         <td class="fw-semibold">
-          ${flightNumbers.join("<br>")}
+          ${cancelled.flight.map(f => f.flightNumber).join("<br>")}
         </td>
         <td>
           <button class="btn btn-sm btn-outline-secondary ms-1 toggleRoute" data-id="${cancelled._id}" title="View Route">

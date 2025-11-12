@@ -1,0 +1,379 @@
+<main class="booking-page container-fluid my-5 px-4">
+  <div class="card shadow-lg mx-auto" style="max-width: 900px;">
+    <div class="card-header bg-danger text-white text-center py-3">
+      <h3>Book Your Flight</h3>
+    </div>
+
+    <div class="card-body">
+
+      <!-- Step 1: Route Selection -->
+      <div class="alert alert-danger text-center fw-semibold mt-2">
+        <strong>Select Your Flight Route</strong><br>
+        <small class="text-muted">(Available flights will automatically appear below)</small>
+      </div>
+
+      <div id="flightSearchForm" class="mb-4">
+        <div class="row g-3 justify-content-center">
+          <div class="col-md-5">
+            <label class="form-label fw-semibold">Origin</label>
+            <select id="origin" class="form-select" required>
+              <option value="">-- Select Origin --</option>
+              {{#each origins}}
+                <option value="{{this}}">{{this}}</option>
+              {{/each}}
+            </select>
+          </div>
+
+          <div class="col-md-5">
+            <label class="form-label fw-semibold">Destination</label>
+            <select id="destination" class="form-select" required>
+              <option value="">-- Select Destination --</option>
+              {{#each destinations}}
+                <option value="{{this}}">{{this}}</option>
+              {{/each}}
+            </select>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-3 justify-content-center">
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Trip Type</label>
+            <select id="tripTypeSelect" class="form-select">
+              <option value="One-Way">One-Way</option>
+              <option value="Round-Trip">Round-Trip</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Available Flights -->
+      <div id="flightSelection" class="d-none mt-4">
+        <div class="alert alert-info text-center fw-semibold">
+          <h5 class="text-danger fw-bold mb-2">Select Available Flight(s)</h5>
+
+          <label class="fw-semibold">Outbound Flight</label>
+          <select id="outboundFlight" class="form-select text-center mb-3">
+            <option value="">-- Choose Outbound Flight --</option>
+          </select>
+
+          <div id="returnFlightSection" class="d-none">
+            <label class="fw-semibold mt-3">Return Flight</label>
+            <select id="returnFlight" class="form-select text-center">
+              <option value="">-- Choose Return Flight --</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Passenger + Seat Selection -->
+      <form id="reservationForm" action="/reservations/create" method="POST" class="d-none mt-4">
+        <input type="hidden" id="passengersData" name="passengers">
+
+        <div class="row mb-3">
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Number of Passengers</label>
+            <input type="number" id="passengerCount" class="form-control" min="1" max="10" value="1" required>
+          </div>
+        </div>
+
+        <div id="passengerFields"></div>
+
+        <h5 class="text-center text-danger mt-4">Seat Selection</h5>
+        <div id="seat-map" class="my-3 d-flex flex-column align-items-center"></div>
+
+        <div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
+          <span class="badge bg-danger">First Class</span>
+          <span class="badge bg-light text-dark border border-purple">Business</span>
+          <span class="badge bg-primary">Economy</span>
+          <span class="badge bg-secondary">Occupied</span>
+          <span class="badge bg-warning text-dark">Selected</span>
+        </div>
+
+        <div class="card bg-light p-3 mb-4 summary-card mx-auto">
+          <h5 class="text-danger fw-bold">Price Summary</h5>
+          <p>Base Fare: ₱<span id="baseFare">0</span></p>
+          <p>Return Fare: ₱<span id="returnFare">0</span></p>
+          <p>Meal Total: ₱<span id="mealFee">0</span></p>
+          <p>Baggage Total: ₱<span id="baggageFee">0</span></p>
+          <p>Seat Total: ₱<span id="seatFee">0</span></p>
+          <hr>
+          <h5>Total: ₱<span id="totalPrice">0</span></h5>
+        </div>
+
+        <div class="d-flex justify-content-center gap-2">
+          <button type="submit" id="confirmBooking" class="btn btn-danger px-4">Confirm Booking</button>
+          <button type="reset" class="btn btn-outline-secondary px-4">Reset</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // --- From backend (Handlebars)
+  const occupiedSeats = {{{occupiedSeats}}} || [];
+
+  // --- DOM elements
+  const origin = document.getElementById("origin");
+  const destination = document.getElementById("destination");
+  const tripType = document.getElementById("tripTypeSelect");
+  const flightSelection = document.getElementById("flightSelection");
+  const returnSection = document.getElementById("returnFlightSection");
+  const outboundFlight = document.getElementById("outboundFlight");
+  const returnFlight = document.getElementById("returnFlight");
+  const reservationForm = document.getElementById("reservationForm");
+  const passengerCountInput = document.getElementById("passengerCount");
+  const passengerFields = document.getElementById("passengerFields");
+  const seatMap = document.getElementById("seat-map");
+
+  const baseFare = document.getElementById("baseFare");
+  const returnFare = document.getElementById("returnFare");
+  const mealFeeEl = document.getElementById("mealFee");
+  const baggageFeeEl = document.getElementById("baggageFee");
+  const seatFeeEl = document.getElementById("seatFee");
+  const totalPriceEl = document.getElementById("totalPrice");
+
+  // --- Seat setup
+  const seatPricing = { first: 5000, business: 3000, economy: 1500 };
+  const seatClasses = { 1: "first", 2: "first", 3: "business", 4: "business" };
+  let selectedSeats = [];
+
+  // ============================================================
+  // RESET FORM
+  // ============================================================
+  function resetAll() {
+    flightSelection.classList.add("d-none");
+    returnSection.classList.add("d-none");
+    reservationForm.classList.add("d-none");
+    outboundFlight.innerHTML = `<option value="">-- Choose Outbound Flight --</option>`;
+    returnFlight.innerHTML = `<option value="">-- Choose Return Flight --</option>`;
+    baseFare.textContent = returnFare.textContent = mealFeeEl.textContent =
+      baggageFeeEl.textContent = seatFeeEl.textContent = totalPriceEl.textContent = "0";
+  }
+
+  // ============================================================
+  // LOAD FLIGHTS
+  // ============================================================
+  async function loadFlights() {
+    const o = origin.value, d = destination.value, type = tripType.value;
+    if (!o || !d) return resetAll();
+    try {
+      const res = await fetch(`/reservations/search?origin=${o}&destination=${d}`);
+      const data = await res.json();
+      const flights = data.flights || [];
+      outboundFlight.innerHTML = `<option value="">-- Choose Outbound Flight --</option>`;
+      flights.forEach(f =>
+        outboundFlight.innerHTML += `<option value="${f._id}" data-price="${f.price}">
+          ${f.origin} → ${f.destination} | ₱${f.price} (${f.departureDate} ${f.departureTime} → ${f.arrivalTime})
+        </option>`
+      );
+      flightSelection.classList.remove("d-none");
+
+      if (type === "Round-Trip") {
+        const rev = await fetch(`/reservations/search?origin=${d}&destination=${o}`);
+        const rd = await rev.json();
+        returnSection.classList.remove("d-none");
+        returnFlight.innerHTML = `<option value="">-- Choose Return Flight --</option>`;
+        rd.flights?.forEach(r =>
+          returnFlight.innerHTML += `<option value="${r._id}" data-price="${r.price}">
+            ${r.origin} → ${r.destination} | ₱${r.price} (${r.departureDate} ${r.departureTime} → ${r.arrivalTime})
+          </option>`
+        );
+      } else returnSection.classList.add("d-none");
+    } catch (e) {
+      console.error("Flight load error", e);
+    }
+  }
+  [origin, destination, tripType].forEach(x => x.addEventListener("change", loadFlights));
+
+  // ============================================================
+  // PASSENGERS
+  // ============================================================
+  function generatePassengerForms() {
+    passengerFields.innerHTML = "";
+    const count = parseInt(passengerCountInput.value) || 1;
+    for (let i = 1; i <= count; i++) {
+      passengerFields.innerHTML += `
+        <div class="card p-3 mb-3 shadow-sm">
+          <h6 class="fw-bold">Passenger ${i}</h6>
+          <div class="row g-3">
+            <div class="col-md-6"><label>Full Name</label><input class="form-control full-name" required></div>
+            <div class="col-md-3"><label>Age</label><input type="number" class="form-control age" min="0" required></div>
+            <div class="col-md-3"><label>Gender</label>
+              <select class="form-select gender"><option>Male</option><option>Female</option></select></div>
+            <div class="col-md-6"><label>Passport Number</label><input class="form-control passport"></div>
+            <div class="col-md-3"><label>Meal Option</label>
+              <select class="form-select meal-option">
+                <option>None</option><option>Vegetarian</option><option>Halal</option><option>Kids Meal</option>
+              </select></div>
+            <div class="col-md-3"><label>Baggage (kg)</label><input type="number" class="form-control baggage" value="0" min="0"></div>
+          </div>
+          <small class="seat-info text-muted mt-2">Seat: None</small>
+        </div>`;
+    }
+    selectedSeats = [];
+    generateSeatMap();
+    updateSummary();
+  }
+  passengerCountInput.addEventListener("change", generatePassengerForms);
+
+  // ============================================================
+  // SEAT MAP (with seat limit + occupied seats)
+  // ============================================================
+  function generateSeatMap() {
+    seatMap.innerHTML = "";
+    for (let row = 1; row <= 10; row++) {
+      const rowDiv = document.createElement("div");
+      rowDiv.className = "d-flex justify-content-center";
+      ["A", "B", "C", "D", "E", "F"].forEach(col => {
+        const id = `${row}${col}`;
+        const cls = seatClasses[row] || "economy";
+        const seat = document.createElement("div");
+        seat.className = `seat border text-center m-1 p-2 rounded ${cls}`;
+        seat.dataset.price = seatPricing[cls];
+        seat.dataset.seat = id;
+        seat.textContent = id;
+        seat.style.width = "40px";
+        seat.style.cursor = "pointer";
+
+        if (occupiedSeats.includes(id)) {
+          seat.classList.add("occupied", "bg-secondary", "text-white");
+          seat.style.cursor = "not-allowed";
+        }
+
+        seat.addEventListener("click", function () {
+          if (seat.classList.contains("occupied")) return;
+
+          const max = parseInt(passengerCountInput.value);
+          if (!seat.classList.contains("selected") && selectedSeats.length >= max) {
+            alert(`You can only select ${max} seat(s).`);
+            return;
+          }
+
+          seat.classList.toggle("selected");
+          if (seat.classList.contains("selected")) {
+            seat.classList.add("bg-warning", "text-dark");
+            selectedSeats.push(id);
+          } else {
+            seat.classList.remove("bg-warning", "text-dark");
+            selectedSeats = selectedSeats.filter(s => s !== id);
+          }
+
+          updatePassengerSeats();
+          updateSummary();
+        });
+
+        rowDiv.appendChild(seat);
+      });
+      seatMap.appendChild(rowDiv);
+    }
+  }
+
+  // ============================================================
+  // UPDATE PASSENGER SEAT LABELS
+  // ============================================================
+  function updatePassengerSeats() {
+    const cards = passengerFields.querySelectorAll(".card");
+    cards.forEach((card, i) => {
+      const info = card.querySelector(".seat-info");
+      info.textContent = selectedSeats[i] ? `Seat: ${selectedSeats[i]}` : "Seat: None";
+    });
+  }
+
+  // ============================================================
+  // UPDATE SUMMARY
+  // ============================================================
+  function updateSummary() {
+    const base = parseInt(outboundFlight.selectedOptions[0]?.dataset.price || 0);
+    const ret = parseInt(returnFlight.selectedOptions[0]?.dataset.price || 0);
+    let meal = 0, bag = 0, seat = 0;
+
+    document.querySelectorAll(".meal-option").forEach(opt => {
+      if (opt.value !== "None") meal += 150;
+    });
+    document.querySelectorAll(".baggage").forEach(b => {
+      const kg = parseInt(b.value) || 0;
+      bag += kg * 50;
+    });
+    selectedSeats.forEach(id => {
+      const row = parseInt(id);
+      let type = "economy";
+      if (row <= 2) type = "first";
+      else if (row <= 4) type = "business";
+      seat += seatPricing[type];
+    });
+
+    const total = base + ret + meal + bag + seat;
+    baseFare.textContent = base;
+    returnFare.textContent = ret;
+    mealFeeEl.textContent = meal;
+    baggageFeeEl.textContent = bag;
+    seatFeeEl.textContent = seat;
+    totalPriceEl.textContent = total;
+  }
+
+  document.addEventListener("change", e => {
+    if (e.target.matches(".meal-option, .baggage")) updateSummary();
+  });
+
+  // ============================================================
+  // SUBMIT FORM
+  // ============================================================
+  reservationForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const passengers = [];
+    const cards = passengerFields.querySelectorAll(".card");
+    cards.forEach((card, i) => {
+      passengers.push({
+        fullName: card.querySelector(".full-name").value.trim(),
+        age: parseInt(card.querySelector(".age").value) || 0,
+        gender: card.querySelector(".gender").value,
+        passport: card.querySelector(".passport").value.trim(),
+        meal: card.querySelector(".meal-option").value,
+        baggageAllowance: parseInt(card.querySelector(".baggage").value) || 0,
+        seatNumber: selectedSeats[i] || null,
+      });
+    });
+
+    const payload = {
+      flight: outboundFlight.value,
+      returnFlight: returnFlight.value || null,
+      travelClass: "Economy",
+      tripType: tripType.value,
+      passengers,
+      totalAmount: parseInt(totalPriceEl.textContent) || 0,
+    };
+
+    try {
+      const res = await fetch("/reservations/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (data.redirect) window.location.href = data.redirect;
+      else alert("Reservation saved!");
+    } catch (err) {
+      console.error("Reservation error:", err);
+      alert("Error creating reservation");
+    }
+  });
+
+  // ============================================================
+  // INITIALIZE
+  // ============================================================
+  outboundFlight.addEventListener("change", () => {
+    if (tripType.value === "One-Way" || returnFlight.value) reservationForm.classList.remove("d-none");
+    generatePassengerForms();
+    updateSummary();
+  });
+  returnFlight.addEventListener("change", () => {
+    reservationForm.classList.remove("d-none");
+    updateSummary();
+  });
+
+  generatePassengerForms();
+});
+</script>

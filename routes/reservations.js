@@ -170,26 +170,44 @@ router.get('/:id/edit', isAuthenticated, async (req, res) => {
 });
 
 // POST reservations/:id/edit - Handle edit submission
+// POST /reservations/:id/edit - Handle edit submission
 router.post('/:id/edit', isAuthenticated, async (req, res) => {
   try {
-    const {id} = req.params.id;
-    const {passengers, price} = req.body;
-
+    const reservationId = req.params.id;
+    const { passengersJSON, totalPrice } = req.body;
+    const updatedPassengers = JSON.parse(passengersJSON || "[]");
+    
+    // ✅ Update reservation in MongoDB
     const updatedReservation = await Reservation.findByIdAndUpdate(
-      id,
-      {passengers, price},
-      {new: true}
-    ).lean();
+      reservationId,
+      {
+        passengers: updatedPassengers,
+        price: parseFloat(totalPrice) || 0,
+        status: 'Confirmed', // optional — can set “Edited” if you prefer
+      },
+      { new: true }
+    )
+      .populate('flight')
+      .lean();
 
-    const parsedPassengers = Array.isArray(passengers)
-      ? passengers
-      : JSON.parse(passengers);
+    if (!updatedReservation) {
+      return res.status(404).send('Reservation not found');
+    }
+
+    console.log('✅ Reservation updated:', updatedReservation);
+
+    // ✅ Redirect to edit confirmation page
+    res.render('reservations/edit-confirmation', {
+  title: 'Reservation Updated',
+  reservation: updatedReservation,
+});
 
   } catch (err) {
-    console.error('❌ Reservation update error:', err);
-    res.status(500).send('Server error during Reservation update');
+    console.error('❌ Error updating reservation:', err);
+    res.status(500).send('Error updating reservation');
   }
 });
+
 
 
 /* =============================

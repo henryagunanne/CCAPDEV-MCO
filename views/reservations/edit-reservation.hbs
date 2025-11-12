@@ -50,6 +50,10 @@
                 <input type="hidden" name="returnFlight" value="{{returnFlight._id}}">
             {{/if}}
 
+<input type="hidden" name="totalPrice" id="totalPriceInput">
+<input type="hidden" name="passengersJSON" id="passengersJSON">
+
+
             <!-- Passenger Cards -->
             <div id="passengerFields">
   {{#each reservation.passengers}}
@@ -306,5 +310,26 @@ setTimeout(() => {
 }, 100);
 
 
+// 🧾 Before submitting, collect all passenger + price data
+document.querySelector("#editReservationForm").addEventListener("submit", e => {
+  const totalPrice = document.querySelector("#totalPrice").textContent.trim();
+  document.querySelector("#totalPriceInput").value = totalPrice;
+
+  const passengerData = Array.from(document.querySelectorAll("#passengerFields .card")).map((card, i) => ({
+    fullName: card.querySelector('input[name*="[fullName]"]').value,
+    gender: card.querySelector('select[name*="[gender]"]').value,
+    age: parseInt(card.querySelector('input[name*="[age]"]').value) || 0,
+    passport: card.querySelector('input[name*="[passport]"]').value,
+    seatNumber: card.querySelector(".seat-info").textContent.replace("Seat:", "").trim(),
+    meal: card.querySelector(".meal-option").value,
+    baggageAllowance: parseInt(card.querySelector(".baggage-input").value) || 0
+  }));
+
+  document.querySelector("#passengersJSON").value = JSON.stringify(passengerData);
 });
+
+
+});
+
+
 </script>

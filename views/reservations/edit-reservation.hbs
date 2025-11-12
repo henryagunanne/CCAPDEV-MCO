@@ -52,38 +52,56 @@
 
             <!-- Passenger Cards -->
             <div id="passengerFields">
-                {{#each reservation.passengers}}
-                <div class="card my-3 shadow-sm">
-                    <div class="card-header bg-light"><strong>Passenger {{inc @index}}</strong></div>
-                    <div class="card-body">
+  {{#each reservation.passengers}}
+  <div class="card my-3 shadow-sm">
+    <div class="card-header bg-light"><strong>Passenger {{inc @index}}</strong></div>
+    <div class="card-body">
 
-                    <!-- Row 1: Full Name + Gender -->
-                    <div class="row mb-2">
-                        <div class="col-md-6">
-                        <label class="form-label">Full Name</label>
-                        <input type="text" name="passengers[{{@index}}][fullName]" class="form-control" value="{{this.fullName}}" required>
-                        </div>
-                        <div class="col-md-6">
-                        <label class="form-label">Gender</label>
-                        <select name="passengers[{{@index}}][gender]" class="form-select" required>
-                            <option value="Male" {{#if (eq this.gender "Male")}}selected{{/if}}>Male</option>
-                            <option value="Female" {{#if (eq this.gender "Female")}}selected{{/if}}>Female</option>
-                            <option value="Other" {{#if (eq this.gender "Other")}}selected{{/if}}>Other</option>
-                        </select>
-                        </div>
-                    </div>
+      <!-- Row 1: Full Name + Gender -->
+      <div class="row mb-2">
+        <div class="col-md-6">
+          <label class="form-label text-muted fw-semibold">Full Name</label>
+          <input type="text" 
+                 name="passengers[{{@index}}][fullName]" 
+                 class="form-control" 
+                 value="{{this.fullName}}" 
+                 readonly
+                 style="background-color: #e9ecef; color: #6c757d; cursor: not-allowed;">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label text-muted fw-semibold">Gender</label>
+          <select name="passengers[{{@index}}][gender]" 
+                  class="form-select" 
+                  disabled 
+                  style="background-color: #e9ecef; color: #6c757d; cursor: not-allowed;">
+            <option value="Male" {{#if (eq this.gender "Male")}}selected{{/if}}>Male</option>
+            <option value="Female" {{#if (eq this.gender "Female")}}selected{{/if}}>Female</option>
+            <option value="Other" {{#if (eq this.gender "Other")}}selected{{/if}}>Other</option>
+          </select>
+        </div>
+      </div>
 
-                    <!-- Row 2: Age + Passport -->
-                    <div class="row mb-2">
-                        <div class="col-md-6">
-                        <label class="form-label">Age</label>
-                        <input type="number" name="passengers[{{@index}}][age]" class="form-control" value="{{this.age}}" min="0" required>
-                        </div>
-                        <div class="col-md-6">
-                        <label class="form-label">Passport Number</label>
-                        <input type="text" name="passengers[{{@index}}][passport]" class="form-control" value="{{this.passport}}" required>
-                        </div>
-                    </div>
+      <!-- Row 2: Age + Passport -->
+      <div class="row mb-2">
+        <div class="col-md-6">
+          <label class="form-label text-muted fw-semibold">Age</label>
+          <input type="number" 
+                 name="passengers[{{@index}}][age]" 
+                 class="form-control" 
+                 value="{{this.age}}" 
+                 readonly
+                 style="background-color: #e9ecef; color: #6c757d; cursor: not-allowed;">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label text-muted fw-semibold">Passport Number</label>
+          <input type="text" 
+                 name="passengers[{{@index}}][passport]" 
+                 class="form-control" 
+                 value="{{this.passport}}" 
+                 readonly
+                 style="background-color: #e9ecef; color: #6c757d; cursor: not-allowed;">
+        </div>
+      </div>
 
                     <!-- Row 3: Meal + Baggage -->
                     <div class="row">

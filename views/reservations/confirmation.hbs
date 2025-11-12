@@ -87,13 +87,48 @@
           </table>
         </div>
       </div>
+
       {{/if}}
+
+      <!-- PRICE SUMMARY -->
+<div class="mt-5">
+  <h5 class="fw-bold text-center text-dark mb-3">Price Summary</h5>
+  <div class="table-responsive">
+    <table class="table table-bordered text-center align-middle border-danger">
+      <tbody>
+        <tr>
+          <th class="bg-danger-subtle text-dark">Base Fare</th>
+          <td>₱{{reservation.flight.[0].price}}</td>
+        </tr>
+        {{#if reservation.flight.[1]}}
+        <tr>
+          <th class="bg-danger-subtle text-dark">Return Fare</th>
+          <td>₱{{reservation.flight.[1].price}}</td>
+        </tr>
+        {{/if}}
+        <tr>
+          <th class="bg-danger-subtle text-dark">Meal Total</th>
+          <td>₱{{reservation.mealTotal}}</td>
+        </tr>
+        <tr>
+          <th class="bg-danger-subtle text-dark">Baggage Total</th>
+          <td>₱{{reservation.baggageTotal}}</td>
+        </tr>
+        <tr class="table-danger fw-bold">
+          <th>Total Price</th>
+          <td>₱{{reservation.price}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
 
       <!-- BUTTONS -->
       <div class="text-center mt-5">
         <a href="/" class="btn btn-danger px-4 mx-2">Return to Home</a>
         <a href="/reservations/my-bookings" class="btn btn-outline-secondary px-4 mx-2">
-  View My Reservations
+  View My Bookings
 </a>
       </div>
     </div>

@@ -59,24 +59,39 @@ console.log("📦 Incoming reservation body:", req.body);
 
 
 // ✅ Confirmation Route 
-router.get("/:id/confirmation", isAuthenticated,  async (req, res) => {
+router.get("/:id/confirmation", isAuthenticated, async (req, res) => {
   try {
-    const reservation = await Reservation.findById(req.params.id)
-      .populate("flight")     // get flight details
-      .populate("userId")      // optional, for user info
-      .lean();                 // convert to plain object
+    // fetch reservation data
+    const reservationDoc = await Reservation.findById(req.params.id)
+      .populate("flight")
+      .populate("userId");
 
-    if (!reservation) return res.status(404).send("Reservation not found");
+    if (!reservationDoc) return res.status(404).send("Reservation not found");
 
+    // convert to plain object early
+    const reservation = reservationDoc.toObject();
+
+    // ✅ compute totals correctly
+    reservation.mealTotal = reservation.passengers.reduce(
+      (sum, p) => sum + (p.meal && p.meal !== "None" ? 150 : 0),
+      0
+    );
+    reservation.baggageTotal = reservation.passengers.reduce(
+      (sum, p) => sum + ((p.baggageAllowance || 0) * 50),
+      0
+    );
+
+    // ✅ render with updated totals
     res.render("reservations/confirmation", { 
       title: "Booking Confirmed",
       reservation 
     });
   } catch (err) {
-    console.error("Error loading reservation:", err);
+    console.error("❌ Error loading reservation:", err);
     res.status(500).send("Error loading reservation");
   }
 });
+
 
 
 // GET reservations/my-bookings - render my reservations page
@@ -143,16 +158,50 @@ router.get('/:id/edit', isAuthenticated, async (req, res) => {
       ? reservation.flight[1]
       : null;
 
-    // ✅ Fetch all occupied seats for the same flight, excluding current reservation
-    const otherReservations = await Reservation.find({
-      flight: outboundFlight._id,
-      _id: { $ne: reservation._id },
-      status: { $ne: 'Cancelled' }
-    }).lean();
+    // ✅ Fetch real occupied seats (excluding current reservation)
+      const otherReservations = await Reservation.find({
+        flight: outboundFlight._id,
+        _id: { $ne: reservation._id },
+        status: { $ne: 'Cancelled' }
+      }).lean();
 
-    const occupiedSeats = otherReservations.flatMap(r =>
-      r.passengers.map(p => p.seatNumber)
-    );
+      const realOccupiedSeats = otherReservations.flatMap(r =>
+        r.passengers.map(p => p.seatNumber)
+      );
+
+      // 🪑 Generate random static demo occupied seats safely
+      function getRandomStaticSeats(currentPassengerSeats = []) {
+        const allSeats = [
+          "1A","1B","1C","1D","1E","1F",
+          "2A","2B","2C","2D","2E","2F",
+          "3A","3B","3C","3D","3E","3F",
+          "4A","4B","4C","4D","4E","4F",
+          "5A","5B","5C","5D","5E","5F",
+          "6A","6B","6C","6D","6E","6F",
+          "7A","7B","7C","7D","7E","7F",
+          "8A","8B","8C","8D","8E","8F",
+          "9A","9B","9C","9D","9E","9F",
+          "10A","10B","10C","10D","10E","10F"
+        ];
+
+        // Exclude seats currently occupied by this reservation
+        const availableSeats = allSeats.filter(seat => !currentPassengerSeats.includes(seat));
+
+        // Choose random 8–12 demo seats
+        const count = Math.floor(Math.random() * 5) + 8; // random between 8–12
+        const shuffled = availableSeats.sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, count);
+      }
+
+      // 🎟 Get passenger seats from this reservation
+      const currentPassengerSeats = reservation.passengers.map(p => p.seatNumber);
+
+      // Generate demo occupied seats without conflicting with user seats
+      const staticOccupiedSeats = getRandomStaticSeats(currentPassengerSeats);
+
+      // ✅ Merge & remove duplicates
+      const occupiedSeats = [...new Set([...realOccupiedSeats, ...staticOccupiedSeats])];
+
 
     // ✅ Pass to Handlebars properly as JSON string
     res.render('reservations/edit-reservation', {
@@ -170,48 +219,80 @@ router.get('/:id/edit', isAuthenticated, async (req, res) => {
 });
 
       // POST /reservations/:id/edit - Handle edit submission
-      router.post('/:id/edit', isAuthenticated, async (req, res) => {
-        try {
-          const reservationId = req.params.id;
-          const { passengersJSON, totalPrice } = req.body;
+router.post('/:id/edit', isAuthenticated, async (req, res) => {
+  try {
+    const reservationId = req.params.id;
+    const { passengersJSON, totalPrice } = req.body;
 
-          // Parse passenger data from form
-          const updatedPassengers = JSON.parse(passengersJSON || "[]");
+    const updatedPassengers = JSON.parse(passengersJSON || "[]");
+    const existingReservation = await Reservation.findById(reservationId);
 
-          // Fetch the existing reservation to retain its status
-          const existingReservation = await Reservation.findById(reservationId);
-          if (!existingReservation) {
-            return res.status(404).send('Reservation not found');
-          }
+    if (!existingReservation) {
+      return res.status(404).send('Reservation not found');
+    }
 
-          // Update the reservation
-          const updatedReservation = await Reservation.findByIdAndUpdate(
-            reservationId,
-            {
-              passengers: updatedPassengers,
-              price: parseFloat(totalPrice) || existingReservation.price,
-              status: existingReservation.status, // ✅ keep original status
-            },
-            { new: true }
-          )
-            .populate('flight')
-            .lean();
+    // Update and repopulate
+    const updatedReservationDoc = await Reservation.findByIdAndUpdate(
+      reservationId,
+      {
+        passengers: updatedPassengers,
+        price: parseFloat(totalPrice) || existingReservation.price,
+        status: existingReservation.status,
+      },
+      { new: true }
+    )
+      .populate('flight')
+      .populate('userId');
 
-          console.log('✅ Reservation updated without status change:', updatedReservation);
+    const reservation = updatedReservationDoc.toObject();
 
-          // Render confirmation page
-          res.render('reservations/edit-confirmation', {
-            title: 'Reservation Updated',
-            reservation: updatedReservation,
-          });
-        } catch (err) {
-          console.error('❌ Error updating reservation:', err);
-          res.status(500).send('Error updating reservation');
-        }
-      });
+    // 🧮 Define pricing
+    const seatPricing = { first: 5000, business: 3000, economy: 1500 };
+    const travelClass = (reservation.travelClass || "economy").toLowerCase();
+
+    // ✅ Compute totals
+    reservation.mealTotal = reservation.passengers.reduce(
+      (sum, p) => sum + (p.meal && p.meal !== "None" ? 150 : 0),
+      0
+    );
+    reservation.baggageTotal = reservation.passengers.reduce(
+      (sum, p) => sum + ((p.baggageAllowance || 0) * 50),
+      0
+    );
+        // 🧮 Compute seat total dynamically by seat row
+    reservation.seatTotal = reservation.passengers.reduce((sum, p) => {
+      if (!p.seatNumber) return sum;
+
+      const seatRow = parseInt(p.seatNumber); // extract row number (e.g., 1 from "1A", 4 from "4D")
+      let seatClass = "economy";
+
+      if (seatRow <= 2) seatClass = "first";
+      else if (seatRow <= 4) seatClass = "business";
+      else seatClass = "economy";
+
+      const seatPricing = { first: 5000, business: 3000, economy: 1500 };
+      return sum + (seatPricing[seatClass] || 0);
+    }, 0);
 
 
 
+    // ✅ Compute grand total
+    const baseFare = reservation.flight?.[0]?.price || 0;
+    const returnFare = reservation.flight?.[1]?.price || 0;
+
+    reservation.totalFinalPrice =
+      baseFare + returnFare + reservation.mealTotal + reservation.baggageTotal + reservation.seatTotal;
+
+    // ✅ Render
+    res.render('reservations/edit-confirmation', {
+      title: 'Reservation Updated',
+      reservation,
+    });
+  } catch (err) {
+    console.error('❌ Error updating reservation:', err);
+    res.status(500).send('Error updating reservation');
+  }
+});
 
 /* =============================
    BOOK PAGE - Show booking form

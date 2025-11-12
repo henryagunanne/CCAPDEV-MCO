@@ -169,44 +169,47 @@ router.get('/:id/edit', isAuthenticated, async (req, res) => {
   }
 });
 
-// POST reservations/:id/edit - Handle edit submission
-// POST /reservations/:id/edit - Handle edit submission
-router.post('/:id/edit', isAuthenticated, async (req, res) => {
-  try {
-    const reservationId = req.params.id;
-    const { passengersJSON, totalPrice } = req.body;
-    const updatedPassengers = JSON.parse(passengersJSON || "[]");
-    
-    // ✅ Update reservation in MongoDB
-    const updatedReservation = await Reservation.findByIdAndUpdate(
-      reservationId,
-      {
-        passengers: updatedPassengers,
-        price: parseFloat(totalPrice) || 0,
-        status: 'Confirmed', // optional — can set “Edited” if you prefer
-      },
-      { new: true }
-    )
-      .populate('flight')
-      .lean();
+      // POST /reservations/:id/edit - Handle edit submission
+      router.post('/:id/edit', isAuthenticated, async (req, res) => {
+        try {
+          const reservationId = req.params.id;
+          const { passengersJSON, totalPrice } = req.body;
 
-    if (!updatedReservation) {
-      return res.status(404).send('Reservation not found');
-    }
+          // Parse passenger data from form
+          const updatedPassengers = JSON.parse(passengersJSON || "[]");
 
-    console.log('✅ Reservation updated:', updatedReservation);
+          // Fetch the existing reservation to retain its status
+          const existingReservation = await Reservation.findById(reservationId);
+          if (!existingReservation) {
+            return res.status(404).send('Reservation not found');
+          }
 
-    // ✅ Redirect to edit confirmation page
-    res.render('reservations/edit-confirmation', {
-  title: 'Reservation Updated',
-  reservation: updatedReservation,
-});
+          // Update the reservation
+          const updatedReservation = await Reservation.findByIdAndUpdate(
+            reservationId,
+            {
+              passengers: updatedPassengers,
+              price: parseFloat(totalPrice) || existingReservation.price,
+              status: existingReservation.status, // ✅ keep original status
+            },
+            { new: true }
+          )
+            .populate('flight')
+            .lean();
 
-  } catch (err) {
-    console.error('❌ Error updating reservation:', err);
-    res.status(500).send('Error updating reservation');
-  }
-});
+          console.log('✅ Reservation updated without status change:', updatedReservation);
+
+          // Render confirmation page
+          res.render('reservations/edit-confirmation', {
+            title: 'Reservation Updated',
+            reservation: updatedReservation,
+          });
+        } catch (err) {
+          console.error('❌ Error updating reservation:', err);
+          res.status(500).send('Error updating reservation');
+        }
+      });
+
 
 
 

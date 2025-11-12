@@ -6,12 +6,10 @@ const Flight = require('../models/Flight');
 const User = require('../models/User');
 
 /* =============================
-   AUTHENTICATION CHECK
+   AUTH CHECK
 ============================= */
 function isAuthenticated(req, res, next) {
-  if (req.session.user) {
-    return next();
-  }
+  if (req.session.user) return next();
   res.status(403).render('error/access-denied', { 
     title: 'Access Denied',
     isAdmin: req.session.user?.role === 'Admin'
@@ -19,48 +17,61 @@ function isAuthenticated(req, res, next) {
 }
 
 /* =============================
-   BOOK PAGE - Flight Selection (navbar "Book" link)
+   BOOK PAGE (Dropdown Select)
 ============================= */
-router.get('/book-select', async (req, res) => {
+router.get('/book-select', isAuthenticated, async (req, res) => {
   try {
     console.log("🧭 /reservations/book-select accessed");
 
-    // Fetch all flights
     const flights = await Flight.find().lean();
+    const origins = [...new Set(flights.map(f => f.origin))];
+    const destinations = [...new Set(flights.map(f => f.destination))];
 
-    if (!flights || flights.length === 0) {
-      console.log("⚠️ No flights found in database");
-    }
-
-    // Render book-select.hbs
     res.render('reservations/book-select', {
       title: 'Book a Flight',
-      flights,
+      origins,
+      destinations,
       user: req.session.user
     });
   } catch (err) {
-    console.error('❌ Error loading book page:', err);
-    res.status(500).send('Error loading book page.');
+    console.error('❌ Error loading book-select page:', err);
+    res.status(500).send('Error loading booking page.');
   }
 });
 
 /* =============================
-   BOOK PAGE - Show Booking Form (after selecting flight)
+   FLIGHT SEARCH API (used by AJAX)
+============================= */
+router.get('/search', isAuthenticated, async (req, res) => {
+  try {
+    const { origin, destination } = req.query;
+    if (!origin || !destination) {
+      return res.status(400).json({ flights: [] });
+    }
+
+    const flights = await Flight.find({ origin, destination }).lean();
+    console.log(`✈️ Found ${flights.length} flights from ${origin} to ${destination}`);
+    res.json({ flights });
+  } catch (err) {
+    console.error('❌ Error searching flights:', err);
+    res.status(500).json({ flights: [] });
+  }
+});
+
+/* =============================
+   BOOK PAGE - After selecting a flight
 ============================= */
 router.get('/book/:flightId', isAuthenticated, async (req, res) => {
   try {
-    const flightId = req.params.flightId;
-    const flight = await Flight.findById(flightId).lean();
-
+    const flight = await Flight.findById(req.params.flightId).lean();
     if (!flight) return res.status(404).send('Flight not found');
 
     const travelClass = req.query.travelClass || 'Economy';
-    const tripType   = req.query.tripType   || 'One-Way';
-    const departDate = req.query.depart     || '';
-    const returnDate = req.query.return     || '';
+    const tripType = req.query.tripType || 'One-Way';
+    const departDate = req.query.depart || '';
+    const returnDate = req.query.return || '';
 
-    // Load possible return flights (same route, opposite direction)
-    const returnFlights = await Flight.find({
+    const allReturnFlights = await Flight.find({
       origin: flight.destination,
       destination: flight.origin
     }).lean();
@@ -72,7 +83,7 @@ router.get('/book/:flightId', isAuthenticated, async (req, res) => {
       tripType,
       departDate,
       returnDate,
-      returnFlights,
+      returnFlights: allReturnFlights,
       user: req.session.user
     });
   } catch (err) {
@@ -102,8 +113,7 @@ router.post("/create", isAuthenticated, async (req, res) => {
     });
 
     await newReservation.save();
-    console.log("✅ New reservation created:", newReservation);
-
+    console.log("✅ New reservation created:", newReservation._id);
     res.json({ redirect: `/reservations/${newReservation._id}/confirmation` });
   } catch (err) {
     console.error("❌ Error creating reservation:", err);
@@ -116,45 +126,27 @@ router.post("/create", isAuthenticated, async (req, res) => {
 ============================= */
 router.get("/:id/confirmation", isAuthenticated, async (req, res) => {
   try {
-    const reservation = await Reservation.findById(req.params.id)
-      .populate("flight")
-      .populate("userId")
-      .lean();
-
-
-// ✅ Confirmation Route 
-router.get("/:id/confirmation", isAuthenticated, async (req, res) => {
-  try {
-    // fetch reservation data
     const reservationDoc = await Reservation.findById(req.params.id)
       .populate("flight")
       .populate("userId");
-
-
     if (!reservationDoc) return res.status(404).send("Reservation not found");
 
-    // convert to plain object early
     const reservation = reservationDoc.toObject();
-
-    // ✅ compute totals correctly
     reservation.mealTotal = reservation.passengers.reduce(
-      (sum, p) => sum + (p.meal && p.meal !== "None" ? 150 : 0),
-      0
+      (sum, p) => sum + (p.meal && p.meal !== "None" ? 150 : 0), 0
     );
     reservation.baggageTotal = reservation.passengers.reduce(
-      (sum, p) => sum + ((p.baggageAllowance || 0) * 50),
-      0
+      (sum, p) => sum + ((p.baggageAllowance || 0) * 50), 0
     );
 
-    // ✅ render with updated totals
     res.render("reservations/confirmation", { 
       title: "Booking Confirmed",
       reservation,
       user: req.session.user
     });
   } catch (err) {
-    console.error("❌ Error loading reservation:", err);
-    res.status(500).send("Error loading reservation");
+    console.error("❌ Error loading confirmation:", err);
+    res.status(500).send("Error loading reservation confirmation");
   }
 });
 
@@ -166,7 +158,7 @@ router.get('/my-bookings', isAuthenticated, async (req, res) => {
     const userId = req.session.user._id;
     const reservations = await Reservation.find({ userId })
       .populate("flight")
-      .lean(); 
+      .lean();
 
     res.render('reservations/myBookings', {
       title: 'My Bookings',
@@ -174,7 +166,7 @@ router.get('/my-bookings', isAuthenticated, async (req, res) => {
       user: req.session.user
     });
   } catch (err) {
-    console.error("Error loading reservations:", err);
+    console.error("❌ Error loading my bookings:", err);
     res.status(500).send("Error loading reservations");
   }
 });
@@ -185,235 +177,16 @@ router.get('/my-bookings', isAuthenticated, async (req, res) => {
 router.post('/cancel/:reservationId', isAuthenticated, async (req, res) => {
   try {
     const { reservationId } = req.params;
-
-    const cancelledReservation = await Reservation.findByIdAndUpdate(
+    const cancelled = await Reservation.findByIdAndUpdate(
       reservationId,
       { status: 'Cancelled' },
       { new: true }
     );
-
-    if (!cancelledReservation) {
-      return res.status(404).send('Reservation not found');
-    }
-
-    res.json({ 
-      success: true, 
-      message: 'Reservation Cancelled',
-      cancelledReservation
-    });
+    if (!cancelled) return res.status(404).send('Reservation not found');
+    res.json({ success: true, message: 'Reservation Cancelled', cancelled });
   } catch (err) {
-    console.error('❌ Reservation update error:', err);
-    res.status(500).send('Server error during Reservation update');
-  }
-});
-
-/* =============================
-   EDIT RESERVATION
-============================= */
-router.get('/edit/:id', isAuthenticated, async (req, res) => {
-  try {
-    const reservation = await Reservation.findById(req.params.id)
-      .populate('flight')
-      .lean();
-
-    if (!reservation) return res.status(404).send('Reservation not found');
-
-    // Handle outbound/return flights correctly
-    const outboundFlight = Array.isArray(reservation.flight)
-      ? reservation.flight[0]
-      : reservation.flight;
-    const returnFlight = Array.isArray(reservation.flight) && reservation.flight[1]
-      ? reservation.flight[1]
-      : null;
-
-    // ✅ Fetch real occupied seats (excluding current reservation)
-      const otherReservations = await Reservation.find({
-        flight: outboundFlight._id,
-        _id: { $ne: reservation._id },
-        status: { $ne: 'Cancelled' }
-      }).lean();
-
-      const realOccupiedSeats = otherReservations.flatMap(r =>
-        r.passengers.map(p => p.seatNumber)
-      );
-
-      // 🪑 Generate random static demo occupied seats safely
-      function getRandomStaticSeats(currentPassengerSeats = []) {
-        const allSeats = [
-          "1A","1B","1C","1D","1E","1F",
-          "2A","2B","2C","2D","2E","2F",
-          "3A","3B","3C","3D","3E","3F",
-          "4A","4B","4C","4D","4E","4F",
-          "5A","5B","5C","5D","5E","5F",
-          "6A","6B","6C","6D","6E","6F",
-          "7A","7B","7C","7D","7E","7F",
-          "8A","8B","8C","8D","8E","8F",
-          "9A","9B","9C","9D","9E","9F",
-          "10A","10B","10C","10D","10E","10F"
-        ];
-
-        // Exclude seats currently occupied by this reservation
-        const availableSeats = allSeats.filter(seat => !currentPassengerSeats.includes(seat));
-
-        // Choose random 8–12 demo seats
-        const count = Math.floor(Math.random() * 5) + 8; // random between 8–12
-        const shuffled = availableSeats.sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, count);
-      }
-
-      // 🎟 Get passenger seats from this reservation
-      const currentPassengerSeats = reservation.passengers.map(p => p.seatNumber);
-
-      // Generate demo occupied seats without conflicting with user seats
-      const staticOccupiedSeats = getRandomStaticSeats(currentPassengerSeats);
-
-      // ✅ Merge & remove duplicates
-      const occupiedSeats = [...new Set([...realOccupiedSeats, ...staticOccupiedSeats])];
-
-
-    // ✅ Pass to Handlebars properly as JSON string
-    res.render('reservations/edit-reservation', {
-      title: 'Edit Reservation',
-      reservation,
-      passengers: reservation.passengers.length > 0,
-      user: req.session.user
-    });
-
-  } catch (err) {
-    console.error("❌ Error loading edit page:", err);
-    res.status(500).send('Server error loading edit page.');
-  }
-});
-
-      // POST /reservations/:id/edit - Handle edit submission
-router.post('/:id/edit', isAuthenticated, async (req, res) => {
-  try {
-    const reservationId = req.params.id;
-    const { passengersJSON, totalPrice } = req.body;
-
-    const updatedPassengers = JSON.parse(passengersJSON || "[]");
-    const existingReservation = await Reservation.findById(reservationId);
-
-    if (!existingReservation) {
-      return res.status(404).send('Reservation not found');
-    }
-
-    // Update and repopulate
-    const updatedReservationDoc = await Reservation.findByIdAndUpdate(
-      reservationId,
-      {
-        passengers: updatedPassengers,
-        price: parseFloat(totalPrice) || existingReservation.price,
-        status: existingReservation.status,
-      },
-      { new: true }
-    )
-      .populate('flight')
-      .populate('userId');
-
-    const reservation = updatedReservationDoc.toObject();
-
-    // 🧮 Define pricing
-    const seatPricing = { first: 5000, business: 3000, economy: 1500 };
-    const travelClass = (reservation.travelClass || "economy").toLowerCase();
-
-    // ✅ Compute totals
-    reservation.mealTotal = reservation.passengers.reduce(
-      (sum, p) => sum + (p.meal && p.meal !== "None" ? 150 : 0),
-      0
-    );
-    reservation.baggageTotal = reservation.passengers.reduce(
-      (sum, p) => sum + ((p.baggageAllowance || 0) * 50),
-      0
-    );
-        // 🧮 Compute seat total dynamically by seat row
-    reservation.seatTotal = reservation.passengers.reduce((sum, p) => {
-      if (!p.seatNumber) return sum;
-
-      const seatRow = parseInt(p.seatNumber); // extract row number (e.g., 1 from "1A", 4 from "4D")
-      let seatClass = "economy";
-
-      if (seatRow <= 2) seatClass = "first";
-      else if (seatRow <= 4) seatClass = "business";
-      else seatClass = "economy";
-
-      const seatPricing = { first: 5000, business: 3000, economy: 1500 };
-      return sum + (seatPricing[seatClass] || 0);
-    }, 0);
-
-
-
-    // ✅ Compute grand total
-    const baseFare = reservation.flight?.[0]?.price || 0;
-    const returnFare = reservation.flight?.[1]?.price || 0;
-
-    reservation.totalFinalPrice =
-      baseFare + returnFare + reservation.mealTotal + reservation.baggageTotal + reservation.seatTotal;
-
-    // ✅ Render
-    res.render('reservations/edit-confirmation', {
-      title: 'Reservation Updated',
-      reservation,
-    });
-  } catch (err) {
-    console.error('❌ Error updating reservation:', err);
-    res.status(500).send('Error updating reservation');
-  }
-});
-
-/* =============================
-   BOOK PAGE - Show booking form
-============================= */
-router.get('/book/:flightId', isAuthenticated, async (req, res) => {
-  try {
-    const flightId = req.params.flightId;
-    const flight = await Flight.findById(flightId).lean();
-    if (!flight) return res.status(404).send('Flight not found');
-
-    const travelClass = req.query.travelClass || 'Economy';
-    const tripType = req.query.tripType || 'One-Way';
-    const departDate = req.query.depart || '';
-    const returnDate = req.query.return || '';
-
-    // ✅ 1. Fetch reserved seats for this flight
-    const existingReservations = await Reservation.find({
-      flight: flightId,
-      status: { $ne: 'Cancelled' } // exclude cancelled
-    }).lean();
-
-    // Flatten seat numbers from all passengers
-    const occupiedSeats = existingReservations.flatMap(r =>
-      r.passengers.map(p => p.seatNumber)
-    );
-
-    // ✅ 2. Load valid return flights (future only)
-    const departDateObj = new Date(`${flight.departureDate}T00:00:00Z`);
-    const today = new Date();
-    const allReturnFlights = await Flight.find({
-      origin: flight.destination,
-      destination: flight.origin
-    }).lean();
-
-    const returnFlights = allReturnFlights.filter(f => {
-      const fDate = new Date(`${f.departureDate}T00:00:00Z`);
-      return fDate > today && fDate > departDateObj;
-    }).sort((a, b) => new Date(`${a.departureDate}T00:00:00Z`) - new Date(`${b.departureDate}T00:00:00Z`));
-
-    // ✅ 3. Render with occupied seat list
-    res.render('reservations/reservation', {
-      title: 'Book Your Flight',
-      flight,
-      travelClass,
-      tripType,
-      departDate,
-      returnDate,
-      returnFlights,
-      occupiedSeats: JSON.stringify(occupiedSeats) // pass to JS
-    });
-
-  } catch (err) {
-    console.error('Error loading booking page:', err);
-    res.status(500).send('Error loading booking page.');
+    console.error('❌ Reservation cancel error:', err);
+    res.status(500).send('Server error cancelling reservation');
   }
 });
 
@@ -425,11 +198,10 @@ router.get('/:id', isAuthenticated, async (req, res) => {
     const reservation = await Reservation.findById(req.params.id)
       .populate('flight')
       .lean();
-
     if (!reservation) return res.status(404).send('Reservation not found');
     res.render('reservations/details', { title: 'Booking Details', reservation, user: req.session.user });
   } catch (err) {
-    console.error("Error loading reservation:", err);
+    console.error("❌ Error loading reservation:", err);
     res.status(500).send('Error loading reservation');
   }
 });

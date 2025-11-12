@@ -111,8 +111,7 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-  // --- From backend (Handlebars)
-  const occupiedSeats = {{{occupiedSeats}}} || [];
+  
 
   // --- DOM elements
   const origin = document.getElementById("origin");
@@ -139,6 +138,11 @@ document.addEventListener("DOMContentLoaded", function () {
   const seatClasses = { 1: "first", 2: "first", 3: "business", 4: "business" };
   let selectedSeats = [];
 
+
+// --- From backend (Handlebars)
+  const occupiedSeats = {{{occupiedSeats}}} || [];
+
+  
   // ============================================================
   // RESET FORM
   // ============================================================

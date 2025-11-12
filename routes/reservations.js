@@ -23,7 +23,7 @@ function isAuthenticated(req, res, next) {
 ============================= */
 router.get('/book', async (req, res) => {
   try {
-    console.log("🧭 /reservations/book-select accessed");
+    console.log("🧭 /reservations/book accessed");
 
     // Fetch all flights
     const flights = await Flight.find().lean();

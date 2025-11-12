@@ -13,5 +13,5 @@ document.addEventListener("DOMContentLoaded", () => {
       // Redirect to the actual booking page for that flight
       window.location.href = `/reservations/book/${flightId}`;
     });
-  });
+});
   

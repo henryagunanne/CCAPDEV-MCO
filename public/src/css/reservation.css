@@ -6,32 +6,35 @@ html, body {
   margin: 0;
 }
 
-/* Make main take up full height before footer (This is currently affecting the homepage so I commented it out)
+/* Make main take up full height before footer (commented out since it affects homepage)
 main {
   flex: 1;
   padding-top: 30px;
-}*/
+}
+*/
 
-/* Seat Map Layout */
+/* === Seat Map Layout === */
 #seat-map {
   display: grid;
-  grid-template-columns: repeat(7, auto);
-  gap: 6px;
-  max-width: 650px;
-  margin: 20px auto;
+  grid-template-columns: repeat(3, 55px) 80px repeat(3, 55px);
+  gap: 10px 15px; /* row-gap | column-gap */
   justify-content: center;
+  margin: 20px auto;
 }
 
+/* === Seats === */
 .seat {
-  width: 45px;
-  height: 45px;
-  margin: 5px;
-  border-radius: 8px;
-  text-align: center;
-  line-height: 45px;
-  font-weight: bold;
+  width: 55px;
+  height: 55px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+  user-select: none;
+  transition: 0.2s ease-in-out;
 }
 
 .seat:hover {
@@ -39,48 +42,51 @@ main {
   opacity: 0.9;
 }
 
-/* Seat States */
-.economy.available {
-  background: #0d6efd;
+/* === Seat Classes === */
+.first {
+  background-color: #dc3545; /* Red */
   color: white;
-  border: 2px solid #007bff;
 }
 
-.business.available {
-  background: #fff;
-  color: black;
-  border: 2px solid #6610f2;
+.business {
+  background-color: #f8f9fa; /* White with purple border */
+  color: #6f42c1;
+  border: 2px solid #6f42c1;
 }
 
-.first.available {
-  background: #dc3545;
+.economy {
+  background-color: #0d6efd; /* Blue */
   color: white;
-  border: 2px solid #b21f2d;
 }
 
+/* === Seat States === */
 .occupied {
-  background: #6c757d;
+  background-color: #6c757d !important;
   color: white;
   cursor: not-allowed;
 }
 
 .selected {
-  background: #ffc107 !important;
-  color: black !important;
+  background-color: gold !important;
+  color: #000 !important;
+  border: 2px solid #d4af37 !important;
 }
 
-.aisle {
-  visibility: hidden;
+/* === Optional: Legend === */
+.badge {
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  border-radius: 6px;
 }
 
-/* Summary Card */
+/* === Summary Card === */
 .summary-card {
   max-width: 400px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-/* Footer fix */
+/* === Footer === */
 footer {
   margin-top: auto;
   background-color: #d32f2f;
@@ -92,6 +98,7 @@ footer {
   position: relative;
 }
 
+/* === Validation Styles === */
 .is-valid {
   border-color: #198754 !important;
 }
@@ -100,19 +107,18 @@ footer {
   border-color: #dc3545 !important;
 }
 
-/* Ensure booking layout fills full width but keeps elements centered */
+/* === Booking Layout === */
 .booking-page {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-/* Make the card stretch better for desktop */
 .booking-page .card {
   width: 100%;
 }
 
-/* On larger screens, center seat map and summary side by side */
+/* === Large Screen Adjustments === */
 @media (min-width: 992px) {
   #seat-map {
     max-width: 700px;
@@ -135,7 +141,7 @@ footer {
 /* --- Flight Details under route --- */
 .flight-details {
   font-size: 1.5rem !important;
-  font-weight: 600 !important;   /* make it readable */
+  font-weight: 600 !important;
   margin-bottom: 5rem;
 }
 
@@ -146,8 +152,9 @@ footer {
   color: #fffbea;
 }
 
+/* --- Return Flight Dropdown --- */
 .return-flight-dropdown {
-  max-width: 600px !important; /* wider */
+  max-width: 600px !important;
   font-size: 1rem;
   padding: 10px 14px;
   border-radius: 10px;
@@ -155,9 +162,13 @@ footer {
   background-color: #fff;
 }
 
-
+/* --- Return Flight Section --- */
 #returnFlightSection {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.seat-row .seat {
+  margin: 0 6px; /* adds horizontal space between seats */
 }

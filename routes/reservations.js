@@ -126,7 +126,7 @@ router.post('/cancel/:reservationId', isAuthenticated, async (req, res) => {
   }
 });
 
-//edit
+// GET reservations/:id/edit - Display edit page
 router.get('/:id/edit', isAuthenticated, async (req, res) => {
   try {
     const reservation = await Reservation.findById(req.params.id)
@@ -167,6 +167,11 @@ router.get('/:id/edit', isAuthenticated, async (req, res) => {
     console.error("❌ Error loading edit page:", err);
     res.status(500).send('Server error loading edit page.');
   }
+});
+
+// POST reservations/:id/edit - Handle edit submission
+router.post('/:id/edit', isAuthenticated, async (req, res) => {
+  
 });
 
 

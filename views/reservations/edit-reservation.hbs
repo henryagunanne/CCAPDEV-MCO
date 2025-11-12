@@ -1,35 +1,35 @@
 <main class="booking-page container-fluid my-5 px-4">
   <div class="card shadow-lg mx-auto" style="max-width: 900px;">
     <div class="card-header bg-danger text-white text-center py-3">
-  {{#if outboundFlight}}
-    <h3>Edit Reservation – 
-      {{outboundFlight.flightNumber}}
-      {{#if returnFlight}} / {{returnFlight.flightNumber}}{{/if}}
-    </h3>
+    {{#if outboundFlight}}
+        <h3>Edit Reservation – 
+        {{outboundFlight.flightNumber}}
+        {{#if returnFlight}} / {{returnFlight.flightNumber}}{{/if}}
+        </h3>
 
-    <!-- Outbound Flight -->
-    <h2 class="route-display mb-1">
-      {{outboundFlight.origin}} → {{outboundFlight.destination}}
-    </h2>
-    <p class="flight-details mb-0">
-      Departure: {{outboundFlight.departureTime}} | Arrival: {{outboundFlight.arrivalTime}}
-    </p>
+        <!-- Outbound Flight -->
+        <h2 class="route-display mb-1">
+        {{outboundFlight.origin}} → {{outboundFlight.destination}}
+        </h2>
+        <p class="flight-details mb-0">
+        Departure: {{outboundFlight.departureTime}} | Arrival: {{outboundFlight.arrivalTime}}
+        </p>
 
-    <!-- Return Flight -->
-    {{#if returnFlight}}
-      <br>
-      <h2 class="route-display mb-1">
-        {{returnFlight.origin}} → {{returnFlight.destination}}
-      </h2>
-      <p class="flight-details mb-0">
-        Departure: {{returnFlight.departureTime}} | Arrival: {{returnFlight.arrivalTime}}
-      </p>
+        <!-- Return Flight -->
+        {{#if returnFlight}}
+        <br>
+        <h2 class="route-display mb-1">
+            {{returnFlight.origin}} → {{returnFlight.destination}}
+        </h2>
+        <p class="flight-details mb-0">
+            Departure: {{returnFlight.departureTime}} | Arrival: {{returnFlight.arrivalTime}}
+        </p>
+        {{/if}}
+    {{else}}
+        <h3>Edit Reservation</h3>
+        <p>No flight details available.</p>
     {{/if}}
-  {{else}}
-    <h3>Edit Reservation</h3>
-    <p>No flight details available.</p>
-  {{/if}}
-</div>
+    </div>
 
 
 
@@ -41,112 +41,112 @@
     </div>
 
     <div class="card-body">
-      <form id="editReservationForm" method="POST" action="/reservations/{{reservation._id}}/edit">
-        <input type="hidden" name="reservationId" value="{{reservation._id}}">
-        {{#if outboundFlight}}
-  <input type="hidden" name="flight" value="{{outboundFlight._id}}">
-{{/if}}
-{{#if returnFlight}}
-  <input type="hidden" name="returnFlight" value="{{returnFlight._id}}">
-{{/if}}
+        <form id="editReservationForm" method="POST" action="/reservations/{{reservation._id}}/edit">
+            <input type="hidden" name="reservationId" value="{{reservation._id}}">
+            {{#if outboundFlight}}
+                <input type="hidden" name="flight" value="{{outboundFlight._id}}">
+            {{/if}}
+            {{#if returnFlight}}
+                <input type="hidden" name="returnFlight" value="{{returnFlight._id}}">
+            {{/if}}
 
-        <!-- Passenger Cards -->
-        <div id="passengerFields">
-          {{#each reservation.passengers}}
-            <div class="card my-3 shadow-sm">
-                <div class="card-header bg-light"><strong>Passenger {{inc @index}}</strong></div>
-                <div class="card-body">
+            <!-- Passenger Cards -->
+            <div id="passengerFields">
+                {{#each reservation.passengers}}
+                <div class="card my-3 shadow-sm">
+                    <div class="card-header bg-light"><strong>Passenger {{inc @index}}</strong></div>
+                    <div class="card-body">
 
-                <!-- Row 1: Full Name + Gender -->
-                <div class="row mb-2">
-                    <div class="col-md-6">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" name="passengers[{{@index}}][fullName]" class="form-control" value="{{this.fullName}}" required>
+                    <!-- Row 1: Full Name + Gender -->
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" name="passengers[{{@index}}][fullName]" class="form-control" value="{{this.fullName}}" required>
+                        </div>
+                        <div class="col-md-6">
+                        <label class="form-label">Gender</label>
+                        <select name="passengers[{{@index}}][gender]" class="form-select" required>
+                            <option value="Male" {{#if (eq this.gender "Male")}}selected{{/if}}>Male</option>
+                            <option value="Female" {{#if (eq this.gender "Female")}}selected{{/if}}>Female</option>
+                            <option value="Other" {{#if (eq this.gender "Other")}}selected{{/if}}>Other</option>
+                        </select>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                    <label class="form-label">Gender</label>
-                    <select name="passengers[{{@index}}][gender]" class="form-select" required>
-                        <option value="Male" {{#if (eq this.gender "Male")}}selected{{/if}}>Male</option>
-                        <option value="Female" {{#if (eq this.gender "Female")}}selected{{/if}}>Female</option>
-                        <option value="Other" {{#if (eq this.gender "Other")}}selected{{/if}}>Other</option>
-                    </select>
+
+                    <!-- Row 2: Age + Passport -->
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                        <label class="form-label">Age</label>
+                        <input type="number" name="passengers[{{@index}}][age]" class="form-control" value="{{this.age}}" min="0" required>
+                        </div>
+                        <div class="col-md-6">
+                        <label class="form-label">Passport Number</label>
+                        <input type="text" name="passengers[{{@index}}][passport]" class="form-control" value="{{this.passport}}" required>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Meal + Baggage -->
+                    <div class="row">
+                        <div class="col-md-6">
+                        <label class="form-label">Meal Option</label>
+                        <select name="passengers[{{@index}}][meal]" class="form-select meal-option" data-index="{{@index}}">
+                            <option value="None" {{#if (eq this.meal "None")}}selected{{/if}}>None</option>
+                            <option value="Vegetarian" {{#if (eq this.meal "Vegetarian")}}selected{{/if}}>Vegetarian</option>
+                            <option value="Non-Vegetarian" {{#if (eq this.meal "Non-Vegetarian")}}selected{{/if}}>Non-Vegetarian</option>
+                            <option value="Vegan" {{#if (eq this.meal "Vegan")}}selected{{/if}}>Vegan</option>
+                            <option value="Gluten-Free" {{#if (eq this.meal "Gluten-Free")}}selected{{/if}}>Gluten-Free</option>
+                        </select>
+                        </div>
+                        <div class="col-md-6">
+                        <label class="form-label">Baggage (kg)</label>
+                        <input type="number" class="form-control baggage-input" data-index="{{@index}}" name="passengers[{{@index}}][baggageAllowance]" value="{{this.baggageAllowance}}" min="0">
+                        </div>
+                    </div>
+
+                    <div class="mt-2 text-muted small seat-info">Seat: {{this.seatNumber}}</div>
                     </div>
                 </div>
+                {{/each}}
 
-                <!-- Row 2: Age + Passport -->
-                <div class="row mb-2">
-                    <div class="col-md-6">
-                    <label class="form-label">Age</label>
-                    <input type="number" name="passengers[{{@index}}][age]" class="form-control" value="{{this.age}}" min="0" required>
-                    </div>
-                    <div class="col-md-6">
-                    <label class="form-label">Passport Number</label>
-                    <input type="text" name="passengers[{{@index}}][passport]" class="form-control" value="{{this.passport}}" required>
-                    </div>
-                </div>
-
-                <!-- Row 3: Meal + Baggage -->
-                <div class="row">
-                    <div class="col-md-6">
-                    <label class="form-label">Meal Option</label>
-                    <select name="passengers[{{@index}}][meal]" class="form-select meal-option" data-index="{{@index}}">
-                        <option value="None" {{#if (eq this.meal "None")}}selected{{/if}}>None</option>
-                        <option value="Vegetarian" {{#if (eq this.meal "Vegetarian")}}selected{{/if}}>Vegetarian</option>
-                        <option value="Non-Vegetarian" {{#if (eq this.meal "Non-Vegetarian")}}selected{{/if}}>Non-Vegetarian</option>
-                        <option value="Vegan" {{#if (eq this.meal "Vegan")}}selected{{/if}}>Vegan</option>
-                        <option value="Gluten-Free" {{#if (eq this.meal "Gluten-Free")}}selected{{/if}}>Gluten-Free</option>
-                    </select>
-                    </div>
-                    <div class="col-md-6">
-                    <label class="form-label">Baggage (kg)</label>
-                    <input type="number" class="form-control baggage-input" data-index="{{@index}}" name="passengers[{{@index}}][baggageAllowance]" value="{{this.baggageAllowance}}" min="0">
-                    </div>
-                </div>
-
-                <div class="mt-2 text-muted small seat-info">Seat: {{this.seatNumber}}</div>
-                </div>
             </div>
-          {{/each}}
 
-        </div>
+            <!-- Seat Selection Section -->
+            <h5 class="text-center text-danger mt-4">Seat Selection</h5>
+            <div id="seat-map" class="my-3 d-flex flex-wrap justify-content-center"></div>
 
- <!-- Seat Selection Section -->
-<h5 class="text-center text-danger mt-4">Seat Selection</h5>
-<div id="seat-map" class="my-3 d-flex flex-wrap justify-content-center"></div>
+            <!-- Legend -->
+            <div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
+            <span class="badge bg-danger">First Class</span>
+            <span class="badge bg-light text-dark border border-purple">Business</span>
+            <span class="badge bg-primary">Economy</span>
+            <span class="badge bg-secondary">Occupied</span>
+            <span class="badge bg-warning text-dark">Selected</span>
+            </div>
 
-<!-- Legend -->
-<div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
-  <span class="badge bg-danger">First Class</span>
-  <span class="badge bg-light text-dark border border-purple">Business</span>
-  <span class="badge bg-primary">Economy</span>
-  <span class="badge bg-secondary">Occupied</span>
-  <span class="badge bg-warning text-dark">Selected</span>
-</div>
+            <!-- Price Summary -->
+            <div class="card bg-light p-3 mb-4 summary-card mx-auto">
+            <h5 class="text-danger fw-bold">Updated Price Summary</h5>
 
-        <!-- Price Summary -->
-        <div class="card bg-light p-3 mb-4 summary-card mx-auto">
-        <h5 class="text-danger fw-bold">Updated Price Summary</h5>
+            <p>Base Fare: ₱<span id="baseFare" data-fare="{{outboundFlight.price}}">{{outboundFlight.price}}</span></p>
+            {{#if returnFlight}}
+            <p>Return Fare: ₱<span id="returnFare" data-fare="{{returnFlight.price}}">{{returnFlight.price}}</span></p>
+            {{/if}}
 
-        <p>Base Fare: ₱<span id="baseFare" data-fare="{{outboundFlight.price}}">{{outboundFlight.price}}</span></p>
-        {{#if returnFlight}}
-          <p>Return Fare: ₱<span id="returnFare" data-fare="{{returnFlight.price}}">{{returnFlight.price}}</span></p>
-        {{/if}}
-
-        <p>Meal Total: ₱<span id="mealFee">0</span></p>
-        <p>Baggage Total: ₱<span id="baggageFee">0</span></p>
-        <p>Seat Total: ₱<span id="seatFee">0</span></p>
-        <hr>
-        <h5>Total: ₱<span id="totalPrice">{{reservation.totalPrice}}</span></h5>
-      </div>
+            <p>Meal Total: ₱<span id="mealFee">0</span></p>
+            <p>Baggage Total: ₱<span id="baggageFee">0</span></p>
+            <p>Seat Total: ₱<span id="seatFee">0</span></p>
+            <hr>
+            <h5>Total: ₱<span id="totalPrice">{{reservation.totalPrice}}</span></h5>
+            </div>
 
 
-        <div id="formMessage" class="text-danger mb-3"></div>
+            <div id="formMessage" class="text-danger mb-3"></div>
 
-        <div class="d-flex justify-content-center gap-2">
-          <button type="submit" class="btn btn-danger px-4">Save Changes</button>
-          <a href="/reservations/my-bookings" class="btn btn-outline-secondary px-4">Cancel</a>
-        </div>
-      </form>
+            <div class="d-flex justify-content-center gap-2">
+            <button type="submit" class="btn btn-danger px-4">Save Changes</button>
+            <a href="/reservations/my-bookings" class="btn btn-outline-secondary px-4">Cancel</a>
+            </div>
+        </form>
     </div>
   </div>
 </main>

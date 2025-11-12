@@ -13,30 +13,31 @@
         <link href="/src/css/flight.css" rel="stylesheet" type="text/css" media="all">
         <link href="/src/css/navbar.css" rel="stylesheet" type="text/css" media="all">
         <link href="/src/css/footer.css" rel="stylesheet" type="text/css" media="all">
-
+        <link rel="stylesheet" href="/src/css/book-select.css">
 
         <!-- ⬇️ Put reservation.css LAST so it overrides everything -->
         <link rel="stylesheet" href="/src/css/reservation.css" type="text/css" media="all">
     </head>
     <body class="d-flex flex-column min-vh-100">
-  {{> navbar}}
+        {{> navbar}}
 
-  <main class="flex-grow-1 d-flex flex-column">
-    <div class="flex-grow-1">
-      {{{body}}}
-    </div>
-  </main>
+        <main class="flex-grow-1 d-flex flex-column">
+            <div class="flex-grow-1">
+                {{{body}}}
+            </div>
+        </main>
 
-  {{> footer}}
+        {{> footer}}
 
-  <!-- JS -->
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="/src/javascript/flight.js"></script>
-  <script src="/src/javascript/reservation.js"></script>
-  <script src="/src/javascript/navbar.js"></script>
-  <script src="/src/javascript/footer.js"></script>
-  <script src="/src/javascript/user.js"></script>
-</body>
+        <!-- JS -->
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="/src/javascript/flight.js"></script>
+        <script src="/src/javascript/reservation.js"></script>
+        <script src="/src/javascript/navbar.js"></script>
+        <script src="/src/javascript/footer.js"></script>
+        <script src="/src/javascript/user.js"></script>
+        <script src="/src/javascript/book-select.js"></script>
+    </body>
  
 </html>

@@ -2,7 +2,7 @@
   {{#if (eq title 'Edit Flight')}}
         <option value="{{flight.destination}}" selected>{{flight.destination}}</option>
     {{else}}
-       <option value="">-- Select a city --</option>
+       <option value="" selected disabled>-- Select Destination --</option>
     {{/if}}
 
   <optgroup label="Philippines">

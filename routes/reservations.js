@@ -18,7 +18,6 @@ function isAuthenticated(req, res, next) {
   });  
 }
 
-<<<<<<< HEAD
 /* =============================
    BOOK PAGE - Flight Selection (navbar "Book" link)
 ============================= */
@@ -81,8 +80,6 @@ router.get('/book/:flightId', isAuthenticated, async (req, res) => {
     res.status(500).send('Error loading booking page.');
   }
 });
-=======
->>>>>>> 404c6c99d6ff48ef59f9350780d91a8458e122b3
 
 /* =============================
    CREATE RESERVATION
@@ -114,7 +111,6 @@ router.post("/create", isAuthenticated, async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
 /* =============================
    CONFIRMATION PAGE
 ============================= */
@@ -124,8 +120,6 @@ router.get("/:id/confirmation", isAuthenticated, async (req, res) => {
       .populate("flight")
       .populate("userId")
       .lean();
-=======
-
 
 
 // ✅ Confirmation Route 
@@ -135,7 +129,7 @@ router.get("/:id/confirmation", isAuthenticated, async (req, res) => {
     const reservationDoc = await Reservation.findById(req.params.id)
       .populate("flight")
       .populate("userId");
->>>>>>> 404c6c99d6ff48ef59f9350780d91a8458e122b3
+
 
     if (!reservationDoc) return res.status(404).send("Reservation not found");
 
@@ -164,15 +158,9 @@ router.get("/:id/confirmation", isAuthenticated, async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
 /* =============================
    MY BOOKINGS PAGE
 ============================= */
-=======
-
-
-// GET reservations/my-bookings - render my reservations page
->>>>>>> 404c6c99d6ff48ef59f9350780d91a8458e122b3
 router.get('/my-bookings', isAuthenticated, async (req, res) => {
   try {
     const userId = req.session.user._id;
@@ -219,15 +207,10 @@ router.post('/cancel/:reservationId', isAuthenticated, async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
 /* =============================
    EDIT RESERVATION
 ============================= */
 router.get('/edit/:id', isAuthenticated, async (req, res) => {
-=======
-// GET reservations/:id/edit - Display edit page
-router.get('/:id/edit', isAuthenticated, async (req, res) => {
->>>>>>> 404c6c99d6ff48ef59f9350780d91a8458e122b3
   try {
     const reservation = await Reservation.findById(req.params.id)
       .populate('flight')
@@ -292,14 +275,8 @@ router.get('/:id/edit', isAuthenticated, async (req, res) => {
     res.render('reservations/edit-reservation', {
       title: 'Edit Reservation',
       reservation,
-<<<<<<< HEAD
       passengers: reservation.passengers.length > 0,
       user: req.session.user
-=======
-      outboundFlight,
-      returnFlight,
-      occupiedSeats: JSON.stringify(occupiedSeats || []), // keep valid JSON
->>>>>>> 404c6c99d6ff48ef59f9350780d91a8458e122b3
     });
 
   } catch (err) {
@@ -457,35 +434,9 @@ router.get('/:id', isAuthenticated, async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
 /* =============================
    DELETE RESERVATION (ADMIN ONLY)
 ============================= */
-=======
-// ✅ Update Reservation (POST)
-router.post('/update/:id', isAuthenticated, async (req, res) => {
-  try {
-    const { passengers, totalPrice } = req.body;
-    const updated = await Reservation.findByIdAndUpdate(
-      req.params.id,
-      {
-        passengers,
-        price: totalPrice
-      },
-      { new: true }
-    );
-    res.json({ success: true, updated });
-  } catch (err) {
-    console.error("❌ Error updating reservation:", err);
-    res.status(500).send("Error updating reservation");
-  }
-});
-
-
-/* =============================
-   DELETE - Cancel reservation - IMPORTANT: ONLY ADMINS CAN DELETE RESERVATIONS - USERS CAN ONLY CANCEL
-============================= /
->>>>>>> 404c6c99d6ff48ef59f9350780d91a8458e122b3
 router.post('/delete/:id', isAuthenticated, async (req, res) => {
   try {
     await Reservation.findByIdAndDelete(req.params.id);
@@ -494,6 +445,6 @@ router.post('/delete/:id', isAuthenticated, async (req, res) => {
   } catch (err) {
     res.status(500).send('Error deleting reservation');
   }
-}); */
+});
 
 module.exports = router;

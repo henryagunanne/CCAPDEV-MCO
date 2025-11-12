@@ -147,6 +147,94 @@
 </main>
 
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🧩 Inline Edit Reservation Script Loaded");
+
+  const mealPrice = 150;
+  const bagPrice = 50;
+  const seatPricing = { first: 5000, business: 3000, economy: 1500 };
+  const seatClasses = { 1: "first", 2: "first", 3: "business", 4: "business" };
+  const baseFare = parseInt(document.querySelector("#baseFare").textContent) || 0;
+
+  // --- passengers
+  const passengers = Array.from(document.querySelectorAll("#passengerFields .card")).map(card => ({
+    seat: card.querySelector(".seat-info").textContent.replace("Seat: ", "").trim(),
+    meal: card.querySelector(".meal-option").value,
+    baggage: parseInt(card.querySelector(".baggage-input").value) || 0
+  }));
+
   const occupiedSeats = {{{occupiedSeats}}} || [];
+  const seatMap = document.querySelector("#seat-map");
+  seatMap.innerHTML = "";
+
+  // --- Build seat map
+  for (let row = 1; row <= 10; row++) {
+    ["A","B","C","D","E","F"].forEach(col => {
+      const seatId = `${row}${col}`;
+      const seatClass = seatClasses[row] || "economy";
+      const seatDiv = document.createElement("div");
+      seatDiv.classList.add("seat");
+      const isOccupied = occupiedSeats.includes(seatId);
+      const isSelected = passengers.some(p => p.seat === seatId);
+      seatDiv.textContent = seatId;
+
+      seatDiv.dataset.id = seatId;
+      seatDiv.dataset.price = seatPricing[seatClass];
+      seatDiv.dataset.class = seatClass;
+
+      if (isOccupied) seatDiv.classList.add("occupied");
+      else seatDiv.classList.add(seatClass, "available");
+
+      if (isSelected) seatDiv.classList.add("selected");
+
+      seatDiv.addEventListener("click", e => {
+        if (seatDiv.classList.contains("occupied")) return alert("⚠️ Seat already taken!");
+
+        if (seatDiv.classList.contains("selected")) {
+          seatDiv.classList.remove("selected");
+          const idx = passengers.findIndex(p => p.seat === seatId);
+          if (idx !== -1) {
+            passengers[idx].seat = null;
+            document.querySelectorAll("#passengerFields .seat-info")[idx].textContent = "Seat: None";
+          }
+          return updateSummary();
+        }
+
+        const next = passengers.findIndex(p => !p.seat);
+        if (next === -1) return alert("All passengers already have seats!");
+
+        passengers[next].seat = seatId;
+        seatDiv.classList.add("selected");
+        document.querySelectorAll("#passengerFields .seat-info")[next].textContent = `Seat: ${seatId}`;
+        updateSummary();
+      });
+
+      seatMap.appendChild(seatDiv);
+      if (col === "C") {
+        const aisle = document.createElement("div");
+        aisle.classList.add("aisle");
+        seatMap.appendChild(aisle);
+      }
+    });
+  }
+
+  // --- Summary update
+  function updateSummary() {
+    const mealFee = passengers.reduce((t,p) => t + (p.meal !== "None" ? mealPrice : 0), 0);
+    const bagFee  = passengers.reduce((t,p) => t + (p.baggage * bagPrice || 0), 0);
+    const seatFee = passengers.reduce((t,p) => t + (p.seat ? seatPricing[getSeatClass(p.seat)] : 0), 0);
+    const total = baseFare + mealFee + bagFee + seatFee;
+    document.querySelector("#mealFee").textContent = mealFee;
+    document.querySelector("#baggageFee").textContent = bagFee;
+    document.querySelector("#seatFee").textContent = seatFee;
+    document.querySelector("#totalPrice").textContent = total;
+  }
+
+  function getSeatClass(seatId) {
+    const row = parseInt(seatId);
+    return seatClasses[row] || "economy";
+  }
+
+  updateSummary();
+});
 </script>
-<script src="/src/javascript/edit-reservation.js"></script>

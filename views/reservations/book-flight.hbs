@@ -191,84 +191,131 @@ document.addEventListener("DOMContentLoaded", function () {
   // PASSENGERS
   // ============================================================
   function generatePassengerForms() {
-    passengerFields.innerHTML = "";
-    const count = parseInt(passengerCountInput.value) || 1;
-    for (let i = 1; i <= count; i++) {
-      passengerFields.innerHTML += `
-        <div class="card p-3 mb-3 shadow-sm">
-          <h6 class="fw-bold">Passenger ${i}</h6>
-          <div class="row g-3">
-            <div class="col-md-6"><label>Full Name</label><input class="form-control full-name" required></div>
-            <div class="col-md-3"><label>Age</label><input type="number" class="form-control age" min="0" required></div>
-            <div class="col-md-3"><label>Gender</label>
-              <select class="form-select gender"><option>Male</option><option>Female</option></select></div>
-            <div class="col-md-6"><label>Passport Number</label><input class="form-control passport"></div>
-            <div class="col-md-3"><label>Meal Option</label>
-              <select class="form-select meal-option">
-                <option>None</option><option>Vegetarian</option><option>Halal</option><option>Kids Meal</option>
-              </select></div>
-            <div class="col-md-3"><label>Baggage (kg)</label><input type="number" class="form-control baggage" value="0" min="0"></div>
+  passengerFields.innerHTML = "";
+  const count = parseInt(passengerCountInput.value) || 1;
+  for (let i = 1; i <= count; i++) {
+    passengerFields.innerHTML += `
+      <div class="card my-3 shadow-sm">
+        <div class="card-header bg-light"><strong>Passenger ${i}</strong></div>
+        <div class="card-body">
+          <div class="row mb-2">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-muted">Full Name</label>
+              <input type="text" class="form-control full-name" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-muted">Gender</label>
+              <select class="form-select gender" required>
+                <option value="">Select</option>
+                <option>Male</option>
+                <option>Female</option>
+              </select>
+            </div>
           </div>
-          <small class="seat-info text-muted mt-2">Seat: None</small>
-        </div>`;
-    }
-    selectedSeats = [];
-    generateSeatMap();
-    updateSummary();
+
+          <div class="row mb-2">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-muted">Age</label>
+              <input type="number" class="form-control age" min="0" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-muted">Passport Number</label>
+              <input type="text" class="form-control passport">
+            </div>
+          </div>
+
+          <div class="row mb-2">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-muted">Meal Option</label>
+              <select class="form-select meal-option">
+                <option>None</option>
+                <option>Vegetarian</option>
+                <option>Non-Vegetarian</option>
+                <option>Vegan</option>
+                <option>Gluten-Free</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold text-muted">Baggage (kg)</label>
+              <input type="number" class="form-control baggage" value="0" min="0">
+            </div>
+          </div>
+
+          <div class="mt-2 text-muted small seat-info">Seat: None</div>
+        </div>
+      </div>`;
   }
+  selectedSeats = [];
+  generateSeatMap();
+  updateSummary();
+}
+
   passengerCountInput.addEventListener("change", generatePassengerForms);
 
   // ============================================================
   // SEAT MAP (with seat limit + occupied seats)
   // ============================================================
   function generateSeatMap() {
-    seatMap.innerHTML = "";
-    for (let row = 1; row <= 10; row++) {
-      const rowDiv = document.createElement("div");
-      rowDiv.className = "d-flex justify-content-center";
-      ["A", "B", "C", "D", "E", "F"].forEach(col => {
-        const id = `${row}${col}`;
-        const cls = seatClasses[row] || "economy";
-        const seat = document.createElement("div");
-        seat.className = `seat border text-center m-1 p-2 rounded ${cls}`;
-        seat.dataset.price = seatPricing[cls];
-        seat.dataset.seat = id;
-        seat.textContent = id;
-        seat.style.width = "40px";
-        seat.style.cursor = "pointer";
+  seatMap.innerHTML = "";
+  for (let row = 1; row <= 10; row++) {
+    const rowDiv = document.createElement("div");
+    rowDiv.classList.add("seat-row");
+    rowDiv.style.display = "flex";
+    rowDiv.style.justifyContent = "center";
+    rowDiv.style.marginBottom = "8px";
 
-        if (occupiedSeats.includes(id)) {
-          seat.classList.add("occupied", "bg-secondary", "text-white");
-          seat.style.cursor = "not-allowed";
+    ["A", "B", "C", "D", "E", "F"].forEach((col, index) => {
+      const seatId = `${row}${col}`;
+      const cls = seatClasses[row] || "economy";
+      const seat = document.createElement("div");
+      seat.classList.add("seat", "border", "rounded", "m-1", "p-2", "text-center");
+      seat.textContent = seatId;
+      seat.dataset.seat = seatId;
+      seat.dataset.price = seatPricing[cls];
+
+      if (occupiedSeats.includes(seatId)) {
+        seat.classList.add("occupied", "bg-secondary", "text-white");
+        seat.style.cursor = "not-allowed";
+      } else {
+        seat.classList.add(cls, "available");
+        seat.style.cursor = "pointer";
+      }
+
+      seat.addEventListener("click", () => {
+        if (seat.classList.contains("occupied")) {
+          alert("⚠️ Seat already taken!");
+          return;
         }
 
-        seat.addEventListener("click", function () {
-          if (seat.classList.contains("occupied")) return;
+        const max = parseInt(passengerCountInput.value);
+        if (!seat.classList.contains("selected") && selectedSeats.length >= max) {
+          alert(`You can only select ${max} seat(s).`);
+          return;
+        }
 
-          const max = parseInt(passengerCountInput.value);
-          if (!seat.classList.contains("selected") && selectedSeats.length >= max) {
-            alert(`You can only select ${max} seat(s).`);
-            return;
-          }
-
-          seat.classList.toggle("selected");
-          if (seat.classList.contains("selected")) {
-            seat.classList.add("bg-warning", "text-dark");
-            selectedSeats.push(id);
-          } else {
-            seat.classList.remove("bg-warning", "text-dark");
-            selectedSeats = selectedSeats.filter(s => s !== id);
-          }
-
-          updatePassengerSeats();
-          updateSummary();
-        });
-
-        rowDiv.appendChild(seat);
+        seat.classList.toggle("selected");
+        if (seat.classList.contains("selected")) {
+          seat.classList.add("bg-warning", "text-dark");
+          selectedSeats.push(seatId);
+        } else {
+          seat.classList.remove("bg-warning", "text-dark");
+          selectedSeats = selectedSeats.filter(s => s !== seatId);
+        }
+        updatePassengerSeats();
+        updateSummary();
       });
-      seatMap.appendChild(rowDiv);
-    }
+
+      rowDiv.appendChild(seat);
+      if (index === 2) {
+        const gap = document.createElement("div");
+        gap.style.width = "60px";
+        rowDiv.appendChild(gap);
+      }
+    });
+    seatMap.appendChild(rowDiv);
   }
+}
+
 
   // ============================================================
   // UPDATE PASSENGER SEAT LABELS

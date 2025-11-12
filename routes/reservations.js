@@ -16,7 +16,7 @@ function isAuthenticated(req, res, next) {
   });  
 }
 
-
+//1
 /* =============================
    CREATE
 ============================= */
@@ -29,9 +29,6 @@ router.post("/create", isAuthenticated, async (req, res) => {
     const parsedPassengers = Array.isArray(passengers)
       ? passengers
       : JSON.parse(passengers);
-
-    const seatRow = Number.parseInt(p.seatNumber);
-
 
 console.log("📦 Incoming reservation body:", req.body);
 
@@ -56,9 +53,113 @@ console.log("📦 Incoming reservation body:", req.body);
   }
 });
 
+//2
+/* =============================
+   BOOK PAGE - Show booking form
+============================= */
+router.get('/book/:flightId', isAuthenticated, async (req, res) => {
+  try {
+    const flightId = req.params.flightId;
+    const flight = await Flight.findById(flightId).lean();
+    if (!flight) return res.status(404).send('Flight not found');
+
+    const travelClass = req.query.travelClass || 'Economy';
+    const tripType = req.query.tripType || 'One-Way';
+    const departDate = req.query.depart || '';
+    const returnDate = req.query.return || '';
+
+    // ✅ 1. Fetch reserved seats for this flight
+    const existingReservations = await Reservation.find({
+      flight: flightId,
+      status: { $ne: 'Cancelled' } // exclude cancelled
+    }).lean();
+
+    // Flatten seat numbers from all passengers
+    const occupiedSeats = existingReservations.flatMap(r =>
+      r.passengers.map(p => p.seatNumber)
+    );
+
+    // ✅ 2. Load valid return flights (future only)
+    const departDateObj = new Date(`${flight.departureDate}T00:00:00Z`);
+    const today = new Date();
+    const allReturnFlights = await Flight.find({
+      origin: flight.destination,
+      destination: flight.origin
+    }).lean();
+
+    const returnFlights = allReturnFlights.filter(f => {
+      const fDate = new Date(`${f.departureDate}T00:00:00Z`);
+      return fDate > today && fDate > departDateObj;
+    }).sort((a, b) => new Date(`${a.departureDate}T00:00:00Z`) - new Date(`${b.departureDate}T00:00:00Z`));
+
+    // ✅ 3. Render with occupied seat list
+    res.render('reservations/reservation', {
+      title: 'Book Your Flight',
+      flight,
+      travelClass,
+      tripType,
+      departDate,
+      returnDate,
+      returnFlights,
+      occupiedSeats: JSON.stringify(occupiedSeats) // pass to JS
+    });
+
+  } catch (err) {
+    console.error('Error loading booking page:', err);
+    res.status(500).send('Error loading booking page.');
+  }
+});
+
+/* =============================
+   BOOK PAGE - Select Route & Flights
+============================= */
+router.get('/book-flight', isAuthenticated, async (req, res) => {
+  try {
+    // Get distinct origins and destinations from flights
+    const origins = await Flight.distinct('origin');
+    const destinations = await Flight.distinct('destination');
+
+    // Render booking page
+    res.render('reservations/book-flight', {
+      title: 'Book Your Flight',
+      origins,
+      destinations,
+      occupiedSeats: JSON.stringify([]) // placeholder for safety
+    });
+  } catch (err) {
+    console.error('❌ Error loading Book Flight page:', err);
+    res.status(500).send('Error loading Book Flight page.');
+  }
+});
+
+/* =============================
+   SEARCH FLIGHTS (AJAX)
+============================= */
+router.get('/search', isAuthenticated, async (req, res) => {
+  try {
+    const { origin, destination } = req.query;
+
+    if (!origin || !destination) {
+      return res.status(400).json({ flights: [] });
+    }
+
+    // Find flights that match the route
+    const flights = await Flight.find({ origin, destination }).lean();
+
+    console.log(`✈️ Found ${flights.length} flights from ${origin} → ${destination}`);
+    res.json({ flights });
+  } catch (err) {
+    console.error('❌ Error fetching flights:', err);
+    res.status(500).json({ flights: [] });
+  }
+});
 
 
 
+//3
+/* =============================
+   CONFIRM
+============================= */
 // ✅ Confirmation Route 
 router.get("/:id/confirmation", isAuthenticated, async (req, res) => {
   try {
@@ -93,8 +194,7 @@ router.get("/:id/confirmation", isAuthenticated, async (req, res) => {
   }
 });
 
-
-
+//4
 // GET reservations/my-bookings - render my reservations page
 router.get('/my-bookings', isAuthenticated, async (req, res) => {
   const userId = req.session.user._id;
@@ -115,7 +215,7 @@ router.get('/my-bookings', isAuthenticated, async (req, res) => {
   }
 });
 
-
+//5
 // POST /reservations/cancel/:reservationId - Cancel a reservation
 router.post('/cancel/:reservationId', isAuthenticated, async (req, res) => {
   const { reservationId } = req.params;
@@ -142,6 +242,7 @@ router.post('/cancel/:reservationId', isAuthenticated, async (req, res) => {
   }
 });
 
+//6
 // GET reservations/:id/edit - Display edit page
 router.get('/:id/edit', isAuthenticated, async (req, res) => {
   try {
@@ -219,6 +320,8 @@ router.get('/:id/edit', isAuthenticated, async (req, res) => {
   }
 });
 
+
+//7
       // POST /reservations/:id/edit - Handle edit submission
 router.post('/:id/edit', isAuthenticated, async (req, res) => {
   try {
@@ -295,62 +398,8 @@ router.post('/:id/edit', isAuthenticated, async (req, res) => {
   }
 });
 
-/* =============================
-   BOOK PAGE - Show booking form
-============================= */
-router.get('/book/:flightId', isAuthenticated, async (req, res) => {
-  try {
-    const flightId = req.params.flightId;
-    const flight = await Flight.findById(flightId).lean();
-    if (!flight) return res.status(404).send('Flight not found');
 
-    const travelClass = req.query.travelClass || 'Economy';
-    const tripType = req.query.tripType || 'One-Way';
-    const departDate = req.query.depart || '';
-    const returnDate = req.query.return || '';
-
-    // ✅ 1. Fetch reserved seats for this flight
-    const existingReservations = await Reservation.find({
-      flight: flightId,
-      status: { $ne: 'Cancelled' } // exclude cancelled
-    }).lean();
-
-    // Flatten seat numbers from all passengers
-    const occupiedSeats = existingReservations.flatMap(r =>
-      r.passengers.map(p => p.seatNumber)
-    );
-
-    // ✅ 2. Load valid return flights (future only)
-    const departDateObj = new Date(`${flight.departureDate}T00:00:00Z`);
-    const today = new Date();
-    const allReturnFlights = await Flight.find({
-      origin: flight.destination,
-      destination: flight.origin
-    }).lean();
-
-    const returnFlights = allReturnFlights.filter(f => {
-      const fDate = new Date(`${f.departureDate}T00:00:00Z`);
-      return fDate > today && fDate > departDateObj;
-    }).sort((a, b) => new Date(`${a.departureDate}T00:00:00Z`) - new Date(`${b.departureDate}T00:00:00Z`));
-
-    // ✅ 3. Render with occupied seat list
-    res.render('reservations/reservation', {
-      title: 'Book Your Flight',
-      flight,
-      travelClass,
-      tripType,
-      departDate,
-      returnDate,
-      returnFlights,
-      occupiedSeats: JSON.stringify(occupiedSeats) // pass to JS
-    });
-
-  } catch (err) {
-    console.error('Error loading booking page:', err);
-    res.status(500).send('Error loading booking page.');
-  }
-});
-
+//8
 /* =============================
    READ - View single reservation
 ============================= */
@@ -400,5 +449,8 @@ router.post('/delete/:id', isAuthenticated, async (req, res) => {
     res.status(500).send('Error deleting reservation');
   }
 }); */
+
+
+
 
 module.exports = router;

@@ -287,11 +287,8 @@
       icon.classList.toggle("bi-eye");
       icon.classList.toggle("bi-eye-slash");
     }
-  });
 
-  // ✅ Toggle route row
-  document.addEventListener("click", (e) => {
-    if (e.target.closest(".toggleRoute")) {
+     if (e.target.closest(".toggleRoute")) {
       const btn = e.target.closest(".toggleRoute");
       const id = btn.dataset.id;
       const row = document.getElementById(`route-${id}`);
@@ -302,6 +299,7 @@
       icon.classList.toggle("bi-eye-slash");
     }
   });
+
 
 // ✅ Handle Cancel Reservation
 document.addEventListener("click", async (e) => {

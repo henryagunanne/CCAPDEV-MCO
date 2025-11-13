@@ -124,7 +124,7 @@
                       {{/each}}
                     </div>
                   {{else}}
-                    <div class="text-muted">No passenger details available.</div>
+                    <div class="text-muted">No Routes details available.</div>
                   {{/if}}
                 </div>
               </td>
@@ -224,6 +224,7 @@
   </div>
 </div>
 
+
 <script>
 function showToast(message, success = true) {
   const toastEl = document.getElementById("toast");
@@ -237,7 +238,7 @@ function showToast(message, success = true) {
   new bootstrap.Toast(toastEl, { delay: 2500 }).show();
 }
 
-// ✅ Persist reservation search
+// Persist reservation search
 document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("reservationFilter");
   if (!input) return;
@@ -253,7 +254,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// ✅ Toggle passengers row
+//  Toggle passengers and route row
 document.addEventListener("click", (e) => {
   const toggleBtn = e.target.closest(".togglePassengers, .toggleRoute");
   if (!toggleBtn) return;
@@ -264,14 +265,14 @@ document.addEventListener("click", (e) => {
   const rowType = isPassenger ? "passengers" : "route";
   const row = document.getElementById(`${rowType}-${id}`);
 
-  // 🧹 1️⃣ Close all other opened rows (both passengers and routes)
+  // Close all other opened rows (both passengers and routes)
   document.querySelectorAll(".passengers-row, .route-row").forEach((r) => {
     if (r.id !== `${rowType}-${id}`) {
       r.classList.add("d-none");
     }
   });
 
-  // 🧹 2️⃣ Reset all other icons to closed state
+  // Reset all other icons to closed state
   document.querySelectorAll(".togglePassengers i, .toggleRoute i").forEach((i) => {
     if (i !== icon) {
       i.classList.remove("bi-caret-up");
@@ -279,7 +280,7 @@ document.addEventListener("click", (e) => {
     }
   });
 
-  // 🎯 3️⃣ Toggle the clicked one
+  // Toggle the clicked one
   const isOpen = !row.classList.contains("d-none");
   row.classList.toggle("d-none", isOpen); // close if open, open if closed
   icon.classList.toggle("bi-caret-down", isOpen);
@@ -287,7 +288,7 @@ document.addEventListener("click", (e) => {
 });
 
 
-// ✅ Inline status edit: enter edit mode
+//  Inline status edit: enter edit mode
 document.addEventListener("click", (e) => {
   if (e.target.closest(".editStatusBtn")) {
     const id = e.target.closest(".editStatusBtn").dataset.id;
@@ -296,7 +297,7 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// ✅ Inline status edit: cancel
+//  Inline status edit: cancel
 document.addEventListener("click", (e) => {
   if (e.target.closest(".cancelStatusBtn")) {
     const id = e.target.closest(".cancelStatusBtn").dataset.id;
@@ -305,7 +306,7 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// ✅ Inline status edit: save -> POST /admin/edit-reservation/:reservationId
+//  Inline status edit: save -> POST /admin/edit-reservation/:reservationId
 document.addEventListener("click", async (e) => {
   if (e.target.closest(".saveStatusBtn")) {
     const id = e.target.closest(".saveStatusBtn").dataset.id;
@@ -348,7 +349,7 @@ document.addEventListener("click", async (e) => {
   }
 });
 
-// ✅ Delete reservation (POST)
+//  Delete reservation (POST)
 document.addEventListener("click", async (e) => {
   if (e.target.closest(".deleteReservationBtn")) {
     const id = e.target.closest(".deleteReservationBtn").dataset.id;

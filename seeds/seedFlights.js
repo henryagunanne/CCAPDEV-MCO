@@ -4,9 +4,9 @@ async function seedFlights() {
   const count = await Flight.countDocuments();
 
   if (count === 0) {
-    console.log('🌱 Seeding Flights collection...');
+    console.log('Seeding Flights collection...');
 
-     // 🌍 All available cities
+     // All available cities
   const cities = [
     'Manila (MNL)', 'Cebu (CEB)', 'Davao (DVO)', 'Clark (CRK)',
     'Tokyo (HND)', 'Osaka (KIX)', 'Nagoya (NGO)',
@@ -20,7 +20,7 @@ async function seedFlights() {
     'Shek Kong (VHSK)'
   ];
 
-  // ✈️ Aircraft options
+  // Aircraft options
   const aircrafts = [
     'Airbus A320', 'Airbus A320neo', 'Airbus A321', 'Airbus A321neo',
     'Airbus A330', 'Airbus A350',
@@ -74,9 +74,9 @@ async function seedFlights() {
   }
 
   await Flight.insertMany(flights);
-  console.log(`✅ Seeded ${flights.length} flights.`);
+  console.log(`Seeded ${flights.length} flights.`);
   } else {
-    console.log('🛫 Flights already exist — skipping seeding.');
+    console.log('Flights already exist — skipping seeding.');
   }
 }
 

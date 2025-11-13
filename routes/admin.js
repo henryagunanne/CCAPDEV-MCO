@@ -6,7 +6,7 @@ const User = require('../models/User');
 const Reservation = require('../models/Reservation');
 
 /* ======================================================
- ✅ Admin Access Middleware
+   Admin Access Middleware
 ====================================================== */
 router.use((req, res, next) => {
   if (req.session.user && req.session.user.role === 'Admin') {
@@ -18,15 +18,15 @@ router.use((req, res, next) => {
 });
 
 /* ======================================================
- ✅ DEBUG LOGGER (optional)
+  DEBUG LOGGER (optional)
 ====================================================== */
 router.use((req, res, next) => {
-  console.log("🔥 ADMIN ROUTE:", req.method, req.originalUrl);
+  console.log("ADMIN ROUTE:", req.method, req.originalUrl);
   next();
 });
 
 /* ======================================================
- ✅ Dashboard Route (ALWAYS FIRST)
+  Dashboard Route 
 ====================================================== */
 router.get('/', async (req, res) => {
   try {
@@ -51,7 +51,7 @@ router.get('/', async (req, res) => {
 });
 
 /* ======================================================
- ✅ Edit Flight Page (MUST COME BEFORE /flights/:param)
+   Edit Flight Page
 ====================================================== */
 router.get('/edit/:id', async (req, res) => {
   try {
@@ -71,13 +71,13 @@ router.get('/edit/:id', async (req, res) => {
     });
 
   } catch (err) {
-    console.error("❌ edit route error:", err);
+    console.error("Edit route error:", err);
     res.status(500).render('error/server-error');
   }
 });
 
 /* ======================================================
- ✅ Create Flight Page
+   Create Flight Page
 ====================================================== */
 router.get('/create', (req, res) => {
   res.render('admin/create', {
@@ -87,7 +87,7 @@ router.get('/create', (req, res) => {
 });
 
 /* ======================================================
- ✅ Get All Flights
+  Get All Flights
 ====================================================== */
 router.get('/flights', async (req, res) => {
   try {
@@ -105,13 +105,13 @@ router.get('/flights', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error retrieving flights:', error);
+    console.error('Error retrieving flights:', error);
     res.status(500).json({ message: 'Error retrieving flights' });
   }
 });
 
 /* ======================================================
- ✅ Flight Search by FlightNumber (Place AFTER /edit/:id)
+   Flight Search by FlightNumber
 ====================================================== */
 router.get('/flights/:flightNumber', async (req, res) => {
   try {
@@ -129,13 +129,13 @@ router.get('/flights/:flightNumber', async (req, res) => {
     });
 
   } catch (err) {
-    console.error('❌ search error:', err);
+    console.error('Search error:', err);
     res.status(500).json({ message: 'Error retrieving flight' });
   }
 });
 
 /* ======================================================
- ✅ Create Flight API
+  Create Flight API
 ====================================================== */
 router.post('/create', async (req, res) => {
   try {
@@ -148,13 +148,13 @@ router.post('/create', async (req, res) => {
     });
 
   } catch (err) {
-    console.error('❌ create flight error:', err);
+    console.error('Create flight error:', err);
     res.status(500).json({ message: 'Error creating flight.' });
   }
 });
 
 /* ======================================================
- ✅ Update Flight
+   Update Flight
 ====================================================== */
 router.put('/update/:id', async (req, res) => {
   try {
@@ -171,13 +171,13 @@ router.put('/update/:id', async (req, res) => {
     res.json({ message: 'Flight updated successfully.', flight: updatedFlight });
 
   } catch (err) {
-    console.error('❌ update flight error:', err);
+    console.error('Update flight error:', err);
     res.status(500).json({ message: 'Error updating flight.' });
   }
 });
 
 /* ======================================================
- ✅ Delete Flight
+   Delete Flight
 ====================================================== */
 router.delete('/delete/:id', async (req, res) => {
   try {
@@ -190,13 +190,13 @@ router.delete('/delete/:id', async (req, res) => {
     res.json({ message: 'Flight deleted successfully.' });
 
   } catch (err) {
-    console.error('❌ delete flight error:', err);
+    console.error('Delete flight error:', err);
     res.status(500).json({ message: 'Error deleting flight.' });
   }
 });
 
 /* ======================================================
- ✅ Reservations
+   Reservations
 ====================================================== */
 router.get('/reservations', async (req, res) => {
   try {
@@ -211,7 +211,7 @@ router.get('/reservations', async (req, res) => {
       reservations
     });
   } catch (error) {
-    console.error('❌ Error retrieving reservations:', error);
+    console.error('Error retrieving reservations:', error);
     res.status(500).json({ message: 'Error retrieving reservations', error });
   }
 });
@@ -238,7 +238,7 @@ router.post('/edit-reservation/:reservationId', async (req, res) => {
       updatedReservation
     });
   }catch (err) {
-    console.error('❌ Reservation update error:', err);
+    console.error('Reservation update error:', err);
     res.status(500).send('Server error during Reservation update');
   }
 });
@@ -255,7 +255,7 @@ router.post('/delete-reservation/:reservationId', async (req, res) => {
 
     res.json({ success: true });
   } catch (error) {
-    console.error('❌ Reservation deletion error:', err);
+    console.error('Reservation deletion error:', err);
     res.status(500).send('Server error during Reservation deletion');
   }
 });

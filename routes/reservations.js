@@ -2,8 +2,8 @@
 const express = require('express');
 const Reservation = require('../models/Reservation');
 const Flight = require('../models/Flight');
-const User = require('../models/User');
 const router = express.Router();
+
 
 // Helper middleware to check if user is authenticated
 function isAuthenticated(req, res, next) {
@@ -151,7 +151,7 @@ router.get('/search', isAuthenticated, async (req, res) => {
     console.log(`✈️ Found ${flights.length} flights from ${origin} → ${destination}`);
     res.json({ flights });
   } catch (err) {
-    console.error('❌ Error fetching flights:', err);
+    console.error('Error fetching flights:', err);
     res.status(500).json({ flights: [] });
   }
 });
@@ -191,7 +191,7 @@ router.get("/:id/confirmation", isAuthenticated, async (req, res) => {
       reservation 
     });
   } catch (err) {
-    console.error("❌ Error loading reservation:", err);
+    console.error("Error loading reservation:", err);
     res.status(500).send("Error loading reservation");
   }
 });
@@ -297,7 +297,7 @@ router.get('/:id/edit', isAuthenticated, async (req, res) => {
         return shuffled.slice(0, count);
       }
 
-      // 🎟 Get passenger seats from this reservation
+      // Get passenger seats from this reservation
       const currentPassengerSeats = reservation.passengers.map(p => p.seatNumber);
 
       // Generate demo occupied seats without conflicting with user seats
@@ -401,7 +401,7 @@ router.post('/:id/edit', isAuthenticated, async (req, res) => {
 });
 
 
-      router.get("/seats/:flightId", async (req, res) => {
+router.get("/seats/:flightId", async (req, res) => {
   try {
     const reservations = await Reservation.find({ flight: req.params.flightId });
 

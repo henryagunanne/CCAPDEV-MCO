@@ -8,36 +8,21 @@ const MongoStore = require('connect-mongo'); // MongoDB session store
 const path = require('path');
 const seedPopularFlights = require('./seeds/seedPopularFlights'); // Seed popular flights
 const seedFlights = require('./seeds/seedFlights'); // Seed flights
-const seedUsers = require('./seeds/seedUsers');
-const seedReservations = require('./seeds/seedReservations');
+const seedUsers = require('./seeds/seedUsers'); // Seed Users
+const seedReservations = require('./seeds/seedReservations'); // Seed Reservations
 const PORT = 3000;  // Server port
-
-const hbs = exphbs.create({
-  helpers: {
-    formatDate: function(dateString) {
-      if (!dateString) return '';
-      const date = new Date(dateString);
-      const options = { month: 'short', day: 'numeric', year: 'numeric' };
-      return date.toLocaleDateString('en-US', options);
-    },
-    eq: (a, b) => a === b
-  }
-});
-app.engine('hbs', hbs.engine);
-app.set('view engine', 'hbs');
-
 
 
 // Connect to MongoDB
 mongoose.connect('mongodb://127.0.0.1:27017/airlineDB')
 .then(async () => {
     console.log('✅ MongoDB connected.');
-    await seedFlights(); // 🌱 seeds flights if empty
-    await seedPopularFlights(); // 🌱 seed popular flights if empty
-    await seedUsers(); // 🌱 seed users if empty
-    await seedReservations(); // 🌱 seed reservations if empty
+    await seedFlights(); // seeds flights if empty
+    await seedPopularFlights(); // seed popular flights if empty
+    await seedUsers(); // seed users if empty
+    await seedReservations(); // seed reservations if empty
   })
-.catch(err => console.error('❌ MongoDB connection error:', err));
+.catch(err => console.error('MongoDB connection error:', err));
 
 
 // Configure Handlebars and handlebars helpers
@@ -94,16 +79,18 @@ app.engine('hbs', exphbs.engine({
     or: (...args) => args.slice(0, -1).some(Boolean),
     not: (a) => !a,
 
-    // 🧩 Equality helper (used in reservation.hbs)
+    // Equality helper (used in reservation.hbs)
     ifEquals: function (a, b, options) {
       return a === b ? options.fn(this) : options.inverse(this);
     },
 
+    // gets the current date in string format
     currentDate: function () {
       const now = new Date();
       return now.toISOString().split('T')[0]; // → "2025-11-11"
     },
     
+    // fuction to check if the flights are upcoming (Used in myBookings.hbs)
     isUpcoming: function (flights) {
       if (!flights || flights.length === 0) return false;
 
@@ -116,6 +103,7 @@ app.engine('hbs', exphbs.engine({
 }
 
 }));
+
 app.set('view engine', 'hbs');  // Set Handlebars as the view engine
 app.set('views', './views'); // Set views directory
 
@@ -123,8 +111,7 @@ app.set('views', './views'); // Set views directory
 // Middleware
 app.use(express.urlencoded({ extended: true }));    // Parse URL-encoded bodies
 app.use(express.json());    // Parse JSON bodies
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.static('public'));  // Serve static files
+app.use(express.static(path.join(__dirname, 'public')));  // Serve static files
 
 
 // Session management

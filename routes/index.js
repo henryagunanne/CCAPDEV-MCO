@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const PopularFlight = require('../models/popularFlight'); // ✅ lowercase file name
+const PopularFlight = require('../models/popularFlight');
 
 // Homepage route — loads dynamic Popular Flights
 router.get('/', async (req, res) => {
   try {
     // Get all popular flights and populate full flight info
     const popularFlights = await PopularFlight.find()
-      .populate('flight')   // ✅ pulls data from Flight collection
+      .populate('flight')  
       .lean();
 
     res.render('flights/search', {
@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
       popularFlights
     });
   } catch (error) {
-    console.error('❌ Error loading flights:', error);
+    console.error('Error loading flights:', error);
     res.status(500).send('Server Error');
   }
 });

@@ -41,7 +41,7 @@ router.post('/register', async (req, res) => {
       await newUser.save();
       res.json({ success: true });
     } catch (err) {
-      console.error('❌ Registration error:', err);
+      console.error('Registration error:', err);
       res.status(500).send('Server error during registration');
     }
 });
@@ -71,7 +71,7 @@ router.post('/login', async (req, res) => {
       });
 
     } catch (err) {
-      console.error('❌ Login error:', err);
+      console.error('Login error:', err);
       res.status(500).send('Server error during login');
     }
 });
@@ -80,7 +80,7 @@ router.post('/login', async (req, res) => {
 router.post('/logout', isAuthenticated, (req, res) => {
     req.session.destroy(err => {
       if (err) {
-        console.error('❌ Logout error:', err);
+        console.error('Logout error:', err);
         return res.status(500).send('Server error during logout');
       }
       res.json({ success: true });
@@ -123,7 +123,7 @@ router.post('/edit/:userId', isAuthenticated, async (req, res) => {
         user: updatedUser 
       });
     } catch (err) {
-      console.error('❌ Profile update error:', err);
+      console.error('Profile update error:', err);
       res.status(500).send('Server error during profile update');
     }
 });
@@ -162,7 +162,7 @@ router.post('/change-password/:userId', isAuthenticated, async (req, res) => {
   
       res.json({ success: true });
     } catch (err) {
-      console.error('❌ Password change error:', err);
+      console.error('Password change error:', err);
       res.status(500).send('Server error during password change');
     }
 });
@@ -181,12 +181,12 @@ router.post('/delete/:userId', isAuthenticated, async (req, res) => {
       // Destroy session after account deletion
       req.session.destroy(err => {
         if (err) {
-          console.error('❌ Session destruction error:', err);
+          console.error('Session destruction error:', err);
         }
         res.json({ success: true });
       });
     } catch (err) {
-      console.error('❌ Account deletion error:', err);
+      console.error('Account deletion error:', err);
       res.status(500).send('Server error during account deletion');
     }
 });
@@ -207,7 +207,7 @@ router.post('/forgot-password', async (req, res) => {
       message: 'Password reset link sent to email (simulated)' 
     });
   } catch (err) {
-    console.error('❌ Forgot password error:', err);
+    console.error('Forgot password error:', err);
     res.status(500).send('Server error during password reset');
   }
 });

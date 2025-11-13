@@ -44,6 +44,7 @@ jQuery (function() {
     });
   });
 
+
   // FLIGHT LIST PAGE JS
   /* ======== Toast helper (jQuery) ======== */
   function showToast(message, success = true) {
@@ -102,7 +103,7 @@ jQuery (function() {
     $('#flightTable').append(rows);
   });
 
-  // create.hbs JS
+  // ===== create.hbs JS =======
   // Clone all origin options into destination
   $('#destination').html($('#origin').html());
 
@@ -122,6 +123,7 @@ jQuery (function() {
       });
     }
   });
+
 
   /* Handle flight creation */
   $('#createFlightForm').on('submit', function(e) {
@@ -170,6 +172,7 @@ jQuery (function() {
     });
   });
 
+  
   // handle logout
   $('.logoutButton').on('click', function() {
     $.ajax({

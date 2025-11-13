@@ -1,4 +1,4 @@
-const PopularFlight = require('../models/popularFlight'); // ✅ lowercase
+const PopularFlight = require('../models/popularFlight');
 const Flight = require('../models/Flight');
 
 async function seedPopularFlights() {
@@ -14,10 +14,10 @@ async function seedPopularFlights() {
         'AA1029', 'AA1052', 'AA1056', 'AA1064',
         'AA1076', 'AA1089', 'AA1320', 'AA1205'
       ]}
-    }).lean(); // ✅ lean() for faster access
+    }).lean(); 
 
     if (flights.length === 0) {
-      console.log('⚠️ No matching flights found in the Flight collection.');
+      console.log('No matching flights found in the Flight collection.');
       return;
     }
 
@@ -120,9 +120,9 @@ async function seedPopularFlights() {
       }
     ]);
 
-    console.log('✅ Popular Flights successfully seeded!');
+    console.log('Popular Flights successfully seeded!');
   } else {
-    console.log('🛫 Popular Flights already exist — skipping seeding.');
+    console.log('Popular Flights already exist — skipping seeding.');
   }
 }
 

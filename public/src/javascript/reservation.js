@@ -1,5 +1,5 @@
 $(document).ready(function () {
-  // 🧭 Get travel class from hidden input (Economy / Business / First)
+  // Get travel class from hidden input (Economy / Business / First)
   const travelClass = ($("#travelClass").val() || "Economy").toLowerCase();
 
   const baseFare = parseInt($("#baseFare").text());
@@ -137,7 +137,7 @@ $(document).on("click", ".seat.available, .seat.selected", function () {
 
     // 🧩 Update travelClass hidden input based on clicked seat
   $("#travelClass").val(seatClass.charAt(0).toUpperCase() + seatClass.slice(1));
-  console.log("✅ Travel Class Selected:", $("#travelClass").val());
+  console.log("Travel Class Selected:", $("#travelClass").val());
 
 
   // If already selected, unselect it
@@ -221,7 +221,7 @@ $(document).on("click", ".seat.available, .seat.selected", function () {
       passengerData.push(passenger);
     });
 
-    console.log("📦 Passenger Data:", passengerData);
+    console.log("Passenger Data:", passengerData);
 
 
     // Compute total from summary

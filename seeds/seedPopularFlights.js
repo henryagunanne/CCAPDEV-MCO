@@ -10,9 +10,9 @@ async function seedPopularFlights() {
     // Fetch flights that match your seed criteria
     const flights = await Flight.find({
       flightNumber: { $in: [
-        'AA1001', 'AA1002', 'AA1003', 'AA1004',
-        'AA2015', 'AA1021', 'AA1022', 'AA1023',
-        'AA1005', 'AA1020', 'AA2010', 'AA1009'
+        'AA1033', 'AA1036', 'AA1013', 'AA1005',
+        'AA1029', 'AA1052', 'AA1056', 'AA1064',
+        'AA1076', 'AA1089', 'AA1320', 'AA1205'
       ]}
     }).lean(); // ✅ lean() for faster access
 
@@ -23,7 +23,7 @@ async function seedPopularFlights() {
 
     await PopularFlight.insertMany([
       {
-        flight: flights.find(f => f.flightNumber === 'AA1001')._id,
+        flight: flights.find(f => f.flightNumber === 'AA1033')._id,
         startDate: new Date('2025-11-10'),
         endDate: new Date('2025-12-10'),
         travelClass: 'Economy',
@@ -31,7 +31,7 @@ async function seedPopularFlights() {
         image: '/assets/cities/hongkong.png'
       },
       {
-        flight: flights.find(f => f.flightNumber === 'AA1002')._id,
+        flight: flights.find(f => f.flightNumber === 'AA1320')._id,
         startDate: new Date('2025-11-15'),
         endDate: new Date('2025-12-15'),
         travelClass: 'Economy',
@@ -39,7 +39,7 @@ async function seedPopularFlights() {
         image: '/assets/cities/singapore.png'
       },
       {
-        flight: flights.find(f => f.flightNumber === 'AA1003')._id,
+        flight: flights.find(f => f.flightNumber === 'AA1089')._id,
         startDate: new Date('2025-11-20'),
         endDate: new Date('2025-12-20'),
         travelClass: 'Economy',
@@ -47,7 +47,7 @@ async function seedPopularFlights() {
         image: '/assets/cities/thailand.png'
       },
       {
-        flight: flights.find(f => f.flightNumber === 'AA1004')._id,
+        flight: flights.find(f => f.flightNumber === 'AA1013')._id,
         startDate: new Date('2025-11-25'),
         endDate: new Date('2025-12-25'),
         travelClass: 'Premium Economy',
@@ -55,7 +55,7 @@ async function seedPopularFlights() {
         image: '/assets/cities/tokyo.png'
       },
       {
-        flight: flights.find(f => f.flightNumber === 'AA2015')._id,
+        flight: flights.find(f => f.flightNumber === 'AA1205')._id,
         startDate: new Date('2025-11-05'),
         endDate: new Date('2025-12-05'),
         travelClass: 'Economy',
@@ -63,7 +63,7 @@ async function seedPopularFlights() {
         image: '/assets/cities/Malaysia.png'
       },
       {
-        flight: flights.find(f => f.flightNumber === 'AA1021')._id,
+        flight: flights.find(f => f.flightNumber === 'AA1076')._id,
         startDate: new Date('2025-11-12'),
         endDate: new Date('2025-12-12'),
         travelClass: 'Economy',
@@ -71,7 +71,7 @@ async function seedPopularFlights() {
         image: '/assets/cities/seoul.png'
       },
       {
-        flight: flights.find(f => f.flightNumber === 'AA1022')._id,
+        flight: flights.find(f => f.flightNumber === 'AA1056')._id,
         startDate: new Date('2025-11-18'),
         endDate: new Date('2025-12-18'),
         travelClass: 'Economy',
@@ -79,7 +79,7 @@ async function seedPopularFlights() {
         image: '/assets/cities/Ho Chi Minh City.png'
       },
       {
-        flight: flights.find(f => f.flightNumber === 'AA1023')._id,
+        flight: flights.find(f => f.flightNumber === 'AA1064')._id,
         startDate: new Date('2025-11-22'),
         endDate: new Date('2025-12-22'),
         travelClass: 'Economy',
@@ -87,7 +87,7 @@ async function seedPopularFlights() {
         image: '/assets/cities/tapei.png'
       },
       {
-        flight: flights.find(f => f.flightNumber === 'AA1005')._id,
+        flight: flights.find(f => f.flightNumber === 'AA1052')._id,
         startDate: new Date('2025-11-11'),
         endDate: new Date('2025-12-15'),
         travelClass: 'Business',
@@ -95,7 +95,7 @@ async function seedPopularFlights() {
         image: '/assets/cities/hanoi.png'
       },
       {
-        flight: flights.find(f => f.flightNumber === 'AA1020')._id,
+        flight: flights.find(f => f.flightNumber === 'AA1036')._id,
         startDate: new Date('2025-11-22'),
         endDate: new Date('2025-12-01'),
         travelClass: 'Business',
@@ -103,7 +103,7 @@ async function seedPopularFlights() {
         image: '/assets/cities/australia.jpg'
       },
       {
-        flight: flights.find(f => f.flightNumber === 'AA2010')._id,
+        flight: flights.find(f => f.flightNumber === 'AA1005')._id,
         startDate: new Date('2025-11-30'),
         endDate: new Date('2025-12-18'),
         travelClass: 'First',
@@ -111,7 +111,7 @@ async function seedPopularFlights() {
         image: '/assets/cities/davao.jpg'
       },
       {
-        flight: flights.find(f => f.flightNumber === 'AA1009')._id,
+        flight: flights.find(f => f.flightNumber === 'AA1029')._id,
         startDate: new Date('2025-11-29'),
         endDate: new Date('2025-12-09'),
         travelClass: 'Economy',

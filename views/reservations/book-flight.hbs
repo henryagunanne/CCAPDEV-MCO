@@ -68,6 +68,8 @@
       <!-- Step 3: Passenger + Seat Selection -->
       <form id="reservationForm" action="/reservations/create" method="POST" class="d-none mt-4">
         <input type="hidden" id="passengersData" name="passengers">
+        <input type="hidden" id="travelClass" name="travelClass" value="Economy">
+
 
         <div class="row mb-3">
           <div class="col-md-4">
@@ -286,28 +288,39 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       seat.addEventListener("click", () => {
-        if (seat.classList.contains("occupied")) {
-          alert("⚠️ Seat already taken!");
-          return;
-        }
+  if (seat.classList.contains("occupied")) {
+    alert("⚠️ Seat already taken!");
+    return;
+  }
 
-        const max = parseInt(passengerCountInput.value);
-        if (!seat.classList.contains("selected") && selectedSeats.length >= max) {
-          alert(`You can only select ${max} seat(s).`);
-          return;
-        }
+  const max = parseInt(passengerCountInput.value);
+  if (!seat.classList.contains("selected") && selectedSeats.length >= max) {
+    alert(`You can only select ${max} seat(s).`);
+    return;
+  }
 
-        seat.classList.toggle("selected");
-        if (seat.classList.contains("selected")) {
-          seat.classList.add("bg-warning", "text-dark");
-          selectedSeats.push(seatId);
-        } else {
-          seat.classList.remove("bg-warning", "text-dark");
-          selectedSeats = selectedSeats.filter(s => s !== seatId);
-        }
-        updatePassengerSeats();
-        updateSummary();
-      });
+  seat.classList.toggle("selected");
+  if (seat.classList.contains("selected")) {
+    seat.classList.add("bg-warning", "text-dark");
+    selectedSeats.push(seatId);
+
+    //  UPDATE TRAVEL CLASS
+    const row = parseInt(seatId);
+    const tc = document.getElementById("travelClass");
+
+    if (row <= 2) tc.value = "First";
+    else if (row <= 4) tc.value = "Business";
+    else tc.value = "Economy";
+
+  } else {
+    seat.classList.remove("bg-warning", "text-dark");
+    selectedSeats = selectedSeats.filter(s => s !== seatId);
+  }
+
+  updatePassengerSeats();
+  updateSummary();
+});
+
 
       rowDiv.appendChild(seat);
       if (index === 2) {
@@ -391,7 +404,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const payload = {
       flight: outboundFlight.value,
       returnFlight: returnFlight.value || null,
-      travelClass: "Economy",
+      travelClass: document.getElementById("travelClass").value,  
       tripType: tripType.value,
       passengers,
       totalAmount: parseInt(totalPriceEl.textContent) || 0,

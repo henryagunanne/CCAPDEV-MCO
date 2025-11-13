@@ -6,495 +6,75 @@ async function seedFlights() {
   if (count === 0) {
     console.log('🌱 Seeding Flights collection...');
 
-    const baseFlights =[
-      {
-        flightNumber: 'AA1001',
-        origin: 'Manila (MNL)',
-        destination: 'Hong Kong (HKG)',
-        departureDate: '2025-11-20',
-        departureTime: '08:30',
-        arrivalTime: '10:45',
-        aircraft: 'Airbus A321',
-        seatCapacity: 180,
-        price: 148,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA1002',
-        origin: 'Manila (MNL)',
-        destination: 'Singapore (SIN)',
-        departureDate: '2025-11-21',
-        departureTime: '09:15',
-        arrivalTime: '12:45',
-        aircraft: 'Airbus A320',
-        seatCapacity: 186,
-        price: 99,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA1003',
-        origin: 'Manila (MNL)',
-        destination: 'Bangkok (BKK)',
-        departureDate: '2025-11-22',
-        departureTime: '10:30',
-        arrivalTime: '13:45',
-        aircraft: 'Airbus A320neo',
-        seatCapacity: 190,
-        price: 188,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA1004',
-        origin: 'Manila (MNL)',
-        destination: 'Tokyo (HND)',
-        departureDate: '2025-11-23',
-        departureTime: '07:00',
-        arrivalTime: '12:00',
-        aircraft: 'Boeing 787',
-        seatCapacity: 250,
-        price: 200,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA1005',
-        origin: 'Manila (MNL)',
-        destination: 'Hanoi (HAN)',
-        departureDate: '2025-11-24',
-        departureTime: '22:30',
-        arrivalTime: '08:30',
-        aircraft: 'Boeing 777',
-        seatCapacity: 300,
-        price: 350,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA1006',
-        origin: 'Manila (MNL)',
-        destination: 'Brisbane (BNE)',
-        departureDate: '2025-11-25',
-        departureTime: '11:15',
-        arrivalTime: '15:00',
-        aircraft: 'Airbus A330',        
-        seatCapacity: 260,
-        price: 175,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA1007',
-        origin: 'Manila (MNL)',
-        destination: 'Ho Chi Minh City (SGN)',
-        departureDate: '2025-11-26',
-        departureTime: '13:00',
-        arrivalTime: '15:45',
-        aircraft: 'Airbus A320',        
-        seatCapacity: 180,
-        price: 120,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA1008',
-        origin: 'Manila (MNL)',
-        destination: 'Taipei (TPE)',
-        departureDate: '2025-11-27',
-        departureTime: '09:30',
-        arrivalTime: '11:45',
-        aircraft: 'Airbus A321neo',        
-        seatCapacity: 200,
-        price: 250,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA1009',
-        origin: 'Manila (MNL)',
-        destination: 'Shanghai (PVG)',
-        departureDate: '2025-11-28',
-        departureTime: '06:30',
-        arrivalTime: '10:30',
-        aircraft: 'Boeing 737 MAX',
-        seatCapacity: 190,
-        price: 220,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA1010',
-        origin: 'Manila (MNL)',
-        destination: 'Melbourne (MEL)',
-        departureDate: '2025-11-29',
-        departureTime: '20:00',
-        arrivalTime: '06:30',
-        aircraft: 'Boeing 787',        
-        seatCapacity: 280,
-        price: 420,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA1011',
-        origin: 'Manila (MNL)',
-        destination: 'Cebu (CEB)',
-        departureDate: '2025-11-30',
-        departureTime: '14:00',
-        arrivalTime: '15:25',
-        aircraft: 'Airbus A320',        
-        seatCapacity: 180,
-        price: 85,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA1012',
-        origin: 'Manila (MNL)',
-        destination: 'Davao (DVO)',
-        departureDate: '2025-12-01',
-        departureTime: '07:45',
-        arrivalTime: '09:30',
-        aircraft: 'Airbus A320neo',       
-        seatCapacity: 180,
-        price: 95,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA1013',
-        origin: 'Manila (MNL)',
-        destination: 'Beijing (PEK)',
-        departureDate: '2025-12-02',
-        departureTime: '08:00',
-        arrivalTime: '12:30',
-        aircraft: 'Boeing 737 MAX',        
-        seatCapacity: 200,
-        price: 210,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA1014',
-        origin: 'Manila (MNL)',
-        destination: 'Osaka (KIX)',
-        departureDate: '2025-12-03',
-        departureTime: '09:45',
-        arrivalTime: '14:00',
-        aircraft: 'Boeing 787',       
-        seatCapacity: 250,
-        price: 230,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA1015',
-        origin: 'Manila (MNL)',
-        destination: 'Nagoya (NGO)',
-        departureDate: '2025-12-04',
-        departureTime: '10:30',
-        arrivalTime: '14:45',
-        aircraft: 'Airbus A321neo',        
-        seatCapacity: 200,
-        price: 215,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA1016',
-        origin: 'Manila (MNL)',
-        destination: 'Davao (DVO)',
-        departureDate: '2025-10-25',
-        departureTime: '08:00',
-        arrivalTime: '10:30',
-        aircraft: 'Airbus A320',        
-        seatCapacity: 180,
-        price: 148,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA1017',
-        origin: 'Manila (MNL)',
-        destination: 'Clark (CRK)',
-        departureDate: '2025-10-25',
-        departureTime: '09:30',
-        arrivalTime: '12:30',
-        aircraft: 'Boeing 737 MAX',        
-        seatCapacity: 170,
-        price: 99,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA1018',
-        origin: 'Manila (MNL)',
-        destination: 'Bangkok (BKK)',
-        departureDate: '2025-10-31',
-        departureTime: '07:15',
-        arrivalTime: '10:00',
-        aircraft: 'Airbus A320',        
-        seatCapacity: 180,
-        price: 188,
-        status: 'On Time'
-      },
-      {
-        flightNumber: 'AA1019',
-        origin: 'Manila (MNL)',
-        destination: 'Shek Kong (VHSK)',
-        departureDate: '2025-10-30',
-        departureTime: '08:00',
-        arrivalTime: '13:00',
-        aircraft: 'Boeing 787 Dreamliner',        
-        seatCapacity: 240,
-        price: 200,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA1020',
-        origin: 'Manila (MNL)',
-        destination: 'Sydney (SYD)',
-        departureDate: '2025-11-09',
-        departureTime: '23:00',
-        arrivalTime: '09:30',
-        aircraft: 'Airbus A350',
-        seatCapacity: 300,
-        price: 350,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA1021',
-        origin: 'Manila (MNL)',
-        destination: 'Seoul (ICN)',
-        departureDate: '2025-11-03',
-        departureTime: '07:15',
-        arrivalTime: '11:00',
-        aircraft: 'Airbus A321',
-        seatCapacity: 200,
-        price: 175,
-        status: 'On Time'
-      },
-      {
-        flightNumber: 'AA1022',
-        origin: 'Manila (MNL)',
-        destination: 'Ho Chi Minh City (SGN)',
-        departureDate: '2025-12-01',
-        departureTime: '10:00',
-        arrivalTime: '13:00',
-        aircraft: 'Airbus A320',
-        seatCapacity: 190,
-        price: 120,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA1023',
-        origin: 'Manila (MNL)',
-        destination: 'Taipei (TPE)',
-        departureDate: '2025-11-15',
-        departureTime: '08:00',
-        arrivalTime: '10:30',
-        aircraft: 'Boeing 737 MAX',
-        seatCapacity: 180,
-        price: 250,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA2001',
-        origin: 'Manila (MNL)',
-        destination: 'Tokyo (HND)',
-        departureDate: '2025-11-01',
-        departureTime: '08:00',
-        arrivalTime: '13:00',
-        aircraft: 'Airbus A321',        
-        seatCapacity: 180,
-        price: 200,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA2002',
-        origin: 'Tokyo (HND)',
-        destination: 'Manila (MNL)',
-        departureDate: '2025-11-06',
-        departureTime: '09:30',
-        arrivalTime: '14:15',
-        aircraft: 'Airbus A321',        
-        seatCapacity: 180,
-        price: 205,
-        status: 'On Time'
-      },
-      {
-        flightNumber: 'AA2003',
-        origin: 'Manila (MNL)',
-        destination: 'Singapore (SIN)',
-        departureDate: '2025-11-03',
-        departureTime: '09:30',
-        arrivalTime: '12:45',
-        aircraft: 'Boeing 737 MAX',        
-        seatCapacity: 160,
-        price: 180,
-        status: 'On Time'
-      },
-      {
-        flightNumber: 'AA2004',
-        origin: 'Manila (MNL)',
-        destination: 'Osaka (KIX)',
-        departureDate: '2025-11-05',
-        departureTime: '07:15',
-        arrivalTime: '10:45',
-        aircraft: 'Airbus A320',       
-        seatCapacity: 170,
-        price: 188,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA2005',
-        origin: 'Manila (MNL)',
-        destination: 'Hong Kong (HKG)',
-        departureDate: '2025-11-07',
-        departureTime: '10:00',
-        arrivalTime: '12:30',
-        aircraft: 'Airbus A320',        
-        seatCapacity: 150,
-        price: 148,
-        status: 'On Time'
-      },
-      {
-        flightNumber: 'AA2006',
-        origin: 'Manila (MNL)',
-        destination: 'Sydney (SYD)',
-        departureDate: '2025-11-09',
-        departureTime: '23:00',
-        arrivalTime: '09:30',
-        aircraft: 'Airbus A350',        
-        seatCapacity: 280,
-        price: 350,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA2007',
-        origin: 'Manila (MNL)',
-        destination: 'Seoul (ICN)',
-        departureDate: '2025-11-12',
-        departureTime: '07:15',
-        arrivalTime: '11:00',
-        aircraft: 'Boeing 787 Dreamliner',        
-        seatCapacity: 220,
-        price: 175,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA2008',
-        origin: 'Manila (MNL)',
-        destination: 'Busan (PUS)',
-        departureDate: '2025-11-15',
-        departureTime: '10:00',
-        arrivalTime: '13:30',
-        aircraft: 'Airbus A321',        
-        seatCapacity: 190,
-        price: 120,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA2009',
-        origin: 'Manila (MNL)',
-        destination: 'Kaohsiung (KHH)',
-        departureDate: '2025-11-17',
-        departureTime: '08:00',
-        arrivalTime: '10:00',
-        aircraft: 'Airbus A320',        
-        seatCapacity: 160,
-        price: 250,
-        status: 'On Time'
-      },
-      {
-        flightNumber: 'AA2010',
-        origin: 'Manila (MNL)',
-        destination: 'Davao (DVO)',
-        departureDate: '2025-11-20',
-        departureTime: '21:00',
-        arrivalTime: '04:30',
-        aircraft: 'Boeing 777',
-        seatCapacity: 300,
-        price: 950,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA2011',
-        origin: 'Manila (MNL)',
-        destination: 'Cebu (CEB)',
-        departureDate: '2025-11-22',
-        departureTime: '08:00',
-        arrivalTime: '09:30',
-        aircraft: 'Airbus A320',        
-        seatCapacity: 180,
-        price: 120,
-        status: 'On Time'
-      },
-      {
-        flightNumber: 'AA2012',
-        origin: 'Cebu (CEB)',
-        destination: 'Manila (MNL)',
-        departureDate: '2025-11-22',
-        departureTime: '10:30',
-        arrivalTime: '12:00',
-        aircraft: 'Airbus A320',       
-        seatCapacity: 180,
-        price: 125,
-        status: 'On Time'
-      },
-      {
-        flightNumber: 'AA2013',
-        origin: 'Manila (MNL)',
-        destination: 'Chiang Mai (CNX)',
-        departureDate: '2025-11-25',
-        departureTime: '22:30',
-        arrivalTime: '15:00',
-        aircraft: 'Boeing 777',       
-        seatCapacity: 320,
-        price: 980,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA2014',
-        origin: 'Manila (MNL)',
-        destination: 'Seletar (XSP)',
-        departureDate: '2025-11-27',
-        departureTime: '23:30',
-        arrivalTime: '13:30',
-        aircraft: 'Airbus A350',       
-        seatCapacity: 300,
-        price: 1100,
-        status: 'Scheduled'
-      },
-      {
-        flightNumber: 'AA2015',
-        origin: 'Manila (MNL)',
-        destination: 'Kuala Lumpur (KUL)',
-        departureDate: '2025-11-30',
-        departureTime: '06:30',
-        arrivalTime: '09:00',
-        aircraft: 'Boeing 737',
-        seatCapacity: 180,
-        price: 150,
-        status: 'On Time'
+     // 🌍 All available cities
+  const cities = [
+    'Manila (MNL)', 'Cebu (CEB)', 'Davao (DVO)', 'Clark (CRK)',
+    'Tokyo (HND)', 'Osaka (KIX)', 'Nagoya (NGO)',
+    'Beijing (PEK)', 'Shanghai (PVG)', 'Hong Kong (HKG)',
+    'Sydney (SYD)', 'Melbourne (MEL)', 'Brisbane (BNE)', 'Perth (PER)',
+    'Hanoi (HAN)', 'Ho Chi Minh City (SGN)', 'Da Nang (DAD)',
+    'Taipei (TPE)', 'Kaohsiung (KHH)', 'Taichung (RMQ)',
+    'Seoul (ICN)', 'Busan (PUS)', 'Jeju (CJU)',
+    'Bangkok (BKK)', 'Chiang Mai (CNX)', 'Phuket (HKT)',
+    'Singapore (SIN)', 'Seletar (XSP)', 'Paya Lebar (QPG)',
+    'Shek Kong (VHSK)'
+  ];
+
+  // ✈️ Aircraft options
+  const aircrafts = [
+    'Airbus A320', 'Airbus A320neo', 'Airbus A321', 'Airbus A321neo',
+    'Airbus A330', 'Airbus A350',
+    'Boeing 737', 'Boeing 777', 'Boeing 787',
+    'Boeing 787 Dreamliner', 'Boeing 737 MAX',
+    'Embraer E190', 'Bombardier CRJ900'
+  ];
+
+  const statuses = ['Scheduled', 'On Time', 'Delayed'];
+
+  const flights = [];
+  let flightNumberCounter = 1000;
+
+  // Helper to generate a single random flight
+  const createFlight = (origin, destination) => {
+    const depDate = new Date(2025, 10, 20 + Math.floor(Math.random() * 10)); // random day in Nov 2025
+    const depHour = 6 + Math.floor(Math.random() * 12); // 6AM–6PM
+    const depMin = Math.random() > 0.5 ? '00' : '30';
+    const arrHour = depHour + 2 + Math.floor(Math.random() * 3); // 2–5 hr duration
+
+    return {
+      flightNumber: `AA${flightNumberCounter++}`,
+      origin,
+      destination,
+      departureDate: depDate.toISOString().split('T')[0],
+      departureTime: `${String(depHour).padStart(2, '0')}:${depMin}`,
+      arrivalTime: `${String(arrHour).padStart(2, '0')}:${depMin}`,
+      aircraft: aircrafts[Math.floor(Math.random() * aircrafts.length)],
+      seatCapacity: 150 + Math.floor(Math.random() * 80),
+      price: 120 + Math.floor(Math.random() * 400),
+      status: statuses[Math.floor(Math.random() * statuses.length)]
+    };
+  };
+
+  // Generate flights for each unique city pair
+  for (let i = 0; i < cities.length; i++) {
+    for (let j = i + 1; j < cities.length; j++) {
+      const origin = cities[i];
+      const destination = cities[j];
+
+      // Two outgoing flights
+      for (let k = 0; k < 2; k++) {
+        flights.push(createFlight(origin, destination));
       }
-    ];
 
-    // --- Generate return flights dynamically ---
-    const returnFlights = baseFlights.map((flight, i) => {
-      // Compute a return flight number (AA9001, AA9002, ...)
-      const returnFlightNumber = `AA90${String(100 + i).slice(1)}`;
+      // Two return flights
+      for (let k = 0; k < 2; k++) {
+        flights.push(createFlight(destination, origin));
+      }
+    }
+  }
 
-      // Add 2 day to departureDate
-      const retDate = new Date(flight.departureDate);
-      retDate.setDate(retDate.getDate() + 2);
-      const formattedReturnDate = retDate.toISOString().split('T')[0];
-
-      return {
-        flightNumber: returnFlightNumber,
-        origin: flight.destination,
-        destination: flight.origin,
-        departureDate: formattedReturnDate,
-        departureTime: '17:00', // Example: standard return time
-        arrivalTime: '19:30',
-        aircraft: flight.aircraft,
-        seatCapacity: flight.seatCapacity,
-        price: flight.price + 10, // Slight price difference
-        status: 'Scheduled'
-      };
-    });
-
-    // Combine both outbound and return flights
-    const allFlights = [...baseFlights, ...returnFlights];
-
-    await Flight.insertMany(allFlights);
-
-    console.log('✅ Flights successfully seeded!');
+  await Flight.insertMany(flights);
+  console.log(`✅ Seeded ${flights.length} flights.`);
   } else {
     console.log('🛫 Flights already exist — skipping seeding.');
   }

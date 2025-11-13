@@ -16,111 +16,220 @@ async function seedReservations() {
     const flights = await Flight.find({
       flightNumber: {
         $in: [
-          'AA1001', 'AA1002', 'AA1003', 'AA1004',
-          'AA9001', 'AA1021', 'AA1022', 'AA9002',
-          'AA1005', 'AA1020', 'AA2010', 'AA1009'
+          'AA1033', 'AA1036', 'AA1013', 'AA1005',
+          'AA1029', 'AA1052', 'AA1056', 'AA1064',
+          'AA1076', 'AA1089', 'AA1320', 'AA1205',
         ]
       }
     });
 
-    await Reservation.insertMany([
-     {
+    const getFlightId = (num) => {
+      const f = flights.find(f => f.flightNumber === num);
+      return f ? f._id : null;
+    };
+
+    const reservations = [
+      {
         userId: users[0]._id,
-        flight: [flights.find(f => f.flightNumber === 'AA1001')._id],
+        flight: [getFlightId('AA1033')],
         tripType: 'One-Way',
         travelClass: 'Economy',
         passengers: [
           {
-            fullName: 'Juan Dela Cruz',
-            age: 28,
+            fullName: 'Miguel Santos',
+            age: 32,
             gender: 'Male',
-            passport: 'P1234567',
-            seatNumber: '10A',
-            meal: 'Vegetarian',
-            baggageAllowance: 15
+            passport: 'P100001',
+            seatNumber: '12A',
+            meal: 'Non-Vegetarian',
+            baggageAllowance: 20
           }
         ],
-        price: 1500,
-        bookingDate: new Date('2024-06-01'),
+        price: 2500,
+        bookingDate: new Date('2025-11-01'),
         status: 'Confirmed'
       },
       {
         userId: users[1]._id,
-        flight: [
-          flights.find(f => f.flightNumber === 'AA1002')._id,
-          flights.find(f => f.flightNumber === 'AA9001')._id // round-trip
-        ],
+        flight: [getFlightId('AA1320'), getFlightId('AA1205')],
         tripType: 'Round-Trip',
         travelClass: 'Economy',
         passengers: [
           {
-            fullName: 'Maria Santos',
-            age: 32,
+            fullName: 'Anna Rivera',
+            age: 29,
             gender: 'Female',
-            passport: 'P9988776',
-            seatNumber: '14C',
-            meal: 'Gluten-Free',
-            baggageAllowance: 20
-          }
-        ],
-        price: 1600,
-        bookingDate: new Date('2024-06-02'),
-        status: 'Confirmed'
-      },
-      {
-        userId: users[2]._id,
-        flight: [
-          flights.find(f => f.flightNumber === 'AA1003')._id, // outgoing
-          flights.find(f => f.flightNumber === 'AA9002')._id  // return flight
-        ],
-        tripType: 'Round-Trip',
-        travelClass: 'Economy',
-        passengers: [
-          {
-            fullName: 'Carlos Reyes',
-            age: 40,
-            gender: 'Male',
-            passport: 'P2233445',
-            seatNumber: '3A',
+            passport: 'P100002',
+            seatNumber: '7C',
             meal: 'Vegan',
             baggageAllowance: 25
           },
           {
-            fullName: 'Sofia Reyes',
-            age: 35,
-            gender: 'Female',
-            passport: 'P2233446',
-            seatNumber: '3B',
+            fullName: 'Luis Rivera',
+            age: 30,
+            gender: 'Male',
+            passport: 'P100003',
+            seatNumber: '7D',
             meal: 'Vegetarian',
             baggageAllowance: 25
           }
         ],
-        price: 3400, // 1700 * 2 (for both passengers)
-        bookingDate: new Date('2024-06-03'),
+        price: 5200,
+        bookingDate: new Date('2025-10-30'),
         status: 'Confirmed'
       },
       {
         userId: users[3]._id,
-        flight: [flights.find(f => f.flightNumber === 'AA1004')._id],
+        flight: [getFlightId('AA1013')],
         tripType: 'One-Way',
         travelClass: 'Premium Economy',
         passengers: [
           {
-            fullName: 'Anna Lopez',
-            age: 29,
-            gender: 'Female',
-            passport: 'P9988777',
-            seatNumber: '14D',
-            meal: 'Non-Vegetarian',
+            fullName: 'Takeshi Mori',
+            age: 45,
+            gender: 'Male',
+            passport: 'J123456',
+            seatNumber: '2A',
+            meal: 'Vegetarian',
             baggageAllowance: 30
           }
         ],
-        price: 1800,
-        bookingDate: new Date('2024-06-04'),
+        price: 4100,
+        bookingDate: new Date('2025-10-25'),
+        status: 'Confirmed'
+      },
+      {
+        userId: users[3]._id,
+        flight: [getFlightId('AA1005'), getFlightId('AA1029')],
+        tripType: 'Round-Trip',
+        travelClass: 'First',
+        passengers: [
+          {
+            fullName: 'Carla Lim',
+            age: 38,
+            gender: 'Female',
+            passport: 'P100004',
+            seatNumber: '1A',
+            meal: 'Vegan',
+            baggageAllowance: 40
+          },
+          {
+            fullName: 'Adrian Lim',
+            age: 40,
+            gender: 'Male',
+            passport: 'P100005',
+            seatNumber: '1B',
+            meal: 'Non-Vegetarian',
+            baggageAllowance: 40
+          }
+        ],
+        price: 9800,
+        bookingDate: new Date('2025-10-20'),
+        status: 'Confirmed'
+      },
+      {
+        userId: users[2]._id,
+        flight: [getFlightId('AA1052')],
+        tripType: 'One-Way',
+        travelClass: 'Business',
+        passengers: [
+          {
+            fullName: 'Nguyen Thi Hoa',
+            age: 27,
+            gender: 'Female',
+            passport: 'V200001',
+            seatNumber: '4B',
+            meal: 'Vegetarian',
+            baggageAllowance: 35
+          }
+        ],
+        price: 5800,
+        bookingDate: new Date('2025-10-27'),
+        status: 'Confirmed'
+      },
+      {
+        userId: users[1]._id,
+        flight: [getFlightId('AA1056'), getFlightId('AA1064')],
+        tripType: 'Round-Trip',
+        travelClass: 'Economy',
+        passengers: [
+          {
+            fullName: 'David Chou',
+            age: 34,
+            gender: 'Male',
+            passport: 'C400010',
+            seatNumber: '14F',
+            meal: 'Gluten-Free',
+            baggageAllowance: 20
+          }
+        ],
+        price: 2700,
+        bookingDate: new Date('2025-11-02'),
+        status: 'Confirmed'
+      },
+      {
+        userId: users[0]._id,
+        flight: [getFlightId('AA1076')],
+        tripType: 'One-Way',
+        travelClass: 'Economy',
+        passengers: [
+          {
+            fullName: 'Kim Ji-won',
+            age: 26,
+            gender: 'Female',
+            passport: 'K900002',
+            seatNumber: '18B',
+            meal: 'Vegan',
+            baggageAllowance: 15
+          }
+        ],
+        price: 2300,
+        bookingDate: new Date('2025-11-05'),
+        status: 'Confirmed'
+      },
+      {
+        userId: users[3]._id,
+        flight: [getFlightId('AA1089')],
+        tripType: 'One-Way',
+        travelClass: 'Business',
+        passengers: [
+          {
+            fullName: 'John Smith',
+            age: 52,
+            gender: 'Male',
+            passport: 'UK500011',
+            seatNumber: '3C',
+            meal: 'Non-Vegetarian',
+            baggageAllowance: 40
+          }
+        ],
+        price: 6500,
+        bookingDate: new Date('2025-11-03'),
+        status: 'Confirmed'
+      },
+      {
+        userId: users[1]._id,
+        flight: [getFlightId('AA2015')],
+        tripType: 'One-Way',
+        travelClass: 'Economy',
+        passengers: [
+          {
+            fullName: 'Aisha Rahman',
+            age: 31,
+            gender: 'Female',
+            passport: 'M300022',
+            seatNumber: '19A',
+            meal: 'Vegetarian',
+            baggageAllowance: 25
+          }
+        ],
+        price: 2400,
+        bookingDate: new Date('2025-10-29'),
         status: 'Confirmed'
       }
-    ]);
+    ].filter(r => r.flight.every(f => f)); // only include those with valid flight IDs
 
+    await Reservation.insertMany(reservations);
     console.log('Reservations collection seeded successfully.');
   } else {
     console.log('Reservations collection already has data. Skipping seeding.');

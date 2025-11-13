@@ -153,7 +153,7 @@
 
           <tbody id="pastBookingTable">
             {{#each reservation}}
-              {{#if (and (eq this.status 'Cancelled') (not isUpcoming this.flight))}}
+              {{#if (or (eq this.status "Cancelled") (not (isUpcoming this.flight)))}}
                 <tr id="reservation-{{this._id}}" class="text-center align-middle">
                   <td class="fw-semibold">
                   {{#each this.flight}}

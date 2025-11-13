@@ -7,7 +7,7 @@ async function seedReservations() {
   const count = await Reservation.countDocuments();
 
   if (count === 0) {
-    console.log('🌱 Seeding Reservations collection...');
+    console.log('Seeding Reservations collection...');
 
     // Get users from the database
     const users = await User.find({ role: 'User' });
@@ -121,9 +121,9 @@ async function seedReservations() {
       }
     ]);
 
-    console.log('✅ Reservations collection seeded successfully.');
+    console.log('Reservations collection seeded successfully.');
   } else {
-    console.log('ℹ️ Reservations collection already has data. Skipping seeding.');
+    console.log('Reservations collection already has data. Skipping seeding.');
   }
 }
 

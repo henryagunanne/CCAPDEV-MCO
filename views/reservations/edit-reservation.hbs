@@ -175,7 +175,7 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("🧩 Edit Reservation Script Loaded");
+  console.log("Edit Reservation Script Loaded");
 
   const mealPrice = 150;
   const bagPrice  = 50;
@@ -223,7 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (isSelected) seat.classList.add("selected");
 
       seat.addEventListener("click", () => {
-        if (seat.classList.contains("occupied")) return alert("⚠️ Seat already taken!");
+        if (seat.classList.contains("occupied")) return alert("Seat already taken!");
 
         if (seat.classList.contains("selected")) {
           seat.classList.remove("selected");
@@ -304,7 +304,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector("#totalPrice").textContent = total;
   }
 
-  // 👉 Wait for DOM hydration to complete before first calculation
+  // Waits for DOM hydration to complete before first calculation
 setTimeout(() => {
   updateSummary();
 }, 100);

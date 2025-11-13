@@ -275,7 +275,7 @@
     new bootstrap.Toast(toastEl, { delay: 2500 }).show();
   }
 
-  // ✅ Toggle passengers and route row
+  // Toggle passengers and route row
   document.addEventListener("click", (e) => {
    const toggleBtn = e.target.closest(".togglePassengers, .toggleRoute");
     if (!toggleBtn) return;
@@ -286,14 +286,14 @@
     const rowType = isPassenger ? "passengers" : "route";
     const row = document.getElementById(`${rowType}-${id}`);
 
-    // 🧹 1️⃣ Close all other opened rows (both passengers and routes)
+    // Close all other opened rows (both passengers and routes)
     document.querySelectorAll(".passengers-row, .route-row").forEach((r) => {
       if (r.id !== `${rowType}-${id}`) {
         r.classList.add("d-none");
       }
     });
 
-    // 🧹 2️⃣ Reset all other icons to closed state
+    // Reset all other icons to closed state
     document.querySelectorAll(".togglePassengers i, .toggleRoute i").forEach((i) => {
       if (i !== icon) {
         i.classList.remove("bi-eye-slash");
@@ -301,7 +301,7 @@
       }
     });
 
-    // 🎯 3️⃣ Toggle the clicked one
+    // Toggle the clicked one
     const isOpen = !row.classList.contains("d-none");
     row.classList.toggle("d-none", isOpen); // close if open, open if closed
     icon.classList.toggle("bi-eye", isOpen);
@@ -309,7 +309,7 @@
   });
 
 
-// ✅ Handle Cancel Reservation
+// Handle Cancel Reservation
 document.addEventListener("click", async (e) => {
   if (!e.target.closest(".cancelReservation")) return;
   e.preventDefault();
@@ -336,7 +336,7 @@ document.addEventListener("click", async (e) => {
     if (passengersRow) passengersRow.remove();
     if (routeRow) routeRow.remove();
 
-    // ✅ Optional: append to the bottom "Past/Cancelled" table
+    // Append to the bottom "Past/Cancelled" table
     const pastTable = document.getElementById("pastBookingTable");
     if (pastTable) {
       const cancelled = data.cancelledReservation;
@@ -373,4 +373,3 @@ document.addEventListener("click", async (e) => {
   }
 });
 </script>
-

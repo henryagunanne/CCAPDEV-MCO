@@ -6,7 +6,7 @@ html, body {
   margin: 0;
 }
 
-/* Make main take up full height before footer (commented out since it affects homepage)
+/* Make main take up full height before footer
 main {
   flex: 1;
   padding-top: 30px;

@@ -141,9 +141,6 @@ document.addEventListener("DOMContentLoaded", function () {
   let selectedSeats = [];
 
 
-// --- From backend (Handlebars)
-  const occupiedSeats = {{{occupiedSeats}}} || [];
-
   
   // ============================================================
   // RESET FORM
@@ -428,15 +425,43 @@ document.addEventListener("DOMContentLoaded", function () {
   // ============================================================
   // INITIALIZE
   // ============================================================
-  outboundFlight.addEventListener("change", () => {
-    if (tripType.value === "One-Way" || returnFlight.value) reservationForm.classList.remove("d-none");
-    generatePassengerForms();
-    updateSummary();
-  });
-  returnFlight.addEventListener("change", () => {
+  outboundFlight.addEventListener("change", async () => {
+  if (!outboundFlight.value) return;
+
+  //  1. Fetch all taken seats for this flight
+  const res = await fetch(`/reservations/seats/${outboundFlight.value}`);
+  const data = await res.json();
+
+  //  2. Overwrite global occupied seats
+  occupiedSeats = data.occupiedSeats || [];
+
+  //  3. Show the form once flight is chosen
+  if (tripType.value === "One-Way" || returnFlight.value) {
     reservationForm.classList.remove("d-none");
-    updateSummary();
-  });
+  }
+
+  //  4. Rebuild passengers + seat map using correct occupied seats
+  generatePassengerForms();
+
+  //  5. Recalculate
+  updateSummary();
+});
+
+  returnFlight.addEventListener("change", async () => {
+  if (!returnFlight.value) return;
+
+  // Fetch seats for return flight
+  const res = await fetch(`/reservations/seats/${returnFlight.value}`);
+  const data = await res.json();
+
+  occupiedSeats = data.occupiedSeats || [];
+
+  reservationForm.classList.remove("d-none");
+
+  generatePassengerForms();
+  updateSummary();
+});
+
 
   generatePassengerForms();
 });

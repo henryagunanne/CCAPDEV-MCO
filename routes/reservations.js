@@ -401,6 +401,25 @@ router.post('/:id/edit', isAuthenticated, async (req, res) => {
 });
 
 
+      router.get("/seats/:flightId", async (req, res) => {
+  try {
+    const reservations = await Reservation.find({ flight: req.params.flightId });
+
+    const takenSeats = [];
+    reservations.forEach(r => {
+      r.passengers.forEach(p => {
+        if (p.seatNumber) takenSeats.push(p.seatNumber);
+      });
+    });
+
+    res.json({ occupiedSeats: takenSeats });
+  } catch (err) {
+    console.error("Seat fetch error:", err);
+    res.json({ occupiedSeats: [] });
+  }
+});
+
+
 //8
 /* =============================
    READ - View single reservation

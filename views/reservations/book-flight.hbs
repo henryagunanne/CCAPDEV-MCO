@@ -128,6 +128,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const passengerFields = document.getElementById("passengerFields");
   const seatMap = document.getElementById("seat-map");
 
+  let occupiedSeats = [];
+
   const baseFare = document.getElementById("baseFare");
   const returnFare = document.getElementById("returnFare");
   const mealFeeEl = document.getElementById("mealFee");
@@ -139,6 +141,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const seatPricing = { first: 5000, business: 3000, economy: 1500 };
   const seatClasses = { 1: "first", 2: "first", 3: "business", 4: "business" };
   let selectedSeats = [];
+  
 
 
   

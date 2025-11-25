@@ -5,7 +5,7 @@ async function seedUsers() {
     const count = await User.countDocuments();
 
     if (count === 0) {
-        console.log('🌱 Seeding Users collection...');
+        console.log('Seeding Users collection...');
 
         await User.insertMany([
             {
@@ -50,9 +50,9 @@ async function seedUsers() {
               }
         ]);
         
-        console.log('✅ Users collection seeded successfully.');
+        console.log('Users collection seeded successfully.');
     }else {
-        console.log('ℹ️ Users collection already has data. Skipping seeding.');
+        console.log('Users collection already has data. Skipping seeding.');
     }
 
 }

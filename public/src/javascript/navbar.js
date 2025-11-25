@@ -102,6 +102,25 @@ jQuery(function() {
 
         const $form = $(this);
 
+        // ensure that passwords match
+        let password = $("#password").val();
+        let confirmPassword = $("#confirmPassword").val();
+        if (password !== confirmPassword) {
+            $(".confirmPassword .invalid-feedback").text("Passwords do not match");
+            $("#confirmPassword")[0].setCustomValidity("Passwords do not match");
+        }
+        else {
+            $("#confirmPassword")[0].setCustomValidity("");
+        }
+
+        // ensure that the terms are accepted
+        if (!$("#termsCheck").is(":checked")) {
+            $(".acceptTerms .invalid-feedback").text("You must accept the terms and conditions");
+            $("#termsCheck").setCustomValidity("You must accept the terms and conditions");
+        } else {
+            $("#termsCheck")[0].setCustomValidity("");
+        }
+
         // Check form validity
         if (this.checkValidity() === false) {
             event.stopPropagation();

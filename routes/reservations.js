@@ -2,8 +2,8 @@
 const express = require('express');
 const Reservation = require('../models/Reservation');
 const Flight = require('../models/Flight');
-const User = require('../models/User');
 const router = express.Router();
+
 
 // Helper middleware to check if user is authenticated
 function isAuthenticated(req, res, next) {
@@ -16,22 +16,31 @@ function isAuthenticated(req, res, next) {
   });  
 }
 
+// Middleware to ensure admin cannot access user routes
+function isAdmin(req, res, next) {
+  if (req.session.user && req.session.user.role === 'Admin') {
+    return res.status(403).render('error/access-denied', { 
+      title: 'Access Denied',
+      isAdmin: req.session.user?.role === 'Admin'
+    });  
+  }
+  next();
+}
+
 //1
 /* =============================
    CREATE
 ============================= */
 
 //  Create Reservation Route
-router.post("/create", isAuthenticated, async (req, res) => {
+router.post("/create", isAuthenticated, isAdmin, async (req, res) => {
   try {
     const { flight, returnFlight, travelClass, tripType, passengers, totalAmount } = req.body;
 
     const parsedPassengers = Array.isArray(passengers)
       ? passengers
       : JSON.parse(passengers);
-
-console.log("Incoming reservation body:", req.body);
-
+      
 
     // Create new reservation with correct field names
     const newReservation = new Reservation({
@@ -46,7 +55,7 @@ console.log("Incoming reservation body:", req.body);
 
     await newReservation.save();
     console.log("New reservation created:", newReservation);
-    res.json({ redirect: `/reservations/${newReservation._id}/confirmation` });
+    res.status(200).json({ redirect: `/reservations/${newReservation._id}/confirmation` });
   } catch (err) {
     console.error("Error creating reservation:", err);
     res.status(500).send("Error creating reservation");
@@ -151,7 +160,7 @@ router.get('/search', isAuthenticated, async (req, res) => {
     console.log(`✈️ Found ${flights.length} flights from ${origin} → ${destination}`);
     res.json({ flights });
   } catch (err) {
-    console.error('❌ Error fetching flights:', err);
+    console.error('Error fetching flights:', err);
     res.status(500).json({ flights: [] });
   }
 });
@@ -191,7 +200,7 @@ router.get("/:id/confirmation", isAuthenticated, async (req, res) => {
       reservation 
     });
   } catch (err) {
-    console.error("❌ Error loading reservation:", err);
+    console.error("Error loading reservation:", err);
     res.status(500).send("Error loading reservation");
   }
 });
@@ -219,7 +228,7 @@ router.get('/my-bookings', isAuthenticated, async (req, res) => {
 
 //5
 // POST /reservations/cancel/:reservationId - Cancel a reservation
-router.post('/cancel/:reservationId', isAuthenticated, async (req, res) => {
+router.post('/cancel/:reservationId', isAuthenticated, isAdmin, async (req, res) => {
   const { reservationId } = req.params;
 
   try{
@@ -233,7 +242,7 @@ router.post('/cancel/:reservationId', isAuthenticated, async (req, res) => {
       return res.status(404).send('Reservation not found');
     }
 
-    res.json({ 
+    res.status(200).json({ 
       success: true, 
       message: 'Reservation Cancelled',
       cancelledReservation
@@ -246,7 +255,7 @@ router.post('/cancel/:reservationId', isAuthenticated, async (req, res) => {
 
 //6
 // GET reservations/:id/edit - Display edit page
-router.get('/:id/edit', isAuthenticated, async (req, res) => {
+router.get('/:id/edit', isAuthenticated, isAdmin, async (req, res) => {
   try {
     const reservation = await Reservation.findById(req.params.id)
       .populate('flight')
@@ -297,7 +306,7 @@ router.get('/:id/edit', isAuthenticated, async (req, res) => {
         return shuffled.slice(0, count);
       }
 
-      // 🎟 Get passenger seats from this reservation
+      // Get passenger seats from this reservation
       const currentPassengerSeats = reservation.passengers.map(p => p.seatNumber);
 
       // Generate demo occupied seats without conflicting with user seats
@@ -325,7 +334,7 @@ router.get('/:id/edit', isAuthenticated, async (req, res) => {
 
 //7
       // POST /reservations/:id/edit - Handle edit submission
-router.post('/:id/edit', isAuthenticated, async (req, res) => {
+router.post('/:id/edit', isAuthenticated, isAdmin, async (req, res) => {
   try {
     const reservationId = req.params.id;
     const { passengersJSON, totalPrice } = req.body;
@@ -390,7 +399,7 @@ router.post('/:id/edit', isAuthenticated, async (req, res) => {
       baseFare + returnFare + reservation.mealTotal + reservation.baggageTotal + reservation.seatTotal;
 
     // Render
-    res.render('reservations/edit-confirmation', {
+    res.status(200).render('reservations/edit-confirmation', {
       title: 'Reservation Updated',
       reservation,
     });
@@ -401,7 +410,7 @@ router.post('/:id/edit', isAuthenticated, async (req, res) => {
 });
 
 
-      router.get("/seats/:flightId", async (req, res) => {
+router.get("/seats/:flightId", async (req, res) => {
   try {
     const reservations = await Reservation.find({ flight: req.params.flightId });
 
@@ -424,7 +433,7 @@ router.post('/:id/edit', isAuthenticated, async (req, res) => {
 /* =============================
    READ - View single reservation
 ============================= */
-router.get('/:id', isAuthenticated, async (req, res) => {
+router.get('/:id', isAuthenticated, isAdmin, async (req, res) => {
   try {
     const reservation = await Reservation.findById(req.params.id)
       .populate('flight')
@@ -439,7 +448,7 @@ router.get('/:id', isAuthenticated, async (req, res) => {
 });
 
 // Update Reservation (POST)
-router.post('/update/:id', isAuthenticated, async (req, res) => {
+router.post('/update/:id', isAuthenticated, isAdmin, async (req, res) => {
   try {
     const { passengers, totalPrice } = req.body;
     const updated = await Reservation.findByIdAndUpdate(

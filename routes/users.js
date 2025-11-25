@@ -1,18 +1,30 @@
 // routes/users.js
 const express = require('express');
 const User = require('../models/User');
-const bcrypt = require('bcryptjs'); // for password hashing
+const bcrypt = require('bcryptjs'); // for password hashing and comparison
 const router = express.Router();
 
 // Middleware to check if user is authenticated
 function isAuthenticated(req, res, next) {
     if (req.session.user) {
       return next();
-    }else 
-    res.status(403).render('error/access-denied', { 
-      title: 'Access Denied',
-      isAdmin: req.session.user?.role === 'Admin'
-    });   
+    }else {
+      res.status(403).render('error/access-denied', { 
+        title: 'Access Denied',
+        isAdmin: req.session.user?.role === 'Admin'
+      });  
+    } 
+}
+
+// Middleware to ensure admin cannot access user routes
+function isAdmin(req, res, next) {
+    if (req.session.user && req.session.user.role === 'Admin') {
+      return res.status(403).render('error/access-denied', { 
+        title: 'Access Denied',
+        isAdmin: req.session.user?.role === 'Admin'
+      });  
+    }
+    next();
 }
 
 // POST /users/register - Handle user registration
@@ -21,16 +33,17 @@ router.post('/register', async (req, res) => {
   
     try {
       // Hash the password
-      const hashedPassword = await bcrypt.hash(password, 10);
+      //const hashedPassword = await bcrypt.hash(password, 10);
   
       const newUser = new User({
         firstName,
         lastName,
         email,
-        password: hashedPassword,
+        password,
         dateOfBirth
       });
 
+      // Check if email already exists
       const existingUser = await User.findOne({email: email}).lean();
       if (existingUser) {
         return res
@@ -39,9 +52,9 @@ router.post('/register', async (req, res) => {
       }
   
       await newUser.save();
-      res.json({ success: true });
+      res.status(200).json({ success: true });
     } catch (err) {
-      console.error('❌ Registration error:', err);
+      console.error('Registration error:', err);
       res.status(500).send('Server error during registration');
     }
 });
@@ -64,14 +77,15 @@ router.post('/login', async (req, res) => {
   
       // Password matched
       req.session.user = user; // store user in session
-      return res.json({ 
+      req.session.user.role = user.role; // store user role in session
+      return res.status(200).json({ 
         success: true, 
         isAdmin: req.session.user.role === 'Admin',
         message: `Welcome, ${user.firstName}!` 
       });
 
     } catch (err) {
-      console.error('❌ Login error:', err);
+      console.error('Login error:', err);
       res.status(500).send('Server error during login');
     }
 });
@@ -80,10 +94,10 @@ router.post('/login', async (req, res) => {
 router.post('/logout', isAuthenticated, (req, res) => {
     req.session.destroy(err => {
       if (err) {
-        console.error('❌ Logout error:', err);
+        console.error('Logout error:', err);
         return res.status(500).send('Server error during logout');
       }
-      res.json({ success: true });
+      res.status(200).json({ success: true });
     });
 });
 
@@ -123,7 +137,7 @@ router.post('/edit/:userId', isAuthenticated, async (req, res) => {
         user: updatedUser 
       });
     } catch (err) {
-      console.error('❌ Profile update error:', err);
+      console.error('Profile update error:', err);
       res.status(500).send('Server error during profile update');
     }
 });
@@ -162,13 +176,13 @@ router.post('/change-password/:userId', isAuthenticated, async (req, res) => {
   
       res.json({ success: true });
     } catch (err) {
-      console.error('❌ Password change error:', err);
+      console.error('Password change error:', err);
       res.status(500).send('Server error during password change');
     }
 });
 
 // POST /users/delete/:userId - Delete user account
-router.post('/delete/:userId', isAuthenticated, async (req, res) => {
+router.post('/delete/:userId', isAuthenticated, isAdmin, async (req, res) => {
     const { userId } = req.params;
   
     try {
@@ -181,12 +195,12 @@ router.post('/delete/:userId', isAuthenticated, async (req, res) => {
       // Destroy session after account deletion
       req.session.destroy(err => {
         if (err) {
-          console.error('❌ Session destruction error:', err);
+          console.error('Session destruction error:', err);
         }
         res.json({ success: true });
       });
     } catch (err) {
-      console.error('❌ Account deletion error:', err);
+      console.error('Account deletion error:', err);
       res.status(500).send('Server error during account deletion');
     }
 });
@@ -207,7 +221,7 @@ router.post('/forgot-password', async (req, res) => {
       message: 'Password reset link sent to email (simulated)' 
     });
   } catch (err) {
-    console.error('❌ Forgot password error:', err);
+    console.error('Forgot password error:', err);
     res.status(500).send('Server error during password reset');
   }
 });

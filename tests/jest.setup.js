@@ -1,11 +1,10 @@
-const request = require('supertest');
-const app = require('../server'); // Import the Express app
+
 const db = require('./setup');  // Import the test database setup module
 
 // Connect to the in-memory database before running tests
 beforeAll(async () => {
   // Create a SuperTest agent for maintaining session state
-  global.agent = request.agent(app);
+  //global.agent = request.agent(app);
 
   await db.connect();
 });

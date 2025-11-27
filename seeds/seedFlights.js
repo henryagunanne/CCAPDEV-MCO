@@ -36,7 +36,7 @@ async function seedFlights() {
 
   // Helper to generate a single random flight
   const createFlight = (origin, destination) => {
-    const depDate = new Date(2025, 10, 20 + Math.floor(Math.random() * 10)); // random day in Nov 2025
+    const depDate = new Date(2025, 11, 1 + Math.floor(Math.random() * 31)); // random day in December 2025
     const depHour = 6 + Math.floor(Math.random() * 12); // 6AM–6PM
     const depMin = Math.random() > 0.5 ? '00' : '30';
     const arrHour = depHour + 2 + Math.floor(Math.random() * 3); // 2–5 hr duration

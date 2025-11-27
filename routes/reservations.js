@@ -77,7 +77,7 @@ router.post("/create", isAuthenticated, isAdmin, async (req, res) => {
 /* =============================
    BOOK PAGE - Show booking form
 ============================= */
-router.get('/book/:flightId', isAuthenticated, async (req, res) => {
+router.get('/book/:flightId', isAuthenticated, isAdmin, async (req, res) => {
   try {
     const flightId = req.params.flightId;
     const flight = await Flight.findById(flightId).lean();
@@ -135,7 +135,7 @@ router.get('/book/:flightId', isAuthenticated, async (req, res) => {
 /* =============================
    BOOK PAGE - Select Route & Flights
 ============================= */
-router.get('/book-flight', isAuthenticated, async (req, res) => {
+router.get('/book-flight', isAuthenticated, isAdmin, async (req, res) => {
   try {
     // Get distinct origins and destinations from flights
     const origins = await Flight.distinct('origin');
@@ -183,7 +183,7 @@ router.get('/search', isAuthenticated, async (req, res) => {
    CONFIRM
 ============================= */
 // Confirmation Route 
-router.get("/:id/confirmation", isAuthenticated, async (req, res) => {
+router.get("/:id/confirmation", isAuthenticated, isAdmin, async (req, res) => {
   try {
     // fetch reservation data
     const reservationDoc = await Reservation.findById(req.params.id)
@@ -219,7 +219,7 @@ router.get("/:id/confirmation", isAuthenticated, async (req, res) => {
 // =============================
 // CHECK-IN PAGE (VIEW)
 // =============================
-router.get("/check-in", isAuthenticated, async (req,res)=>{
+router.get("/check-in", isAuthenticated, isAdmin, async (req,res)=>{
     try{
         res.render("reservations/check-in");
     }catch(err){
@@ -231,7 +231,7 @@ router.get("/check-in", isAuthenticated, async (req,res)=>{
 // =============================
 // CHECK-IN (POST) — With Flight Populate
 // =============================
-router.post("/check-in", isAuthenticated, async (req,res)=>{
+router.post("/check-in", isAuthenticated, isAdmin, async (req,res)=>{
     try{
         let { pnr, fullName } = req.body;
 
@@ -290,7 +290,7 @@ router.post("/check-in", isAuthenticated, async (req,res)=>{
 
 //4
 // GET reservations/my-bookings - render my reservations page
-router.get('/my-bookings', isAuthenticated, async (req, res) => {
+router.get('/my-bookings', isAuthenticated, isAdmin, async (req, res) => {
   const userId = req.session.user._id;
 
   try {

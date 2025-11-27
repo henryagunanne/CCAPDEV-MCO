@@ -228,63 +228,68 @@ router.get("/check-in", isAuthenticated, async (req,res)=>{
     }
 });
 
-// =============================
-// CHECK-IN (POST) — With Flight Populate
-// =============================
 router.post("/check-in", isAuthenticated, async (req,res)=>{
     try{
         let { pnr, fullName } = req.body;
-
         if(!pnr || !fullName)
             return res.json({ success:false, message:"Missing fields" });
 
         pnr = pnr.trim().toUpperCase();
         fullName = fullName.trim();
 
-        // ⬇ MAIN FIX — Populate flight so it shows correctly in boarding pass
         const reservation = await Reservation.findOne({
-            bookingReference: pnr,
-            "passengers.fullName": { $regex: fullName, $options:"i" }
-        })
-        .populate({
-            path: "flight",
-            model: "Flight"
-        });
+        bookingReference: pnr,
+        "passengers.fullName": { $regex: fullName, $options:"i" }
+    }).populate("flight");
 
         if(!reservation)
             return res.json({ success:false, message:"Invalid PNR or Name" });
 
-        // Find passenger index
+        
         const idx = reservation.passengers.findIndex(
-            p => p.fullName.toLowerCase() === fullName.toLowerCase()
+            p => p.fullName.trim().toLowerCase() === fullName.toLowerCase()
         );
 
-        if(reservation.passengers[idx].checkedIn === true){
-            return res.json({
-                success:false,
-                message:`${fullName} is already checked in.`,
-                reservation
-            });
+        if(idx === -1) return res.json({ success:false, message:"Passenger not found" });
+
+
+        // ▶ Fix for old DB documents
+        if(!reservation.passengers[idx].boardingPass || typeof reservation.passengers[idx].boardingPass !== "object"){
+            reservation.passengers[idx].boardingPass = { outbound:null, return:null };
         }
 
-        // Assign boarding pass
-        const boardingCode = "BP-" + Math.floor(100000 + Math.random()*900000);
+        if(reservation.passengers[idx].checkedIn)
+            return res.json({
+                success:false,
+                message:`${fullName} is already checked-in.`,
+                reservation
+            });
+
+
+        let outboundBP = "BP-" + Math.floor(100000 + Math.random()*900000);
+        let returnBP = reservation.flight.length > 1
+            ? "BP-" + Math.floor(100000 + Math.random()*900000)
+            : outboundBP;
+
+
         reservation.passengers[idx].checkedIn = true;
-        reservation.passengers[idx].boardingPass = boardingCode;
+reservation.passengers[idx].boardingPass = { outbound: outboundBP, return: returnBP };
+await reservation.save();
 
-        await reservation.save();
+return res.json({
+    success:true,
+    reservation: await reservation.populate("flight").then(r=>r.toObject()),
+    outboundBP,
+    returnBP
+});
 
-        return res.json({
-            success:true,
-            reservation:reservation.toObject(),
-            boardingCode
-        });
 
     }catch(err){
         console.log("CHECK-IN ERROR:", err);
         return res.json({ success:false, message:"Server error" });
     }
 });
+
 
 
 

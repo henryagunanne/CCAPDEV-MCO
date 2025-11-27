@@ -1,6 +1,14 @@
 const mongoose = require('mongoose');
 
 const passengerSchema = new mongoose.Schema({
+  checkedIn: {
+    type: Boolean,
+    default: false
+  },
+  boardingPass: {
+    type: String,
+    default: null
+  },
   fullName: {
       type: String,
       required: true

@@ -33,6 +33,15 @@ const passengerSchema = new mongoose.Schema({
   baggageAllowance: {
       type: Number,
       default: 0
+  },
+  checkedIn: {
+    type: Boolean,
+    default: false
+  },
+
+  boardingPass: {
+    type: String, // store QR code text or PDF URL
+    default: null
   }
 });
 

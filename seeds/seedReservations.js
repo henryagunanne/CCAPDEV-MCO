@@ -31,6 +31,7 @@ async function seedReservations() {
     const reservations = [
       {
         userId: users[0]._id,
+        bookingReference: 'AAR1033',
         flight: [getFlightId('AA1033')],
         tripType: 'One-Way',
         travelClass: 'Economy',
@@ -51,6 +52,7 @@ async function seedReservations() {
       },
       {
         userId: users[1]._id,
+        bookingReference: 'AAQDE00',
         flight: [getFlightId('AA1320'), getFlightId('AA1205')],
         tripType: 'Round-Trip',
         travelClass: 'Economy',
@@ -80,6 +82,7 @@ async function seedReservations() {
       },
       {
         userId: users[3]._id,
+        bookingReference: 'AAQDEBFY',
         flight: [getFlightId('AA1013')],
         tripType: 'One-Way',
         travelClass: 'Premium Economy',
@@ -100,6 +103,7 @@ async function seedReservations() {
       },
       {
         userId: users[3]._id,
+        bookingReference: 'AAQ1029',
         flight: [getFlightId('AA1005'), getFlightId('AA1029')],
         tripType: 'Round-Trip',
         travelClass: 'First',
@@ -129,6 +133,7 @@ async function seedReservations() {
       },
       {
         userId: users[2]._id,
+        bookingReference: 'AAQ105Y',
         flight: [getFlightId('AA1052')],
         tripType: 'One-Way',
         travelClass: 'Business',
@@ -149,6 +154,7 @@ async function seedReservations() {
       },
       {
         userId: users[1]._id,
+        bookingReference: 'AAWE456',
         flight: [getFlightId('AA1056'), getFlightId('AA1064')],
         tripType: 'Round-Trip',
         travelClass: 'Economy',
@@ -169,6 +175,7 @@ async function seedReservations() {
       },
       {
         userId: users[0]._id,
+        bookingReference: 'AART102',
         flight: [getFlightId('AA1076')],
         tripType: 'One-Way',
         travelClass: 'Economy',
@@ -189,6 +196,7 @@ async function seedReservations() {
       },
       {
         userId: users[3]._id,
+        bookingReference: 'AA4RJNM1',
         flight: [getFlightId('AA1089')],
         tripType: 'One-Way',
         travelClass: 'Business',
@@ -209,6 +217,7 @@ async function seedReservations() {
       },
       {
         userId: users[1]._id,
+        bookingReference: 'AA334KFF',
         flight: [getFlightId('AA2015')],
         tripType: 'One-Way',
         travelClass: 'Economy',

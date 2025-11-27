@@ -19,7 +19,7 @@ function isAuthenticated(req, res, next) {
 // Middleware to ensure admin cannot access user routes
 function isAdmin(req, res, next) {
     if (req.session.user && req.session.user.role === 'Admin') {
-      return res.status(403).render('error/access-denied', { 
+      return res.status(403).render('error/user-only', { 
         title: 'Access Denied',
         isAdmin: req.session.user?.role === 'Admin'
       });  

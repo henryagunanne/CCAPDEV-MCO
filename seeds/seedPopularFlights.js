@@ -5,7 +5,7 @@ async function seedPopularFlights() {
   const count = await PopularFlight.countDocuments();
 
   if (count === 0) {
-    console.log('🌱 Seeding Popular Flights collection...');
+    console.log('Seeding Popular Flights collection...');
 
     // Fetch flights that match your seed criteria
     const flights = await Flight.find({

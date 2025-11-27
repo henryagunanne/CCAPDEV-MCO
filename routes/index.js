@@ -24,4 +24,8 @@ router.get('/bookFlight', (req, res) => {
   res.redirect('/flights/search');
 });
 
+router.get("/check-in", (req,res)=>{
+    res.render("reservations/check-in");
+});
+
 module.exports = router;

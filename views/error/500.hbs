@@ -1,0 +1,17 @@
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="text-center">
+        <h1 class="display-1 text-danger">500</h1>
+        <h2>{{message}}</h2>
+        <p>Something went wrong on our end. Please try again later.</p>
+
+        {{!-- Show error details only in development --}}
+        {{#if error}}
+            <p class="text-muted"><small>Error: {{error}}</small></p>
+        {{/if}}
+
+        {{!-- Unique error tracking ID --}}
+        <p class="text-muted"><small>Error ID: {{errorId}}</small></p>
+
+        <a href="/" class="btn btn-danger">Go Home</a>
+    </div>
+</div>

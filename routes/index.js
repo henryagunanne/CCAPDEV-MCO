@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const PopularFlight = require('../models/popularFlight');
+const logger = require('../logs/logger'); 
 
 // Homepage route — loads dynamic Popular Flights
 router.get('/', async (req, res) => {
@@ -15,7 +16,7 @@ router.get('/', async (req, res) => {
       popularFlights
     });
   } catch (error) {
-    console.error('Error loading flights:', error);
+    logger.error('Error loading flights:', error);
     res.status(500).send('Server Error');
   }
 });

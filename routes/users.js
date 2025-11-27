@@ -3,6 +3,7 @@ const express = require('express');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs'); // for password hashing and comparison
 const router = express.Router();
+const logger = require('../logs/logger'); 
 
 // Middleware to check if user is authenticated
 function isAuthenticated(req, res, next) {
@@ -53,8 +54,9 @@ router.post('/register', async (req, res) => {
   
       await newUser.save();
       res.status(200).json({ success: true });
+      logger.info(`New registered User - ${newUser._id}`);
     } catch (err) {
-      console.error('Registration error:', err);
+      logger.error('Registration error:', err);
       res.status(500).send('Server error during registration');
     }
 });
@@ -78,6 +80,7 @@ router.post('/login', async (req, res) => {
       // Password matched
       req.session.user = user; // store user in session
       req.session.user.role = user.role; // store user role in session
+      logger.info(`${user.firstName} - ${user._id} logged in`);
       return res.status(200).json({ 
         success: true, 
         isAdmin: req.session.user.role === 'Admin',
@@ -85,7 +88,7 @@ router.post('/login', async (req, res) => {
       });
 
     } catch (err) {
-      console.error('Login error:', err);
+      logger.error('Login error:', err);
       res.status(500).send('Server error during login');
     }
 });
@@ -94,7 +97,7 @@ router.post('/login', async (req, res) => {
 router.post('/logout', isAuthenticated, (req, res) => {
     req.session.destroy(err => {
       if (err) {
-        console.error('Logout error:', err);
+        logger.error('Logout error:', err);
         return res.status(500).send('Server error during logout');
       }
       res.status(200).json({ success: true });
@@ -128,16 +131,17 @@ router.post('/edit/:userId', isAuthenticated, async (req, res) => {
       if (!updatedUser) {
         return res.status(404).send('User not found');
       }
-  
+      
       // Update session user data
       req.session.user = updatedUser;
+      logger.info(`User ${req.body} has updated their profile`);
       res.json({ 
         success: true, 
         message: 'Profile updated successfully!',
         user: updatedUser 
       });
     } catch (err) {
-      console.error('Profile update error:', err);
+      logger.error('Profile update error:', err);
       res.status(500).send('Server error during profile update');
     }
 });
@@ -173,10 +177,11 @@ router.post('/change-password/:userId', isAuthenticated, async (req, res) => {
       const hashedNewPassword = await bcrypt.hash(newPassword, 10);
       user.password = hashedNewPassword;
       await user.save();
-  
+      
+      logger.info(`User ${user._id} has changed their password`)
       res.json({ success: true });
     } catch (err) {
-      console.error('Password change error:', err);
+      logger.error('Password change error:', err);
       res.status(500).send('Server error during password change');
     }
 });
@@ -195,12 +200,13 @@ router.post('/delete/:userId', isAuthenticated, isAdmin, async (req, res) => {
       // Destroy session after account deletion
       req.session.destroy(err => {
         if (err) {
-          console.error('Session destruction error:', err);
+          logger.error('Session destruction error:', err);
         }
+        logger.info(`User deleted ${deletedUser.firstName} ${deletedUser.lastName}`);
         res.json({ success: true });
       });
     } catch (err) {
-      console.error('Account deletion error:', err);
+      logger.error('Account deletion error:', err);
       res.status(500).send('Server error during account deletion');
     }
 });
@@ -215,13 +221,14 @@ router.post('/forgot-password', async (req, res) => {
       return res.status(400).send('User not found');
     }
 
+    logger.info(`User ${findUser.lastName} - ${findUser._id} has requested to change their password`)
     // Here you would typically generate a password reset token and send an email
     res.json({ 
       success: true, 
       message: 'Password reset link sent to email (simulated)' 
     });
   } catch (err) {
-    console.error('Forgot password error:', err);
+    logger.error('Forgot password error:', err);
     res.status(500).send('Server error during password reset');
   }
 });

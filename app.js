@@ -11,18 +11,23 @@ const seedFlights = require('./seeds/seedFlights'); // Seed flights
 const seedUsers = require('./seeds/seedUsers'); // Seed Users
 const seedReservations = require('./seeds/seedReservations'); // Seed Reservations
 
+// System logging
+const httpLogger = require('./logs/httpLogger');
+const logger = require('./logs/logger');  
+
  
+
 // Connect to MongoDB
 if (process.env.NODE_ENV !== 'test') {
     mongoose.connect('mongodb://127.0.0.1:27017/airlineDB')
     .then(async () => {
-        console.log('✅ MongoDB connected.');
+        logger.info('✅ MongoDB connected.');
         await seedFlights(); // seeds flights if empty
         await seedPopularFlights(); // seed popular flights if empty
         await seedUsers(); // seed users if empty
         await seedReservations(); // seed reservations if empty
     })
-    .catch(err => console.error('MongoDB connection error:', err));
+    .catch(err => logger.error('MongoDB connection error:', err));
 }
 
 // Configure Handlebars and handlebars helpers
@@ -112,6 +117,7 @@ app.set('views', './views'); // Set views directory
 app.use(express.urlencoded({ extended: true }));    // Parse URL-encoded bodies
 app.use(express.json());    // Parse JSON bodies
 app.use(express.static(path.join(__dirname, 'public')));  // Serve static files
+app.use(httpLogger);    // HTTP Request Logging 
 
 
 // Session management
@@ -143,10 +149,22 @@ app.use('/flights', require('./routes/flights'));
 app.use('/reservations', require('./routes/reservations'));
 app.use('/admin', require('./routes/admin'));
 
+
+
+
 // 404 handler - for unmatched routes
-app.use((req, res, next) => {
-    res.status(404).render('error/404', { url: req.originalUrl });
+app.use((err, req, res, next) => {
+    logger.error(`ERROR: ${err.message}`, { stack: err.stack });
+    res.status(404).render('error/404', {
+        title: '404 Not Found',
+        url: req.originalUrl,
+        code: 404,
+        message: 'Page Not Found',
+        description: `The requested URL "${req.originalUrl}" was not found on this server.`
+    });
 });
+
+
 
 
 // Export app for testing

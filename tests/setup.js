@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server'); // In-memory MongoDB server
+const logger = require('../logs/logger'); 
 
 let mongod;
 
@@ -12,7 +13,7 @@ module.exports.connect = async () => {
 
   await mongoose.connect(uri)
   .then(async () => {
-    console.log('✅ MongoDB connected.');
+    logger.info('✅ MongoDB connected.');
   })
   .catch(err => console.error('MongoDB connection error:', err));
 };

@@ -3,6 +3,7 @@ const express = require('express');
 const Reservation = require('../models/Reservation');
 const Flight = require('../models/Flight');
 const router = express.Router();
+const logger = require('../logs/logger'); 
 
 
 // Helper middleware to check if user is authenticated
@@ -59,12 +60,14 @@ router.post("/create", isAuthenticated, isAdmin, async (req, res) => {
 
     await newReservation.save();
 
+    logger.info(`New Reservation Created - id=${newReservation._id}`);
     return res.status(200).json({
       redirect: `/reservations/${newReservation._id}/confirmation`
     });
 
+
   } catch (err) {
-    console.error("Error creating reservation:", err);
+    logger.error("Error creating reservation:", err);
     return res.status(500).send("Error creating reservation");
   }
 });
@@ -125,7 +128,7 @@ router.get('/book/:flightId', isAuthenticated, isAdmin, async (req, res) => {
     });
 
   } catch (err) {
-    console.error("Error loading book page:", err);
+    logger.error("Error loading book page:", err);
     res.status(500).send("Internal Server Error");
   }
 });
@@ -148,7 +151,7 @@ router.get('/book-flight', isAuthenticated, isAdmin, async (req, res) => {
       occupiedSeats: JSON.stringify([]) // placeholder for safety
     });
   } catch (err) {
-    console.error('Error loading Book Flight page:', err);
+    logger.error('Error loading Book Flight page:', err);
     res.status(500).send('Error loading Book Flight page.');
   }
 });
@@ -167,10 +170,10 @@ router.get('/search', isAuthenticated, async (req, res) => {
     // Find flights that match the route
     const flights = await Flight.find({ origin, destination }).lean();
 
-    console.log(`✈️ Found ${flights.length} flights from ${origin} → ${destination}`);
+    logger.info(`✈️ Found ${flights.length} flights from ${origin} → ${destination}`);
     res.json({ flights });
   } catch (err) {
-    console.error('Error fetching flights:', err);
+    logger.error('Error fetching flights:', err);
     res.status(500).json({ flights: [] });
   }
 });
@@ -210,7 +213,7 @@ router.get("/:id/confirmation", isAuthenticated, isAdmin, async (req, res) => {
       reservation 
     });
   } catch (err) {
-    console.error("Error loading reservation:", err);
+    logger.error("Error loading reservation:", err);
     res.status(500).send("Error loading reservation");
   }
 });
@@ -222,7 +225,7 @@ router.get("/check-in", isAuthenticated, isAdmin, async (req,res)=>{
     try{
         res.render("reservations/check-in");
     }catch(err){
-        console.error("Check-in page error:", err);
+        logger.error("Check-in page error:", err);
         res.status(500).send("Error loading reservation");
     }
 });
@@ -240,9 +243,9 @@ router.post("/check-in", isAuthenticated, isAdmin, async (req,res)=>{
         fullName = fullName.trim();
 
         const reservation = await Reservation.findOne({
-        bookingReference: pnr,
-        "passengers.fullName": { $regex: fullName, $options:"i" }
-    }).populate("flight");
+            bookingReference: pnr,
+            "passengers.fullName": { $regex: fullName, $options:"i" }
+        }).populate("flight");
 
         if(!reservation)
             return res.json({ success:false, message:"Invalid PNR or Name" });
@@ -275,19 +278,19 @@ router.post("/check-in", isAuthenticated, isAdmin, async (req,res)=>{
 
 
         reservation.passengers[idx].checkedIn = true;
-reservation.passengers[idx].boardingPass = { outbound: outboundBP, return: returnBP };
-await reservation.save();
+        reservation.passengers[idx].boardingPass = { outbound: outboundBP, return: returnBP };
+        await reservation.save();
 
-return res.json({
-    success:true,
-    reservation: await reservation.populate("flight").then(r=>r.toObject()),
-    outboundBP,
-    returnBP
-});
+        return res.json({
+            success:true,
+            reservation: await reservation.populate("flight").then(r=>r.toObject()),
+            outboundBP,
+            returnBP
+        });
 
 
     }catch(err){
-        console.log("CHECK-IN ERROR:", err);
+        logger.error("CHECK-IN ERROR:", err);
         return res.json({ success:false, message:"Server error" });
     }
 });
@@ -311,7 +314,7 @@ router.get('/my-bookings', isAuthenticated, isAdmin, async (req, res) => {
       user: req.session.user
     })
   }catch (err){
-    console.error("Error loading reservation:", err);
+    logger.error("Error loading reservation:", err);
     res.status(500).send("Error loading reservation");
   }
 });
@@ -332,13 +335,14 @@ router.post('/cancel/:reservationId', isAuthenticated, isAdmin, async (req, res)
       return res.status(404).send('Reservation not found');
     }
 
+    logger.info(`Reservation with ID ${cancelledReservation._id} has been cancelled`);
     res.status(200).json({ 
       success: true, 
       message: 'Reservation Cancelled',
       cancelledReservation
     });
   }catch (err) {
-    console.error('Reservation update error:', err);
+    logger.error('Reservation update error:', err);
     res.status(500).send('Server error during Reservation update');
   }
 });
@@ -416,7 +420,7 @@ router.get('/:id/edit', isAuthenticated, isAdmin, async (req, res) => {
     });
 
   } catch (err) {
-    console.error("Error loading edit page:", err);
+    logger.error("Error loading edit page:", err);
     res.status(500).send('Server error loading edit page.');
   }
 });
@@ -488,13 +492,14 @@ router.post('/:id/edit', isAuthenticated, isAdmin, async (req, res) => {
     reservation.totalFinalPrice =
       baseFare + returnFare + reservation.mealTotal + reservation.baggageTotal + reservation.seatTotal;
 
+    logger.info(`Reservation with ID ${reservation._id} has been updated`);
     // Render
     res.status(200).render('reservations/edit-confirmation', {
       title: 'Reservation Updated',
       reservation,
     });
   } catch (err) {
-    console.error('Error updating reservation:', err);
+    logger.error('Error updating reservation:', err);
     res.status(500).send('Error updating reservation');
   }
 });
@@ -513,7 +518,7 @@ router.get("/seats/:flightId", async (req, res) => {
 
     res.json({ occupiedSeats: takenSeats });
   } catch (err) {
-    console.error("Seat fetch error:", err);
+    logger.error("Seat fetch error:", err);
     res.json({ occupiedSeats: [] });
   }
 });
@@ -532,7 +537,7 @@ router.get('/:id', isAuthenticated, isAdmin, async (req, res) => {
     if (!reservation) return res.status(404).send('Reservation not found');
     res.render('reservations/details', { title: 'Booking Details', reservation });
   } catch (err) {
-    console.error("Error loading reservation:", err);
+    logger.error("Error loading reservation:", err);
     res.status(500).send('Error loading reservation');
   }
 });
@@ -551,7 +556,7 @@ router.post('/update/:id', isAuthenticated, isAdmin, async (req, res) => {
     );
     res.json({ success: true, updated });
   } catch (err) {
-    console.error("Error updating reservation:", err);
+    logger.error("Error updating reservation:", err);
     res.status(500).send("Error updating reservation");
   }
 });

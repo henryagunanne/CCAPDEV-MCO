@@ -2,6 +2,7 @@
 const express = require('express');
 const Flight = require('../models/Flight');
 const router = express.Router();
+const logger = require('../logs/logger'); 
 
 
 /* ===========================
@@ -83,6 +84,7 @@ router.get('/search', async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({ message: 'Error searching for flights', error });
+        logger.error('Error searching for flights', error);
     }
 });
 
@@ -102,7 +104,7 @@ router.get('/:id/book', async (req, res) => {
         flight
     });
   } catch (err) {
-    console.error('Error loading flight booking page:', err);
+    logger.error('Error loading flight booking page:', err);
     res.status(500).send('Error loading flight booking page');
   }
 });

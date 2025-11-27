@@ -4,6 +4,7 @@ const router = express.Router();
 const Flight = require('../models/Flight');
 const User = require('../models/User');
 const Reservation = require('../models/Reservation');
+const logger = require('../logs/logger'); 
 
 /* ======================================================
    Admin Access Middleware
@@ -21,7 +22,7 @@ router.use((req, res, next) => {
   DEBUG LOGGER (optional)
 ====================================================== */
 router.use((req, res, next) => {
-  console.log("ADMIN ROUTE:", req.method, req.originalUrl);
+  logger.info("ADMIN ROUTE:", req.method, req.originalUrl);
   next();
 });
 
@@ -45,7 +46,7 @@ router.get('/', async (req, res) => {
       }
     });
   } catch (err) {
-    console.error(err);
+    logger.error(err);
     res.status(500).render('error/server-error');
   }
 });
@@ -71,7 +72,7 @@ router.get('/edit/:id', async (req, res) => {
     });
 
   } catch (err) {
-    console.error("Edit route error:", err);
+    logger.error("Edit route error:", err);
     res.status(500).render('error/server-error');
   }
 });
@@ -105,7 +106,7 @@ router.get('/flights', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error retrieving flights:', error);
+    logger.error('Error retrieving flights:', error);
     res.status(500).json({ message: 'Error retrieving flights' });
   }
 });
@@ -129,7 +130,7 @@ router.get('/flights/:flightNumber', async (req, res) => {
     });
 
   } catch (err) {
-    console.error('Search error:', err);
+    logger.error('Search error:', err);
     res.status(500).json({ message: 'Error retrieving flight' });
   }
 });
@@ -147,8 +148,9 @@ router.post('/create', async (req, res) => {
       flight: saved
     });
 
+    logger.info('Flight created successfully.', saved)
   } catch (err) {
-    console.error('Create flight error:', err);
+    logger.error('Create flight error:', err);
     res.status(500).json({ message: 'Error creating flight.' });
   }
 });
@@ -169,9 +171,10 @@ router.put('/update/:id', async (req, res) => {
     }
 
     res.json({ message: 'Flight updated successfully.', flight: updatedFlight });
+    logger.info('Flight updated successfully.', updatedFlight);
 
   } catch (err) {
-    console.error('Update flight error:', err);
+    logger.error('Update flight error:', err);
     res.status(500).json({ message: 'Error updating flight.' });
   }
 });
@@ -188,9 +191,10 @@ router.delete('/delete/:id', async (req, res) => {
     }
 
     res.json({ message: 'Flight deleted successfully.' });
+    logger.info('Flight deleted successfully', deletedFlight);
 
   } catch (err) {
-    console.error('Delete flight error:', err);
+    logger.error('Delete flight error:', err);
     res.status(500).json({ message: 'Error deleting flight.' });
   }
 });
@@ -211,7 +215,7 @@ router.get('/reservations', async (req, res) => {
       reservations
     });
   } catch (error) {
-    console.error('Error retrieving reservations:', error);
+    logger.error('Error retrieving reservations:', error);
     res.status(500).json({ message: 'Error retrieving reservations', error });
   }
 });
@@ -238,7 +242,7 @@ router.post('/edit-reservation/:reservationId', async (req, res) => {
       updatedReservation
     });
   }catch (err) {
-    console.error('Reservation update error:', err);
+    logger.error('Reservation update error:', err);
     res.status(500).send('Server error during Reservation update');
   }
 });
@@ -255,7 +259,7 @@ router.post('/delete-reservation/:reservationId', async (req, res) => {
 
     res.json({ success: true });
   } catch (error) {
-    console.error('Reservation deletion error:', err);
+    logger.error('Reservation deletion error:', err);
     res.status(500).send('Server error during Reservation deletion');
   }
 });

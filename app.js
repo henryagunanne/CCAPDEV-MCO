@@ -12,18 +12,18 @@ const seedUsers = require('./seeds/seedUsers'); // Seed Users
 const seedReservations = require('./seeds/seedReservations'); // Seed Reservations
 
  
-
 // Connect to MongoDB
-mongoose.connect('mongodb://127.0.0.1:27017/airlineDB')
-.then(async () => {
-    console.log('✅ MongoDB connected.');
-    await seedFlights(); // seeds flights if empty
-    await seedPopularFlights(); // seed popular flights if empty
-    await seedUsers(); // seed users if empty
-    await seedReservations(); // seed reservations if empty
-  })
-.catch(err => console.error('MongoDB connection error:', err));
-
+if (process.env.NODE_ENV !== 'test') {
+    mongoose.connect('mongodb://127.0.0.1:27017/airlineDB')
+    .then(async () => {
+        console.log('✅ MongoDB connected.');
+        await seedFlights(); // seeds flights if empty
+        await seedPopularFlights(); // seed popular flights if empty
+        await seedUsers(); // seed users if empty
+        await seedReservations(); // seed reservations if empty
+    })
+    .catch(err => console.error('MongoDB connection error:', err));
+}
 
 // Configure Handlebars and handlebars helpers
 app.engine('hbs', exphbs.engine({

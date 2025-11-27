@@ -5,8 +5,11 @@ let mongod;
 
 // Connect to in-memory MongoDB
 module.exports.connect = async () => {
+  process.env.NODE_ENV = 'test'; // set node environment to test mode
+
   mongod = await MongoMemoryServer.create();
   const uri = mongod.getUri();
+
   await mongoose.connect(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,

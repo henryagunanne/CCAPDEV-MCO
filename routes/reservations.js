@@ -255,7 +255,7 @@ router.post("/check-in", isAuthenticated, isAdmin, async (req,res)=>{
         if(idx === -1) return res.json({ success:false, message:"Passenger not found" });
 
 
-        // ▶ Fix for old DB documents
+        // Fix for old DB documents
         if(!reservation.passengers[idx].boardingPass || typeof reservation.passengers[idx].boardingPass !== "object"){
             reservation.passengers[idx].boardingPass = { outbound:null, return:null };
         }

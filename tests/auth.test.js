@@ -10,6 +10,11 @@ describe('Authentication Tests', () => {
         agent = request.agent(app);
     });
 
+    afterEach(async () => {
+        await agent
+                .post('/users/logout');
+    });
+
     // Registration test
     describe('POST /users/register', () => {
         // valid registration test
@@ -86,10 +91,6 @@ describe('Authentication Tests', () => {
             expect(res.statusCode).toEqual(200);
             expect(res.body).toHaveProperty('success', true);
             expect(res.body.message).toBe('Welcome, Test!');
-
-            // logout user
-                await agent
-                    .post('/users/logout');
         });
     
         // invalid login test with unregistered

@@ -1,0 +1,67 @@
+{"level":"info","message":"🚀 Server running at http://localhost:3000","timestamp":"2025-11-27 19:38:33"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2025-11-27 19:38:33"}
+{"level":"info","message":"GET /reservations/my-bookings 403 15840 - 1270.132 ms","timestamp":"2025-11-27 19:39:03"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 2.412 ms","timestamp":"2025-11-27 19:39:03"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 3.305 ms","timestamp":"2025-11-27 19:39:03"}
+{"level":"info","message":"Anna - 692837e9271256cfec19c403 logged in","timestamp":"2025-11-27 19:39:19"}
+{"level":"info","message":"POST /users/login 200 59 - 165.364 ms","timestamp":"2025-11-27 19:39:19"}
+{"level":"info","message":"GET /reservations/my-bookings 200 34959 - 105.607 ms","timestamp":"2025-11-27 19:39:23"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 12.715 ms","timestamp":"2025-11-27 19:39:23"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 14.579 ms","timestamp":"2025-11-27 19:39:23"}
+{"level":"info","message":"GET / 200 55958 - 126.602 ms","timestamp":"2025-11-27 19:40:21"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 5.980 ms","timestamp":"2025-11-27 19:40:22"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 1.970 ms","timestamp":"2025-11-27 19:40:22"}
+{"level":"info","message":"Admin - 692837e9271256cfec19c404 logged in","timestamp":"2025-11-27 19:40:39"}
+{"level":"info","message":"POST /users/login 200 59 - 154.311 ms","timestamp":"2025-11-27 19:40:39"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2025-11-27 19:40:41"}
+{"level":"info","message":"GET /admin 304 - - 92.827 ms","timestamp":"2025-11-27 19:40:41"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2025-11-27 19:40:44"}
+{"level":"info","message":"GET /admin/reservations 200 63056 - 56.258 ms","timestamp":"2025-11-27 19:40:44"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2025-11-27 19:40:47"}
+{"level":"info","message":"GET /admin/create 200 25734 - 22.307 ms","timestamp":"2025-11-27 19:40:47"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2025-11-27 19:40:48"}
+{"level":"info","message":"GET /admin/flights 200 1764079 - 66.489 ms","timestamp":"2025-11-27 19:40:48"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2025-11-27 19:40:50"}
+{"level":"info","message":"GET /admin 304 - - 50.262 ms","timestamp":"2025-11-27 19:40:50"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2025-11-27 19:40:51"}
+{"level":"info","message":"GET /admin/flights 304 - - 70.407 ms","timestamp":"2025-11-27 19:40:51"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2025-11-27 19:40:57"}
+{"level":"info","message":"GET /admin 304 - - 79.451 ms","timestamp":"2025-11-27 19:40:57"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 1.644 ms","timestamp":"2025-11-27 19:40:59"}
+{"level":"info","message":"GET / 200 56235 - 37.131 ms","timestamp":"2025-11-27 19:40:59"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 1.453 ms","timestamp":"2025-11-27 19:40:59"}
+{"level":"info","message":"GET /reservations/check-in 304 - - 172.448 ms","timestamp":"2025-11-27 19:42:04"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 2.451 ms","timestamp":"2025-11-27 19:42:04"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 2.432 ms","timestamp":"2025-11-27 19:42:04"}
+{"level":"info","message":"GET /reservations/my-bookings 304 - - 1230.122 ms","timestamp":"2025-11-27 19:42:12"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 6.226 ms","timestamp":"2025-11-27 19:42:12"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 40.807 ms","timestamp":"2025-11-27 19:42:12"}
+{"level":"info","message":"GET /reservations/check-in 304 - - 520.398 ms","timestamp":"2025-11-27 19:42:20"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 3.441 ms","timestamp":"2025-11-27 19:42:20"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 2.170 ms","timestamp":"2025-11-27 19:42:20"}
+{"level":"info","message":"GET /reservations/my-bookings 304 - - 182.557 ms","timestamp":"2025-11-27 19:42:26"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 13.131 ms","timestamp":"2025-11-27 19:42:27"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 13.753 ms","timestamp":"2025-11-27 19:42:27"}
+{"level":"info","message":"GET /reservations/check-in 304 - - 22.914 ms","timestamp":"2025-11-27 19:42:31"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 6.144 ms","timestamp":"2025-11-27 19:42:31"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 1.891 ms","timestamp":"2025-11-27 19:42:31"}
+{"level":"info","message":"POST /reservations/check-in 200 49 - 16.547 ms","timestamp":"2025-11-27 19:42:43"}
+{"level":"info","message":"POST /reservations/check-in 200 857 - 58.544 ms","timestamp":"2025-11-27 19:42:47"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 3.018 ms","timestamp":"2025-11-27 19:43:32"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 35.263 ms","timestamp":"2025-11-27 19:43:32"}
+{"level":"info","message":"GET /reservations/check-in 200 19887 - 152.292 ms","timestamp":"2025-11-27 19:43:32"}
+{"level":"info","message":"POST /reservations/check-in 200 858 - 70.137 ms","timestamp":"2025-11-27 19:43:42"}
+{"level":"info","message":"POST /reservations/check-in 200 858 - 159.812 ms","timestamp":"2025-11-27 19:43:59"}
+{"level":"info","message":"POST /reservations/check-in 200 858 - 45.784 ms","timestamp":"2025-11-27 19:45:30"}
+{"level":"info","message":"GET /reservations/my-bookings 304 - - 124.442 ms","timestamp":"2025-11-27 19:45:33"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 1.941 ms","timestamp":"2025-11-27 19:45:33"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 1.506 ms","timestamp":"2025-11-27 19:45:33"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 1.654 ms","timestamp":"2025-11-27 19:45:49"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 1.420 ms","timestamp":"2025-11-27 19:45:49"}
+{"level":"info","message":"GET /reservations/check-in 200 19887 - 46.041 ms","timestamp":"2025-11-27 19:45:49"}
+{"level":"info","message":"POST /reservations/check-in 200 1352 - 32.624 ms","timestamp":"2025-11-27 19:45:57"}
+{"level":"info","message":"POST /reservations/check-in 200 1350 - 12.079 ms","timestamp":"2025-11-27 19:46:44"}
+{"level":"info","message":"GET /reservations/check-in 200 19887 - 23.850 ms","timestamp":"2025-11-27 19:46:51"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 3.473 ms","timestamp":"2025-11-27 19:46:51"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 1.667 ms","timestamp":"2025-11-27 19:46:51"}
+{"level":"info","message":"POST /reservations/check-in 200 1350 - 13.766 ms","timestamp":"2025-11-27 19:46:58"}

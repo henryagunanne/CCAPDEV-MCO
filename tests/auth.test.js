@@ -23,13 +23,15 @@ describe('Authentication Tests', () => {
         // invalid registration test
         it('User Registration - Duplicate Email', async () => {
             // create user first
-            await agent.post('/users/register').send({
-                firstName: 'Duplicate',
-                lastName: 'User',
-                email: 'duplicate@test.com',
-                password: 'password123',
-                dateOfBirth: '1990-01-01'
-            });
+            await agent
+                .post('/users/register')
+                .send({
+                    firstName: 'Duplicate',
+                    lastName: 'User',
+                    email: 'duplicate@test.com',
+                    password: 'password123',
+                    dateOfBirth: '1990-01-01'
+                });
 
             // Try to create the same user again
             const res = await agent 

@@ -10,10 +10,11 @@ module.exports.connect = async () => {
   mongod = await MongoMemoryServer.create();
   const uri = mongod.getUri();
 
-  await mongoose.connect(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  await mongoose.connect(uri)
+  .then(async () => {
+    console.log('✅ MongoDB connected.');
+  })
+  .catch(err => console.error('MongoDB connection error:', err));
 };
 
 // Close the database and stop the in-memory server

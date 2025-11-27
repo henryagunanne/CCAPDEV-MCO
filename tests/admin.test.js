@@ -12,7 +12,7 @@ describe("Admin Tasks and Privileges", () => {
             password: "adminpass123",
             email: "admin@test.com",
             dateOfBirth: new Date(),
-            role: "admin",
+            role: "Admin",
         });
         await admin.save(); // save admin user
 
@@ -30,7 +30,7 @@ describe("Admin Tasks and Privileges", () => {
         it('Admin can create flight', async () => {
             const res = await agent
                 .post('/admin/create')
-                .set('cookie', adminCookie)
+                .set('Cookie', adminCookie)
                 .send({
                     flightNumber: 'AA1001',
                     origin: 'Manila (MNL)',
@@ -67,7 +67,7 @@ describe("Admin Tasks and Privileges", () => {
 
             const res = await agent
                 .post('/admin/create')
-                .set('cookie', userCookie)
+                .set('Cookie', userCookie)
                 .send({
                     flightNumber: 'AA1002',
                     origin: 'Manila (MNL)',

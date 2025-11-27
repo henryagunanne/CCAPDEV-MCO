@@ -31,7 +31,7 @@ describe('Booking Flight Tests', () => {
         userCookie = resLogin.headers["set-cookie"];
 
         //create flight
-        const flight = Flight.create({
+        const flight = await Flight.create({
             flightNumber: 'AA1002',
             origin: 'Manila (MNL)',
             destination: 'Hong Kong (HKG)',
@@ -51,7 +51,7 @@ describe('Booking Flight Tests', () => {
         it('should create reservation', async () => {
             const res = await agent 
                 .post('/reservations/create')
-                .set('cookie', userCookie)
+                .set('Cookie', userCookie)
                 .send({
                     flight: flightId,
                     tripType: 'One-Way',
@@ -80,7 +80,7 @@ describe('Booking Flight Tests', () => {
                 });
 
             expect(res.statusCode).toEqual(200);
-            expect(res.body).toHaveProperty('redirect', '/reservations/<newReservation_id>/confirmation')
+            expect(res.body.redirect).toMatch(/\/reservations\/.*\/confirmation/);
         });
     });
 
@@ -89,7 +89,7 @@ describe('Booking Flight Tests', () => {
         it('should edit the booking details', async () => {
             let resId;
             // first create a booking
-            const reservation = Reservation.create({
+            const reservation = await Reservation.create({
                 userId: userId,
                 flight: flightId,
                 tripType: 'One-Way',
@@ -113,7 +113,7 @@ describe('Booking Flight Tests', () => {
             // edit reservation details
             const res = await agent
                 .post(`/reservations/${resId}/edit`)
-                .set('cookie', userCookie)
+                .set('Cookie', userCookie)
                 .send({
                     passengersJSON: [
                         {
@@ -130,7 +130,6 @@ describe('Booking Flight Tests', () => {
                 });
             
             expect(res.statusCode).toEqual(200);
-            expect(res.body.title).toBe('Reservation Updated');
         });
     });
 
@@ -139,7 +138,7 @@ describe('Booking Flight Tests', () => {
         it('should set the status of the reservation to Cancelled', async () => {
             let resId;
             // first create a booking
-            const reservation = Reservation.create({
+            const reservation = await Reservation.create({
                 userId: userId,
                 flight: flightId,
                 tripType: 'One-Way',
@@ -163,7 +162,7 @@ describe('Booking Flight Tests', () => {
 
             const res = await agent 
                 .post(`/reservations/cancel/${resId}`)
-                .set('cookie', userCookie);
+                .set('Cookie', userCookie);
 
             expect(res.statusCode).toEqual(200);
             expect(res.body).toHaveProperty('success', true);

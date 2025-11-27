@@ -28,10 +28,9 @@ function isAdmin(req, res, next) {
 }
 
 /* =============================
-   CREATE
+   CREATE — WITH CHECK-IN READY PASSENGERS
 ============================= */
 
-//  Create Reservation Route
 router.post("/create", isAuthenticated, isAdmin, async (req, res) => {
   try {
     const { flight, returnFlight, travelClass, tripType, passengers, totalAmount } = req.body;
@@ -40,13 +39,17 @@ router.post("/create", isAuthenticated, isAdmin, async (req, res) => {
       ? passengers
       : JSON.parse(passengers);
 
-    // Generate PNR Code
+    // Add check-in fields per passenger
+    parsedPassengers.forEach(p => {
+      p.checkedIn = false;
+      p.boardingPass = null;
+    });
+
     const bookingReference = ("AA" + Math.random().toString(36).substring(2, 8)).toUpperCase();
 
-    // Create new reservation with correct field names
     const newReservation = new Reservation({
       userId: req.session.user?._id || null,
-      bookingReference,     
+      bookingReference,
       flight: returnFlight ? [flight, returnFlight] : [flight],
       travelClass,
       tripType,
@@ -56,15 +59,17 @@ router.post("/create", isAuthenticated, isAdmin, async (req, res) => {
     });
 
     await newReservation.save();
-    console.log("New reservation created:", newReservation);
-    
-    res.status(200).json({ redirect: `/reservations/${newReservation._id}/confirmation` });
+
+    return res.status(200).json({
+      redirect: `/reservations/${newReservation._id}/confirmation`
+    });
 
   } catch (err) {
     console.error("Error creating reservation:", err);
-    res.status(500).send("Error creating reservation");
+    return res.status(500).send("Error creating reservation");
   }
 });
+
 
 
 
@@ -224,46 +229,64 @@ router.get("/check-in", isAuthenticated, async (req,res)=>{
 });
 
 // =============================
-// CHECK-IN (POST) — VERIFY PNR
+// CHECK-IN (POST) — With Flight Populate
 // =============================
 router.post("/check-in", isAuthenticated, async (req,res)=>{
-
     try{
         let { pnr, fullName } = req.body;
 
-        // Validate FIRST
-        if(!pnr || !fullName){
-            return res.status(400).json({ success:false, message:"Missing fields" });
-        }
+        if(!pnr || !fullName)
+            return res.json({ success:false, message:"Missing fields" });
 
-        // Clean inputs
-        pnr = String(pnr).trim().toUpperCase();
-        fullName = String(fullName).trim();
+        pnr = pnr.trim().toUpperCase();
+        fullName = fullName.trim();
 
+        // ⬇ MAIN FIX — Populate flight so it shows correctly in boarding pass
         const reservation = await Reservation.findOne({
             bookingReference: pnr,
-            "passengers.fullName": { $regex: fullName, $options:"i" } // case-insensitive
+            "passengers.fullName": { $regex: fullName, $options:"i" }
         })
-        .populate("flight")
-        .lean();
+        .populate({
+            path: "flight",
+            model: "Flight"
+        });
 
-        if(!reservation){
-            return res.status(404).json({ success:false, message:"Invalid PNR or Passenger Name" });
+        if(!reservation)
+            return res.json({ success:false, message:"Invalid PNR or Name" });
+
+        // Find passenger index
+        const idx = reservation.passengers.findIndex(
+            p => p.fullName.toLowerCase() === fullName.toLowerCase()
+        );
+
+        if(reservation.passengers[idx].checkedIn === true){
+            return res.json({
+                success:false,
+                message:`${fullName} is already checked in.`,
+                reservation
+            });
         }
 
+        // Assign boarding pass
         const boardingCode = "BP-" + Math.floor(100000 + Math.random()*900000);
+        reservation.passengers[idx].checkedIn = true;
+        reservation.passengers[idx].boardingPass = boardingCode;
 
-        return res.json({ 
+        await reservation.save();
+
+        return res.json({
             success:true,
-            reservation,
-            boardingCode 
+            reservation:reservation.toObject(),
+            boardingCode
         });
 
     }catch(err){
         console.log("CHECK-IN ERROR:", err);
-        return res.status(500).json({ success:false, message:"Server Error" });
+        return res.json({ success:false, message:"Server error" });
     }
 });
+
+
 
 //4
 // GET reservations/my-bookings - render my reservations page

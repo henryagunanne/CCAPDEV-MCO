@@ -79,7 +79,7 @@ document.getElementById("checkinForm").addEventListener("submit", async (e)=>{
             <p><strong>Flight:</strong> ${r.flight[0].origin} → ${r.flight[0].destination}</p>
             <p><strong>Seat:</strong> <span class="text-danger fw-bold">${pax.seatNumber}</span></p>
             <p><strong>PNR:</strong> ${pnr}</p>
-            <p><strong>Boarding Pass:</strong> ${data.boardingCode}</p>
+            <p><strong>Boarding Pass:</strong> <b>${pax.boardingPass.outbound}</b></p>
         </div>
 
         <div class="p-4 bg-white shadow rounded mx-auto mt-3 mb-5" style="max-width:450px;">
@@ -89,7 +89,7 @@ document.getElementById("checkinForm").addEventListener("submit", async (e)=>{
             <p><strong>Flight:</strong> ${r.flight[1].origin} → ${r.flight[1].destination}</p>
             <p><strong>Seat:</strong> <span class="text-danger fw-bold">${pax.seatNumber}</span></p>
             <p><strong>PNR:</strong> ${pnr}</p>
-            <p><strong>Boarding Pass:</strong> ${data.boardingCode}</p>
+            <p><strong>Boarding Pass:</strong> <b>${pax.boardingPass.return}</b></p>
         </div>
     `;
 });

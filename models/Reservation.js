@@ -6,8 +6,8 @@ const passengerSchema = new mongoose.Schema({
     default: false
   },
   boardingPass: {
-    type: String,
-    default: null
+  outbound: { type:String, default:null },
+  return: { type:String, default:null }
   },
   fullName: {
       type: String,

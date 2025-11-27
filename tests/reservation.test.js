@@ -1,10 +1,16 @@
-const agent = global.agent;
+const request = require('supertest');
+const app = require('../server'); // Import the Express app
 const Reservation = require('../models/Reservation');
 const Flight = require('../models/Flight');
 const User = require('../models/User');
 
+let agent; 
+
 describe('Booking Flight Tests', () => {
-    let userCookie;
+    beforeAll(async () => {
+        agent = request.agent(app);
+    });
+
     let flightId;
     let userId;
     // create user, login and create flight before each tests
@@ -21,14 +27,12 @@ describe('Booking Flight Tests', () => {
         userId = resUser._id.toString();
 
         // login user
-        const resLogin = await agent
+        await agent
         .post('/users/login')
         .send({ 
             email: 'test@example.com',
             password: 'password123'
         });
-
-        userCookie = resLogin.headers["set-cookie"];
 
         //create flight
         const flight = await Flight.create({
@@ -51,7 +55,6 @@ describe('Booking Flight Tests', () => {
         it('should create reservation', async () => {
             const res = await agent 
                 .post('/reservations/create')
-                .set('Cookie', userCookie)
                 .send({
                     flight: flightId,
                     tripType: 'One-Way',
@@ -91,6 +94,7 @@ describe('Booking Flight Tests', () => {
             // first create a booking
             const reservation = await Reservation.create({
                 userId: userId,
+                bookingReference: 'AAQDEBFY',
                 flight: flightId,
                 tripType: 'One-Way',
                 travelClass: 'First',
@@ -113,19 +117,16 @@ describe('Booking Flight Tests', () => {
             // edit reservation details
             const res = await agent
                 .post(`/reservations/${resId}/edit`)
-                .set('Cookie', userCookie)
                 .send({
-                    passengersJSON: [
-                        {
-                            fullName: 'Takeshi Mori',
-                            age: 45,
-                            gender: 'Male',
-                            passport: 'PP123456',
-                            seatNumber: '2A',
-                            meal: 'None',
-                            baggageAllowance: 0
-                        }
-                    ],
+                    passengersJSON: JSON.stringify({
+                        fullName: 'Takeshi Mori',
+                        age: 45,
+                        gender: 'Male',
+                        passport: 'PP123456',
+                        seatNumber: '2A',
+                        meal: 'None',
+                        baggageAllowance: 0
+                    }),
                     totalPrice: 5000
                 });
             
@@ -140,6 +141,7 @@ describe('Booking Flight Tests', () => {
             // first create a booking
             const reservation = await Reservation.create({
                 userId: userId,
+                bookingReference: 'AAQDEBFY',
                 flight: flightId,
                 tripType: 'One-Way',
                 travelClass: 'First',
@@ -162,7 +164,6 @@ describe('Booking Flight Tests', () => {
 
             const res = await agent 
                 .post(`/reservations/cancel/${resId}`)
-                .set('Cookie', userCookie);
 
             expect(res.statusCode).toEqual(200);
             expect(res.body).toHaveProperty('success', true);

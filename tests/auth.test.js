@@ -1,7 +1,14 @@
-const agent = global.agent;
+const request = require('supertest');
+const app = require('../server'); // Import the Express app
 const User = require('../models/User');
 
+let agent; 
+
 describe('Authentication Tests', () => {
+
+    beforeAll(async () => {
+        agent = request.agent(app);
+    });
 
     // Registration test
     describe('POST /users/register', () => {
@@ -39,7 +46,7 @@ describe('Authentication Tests', () => {
                 .send({
                     firstName: 'Dup',
                     lastName: 'User',
-                    email: 'duplicate@test.com', //
+                    email: 'duplicate@test.com', // duplicate email
                     password: 'password123',
                     dateOfBirth: new Date()
                 });
@@ -54,6 +61,19 @@ describe('Authentication Tests', () => {
 
     // user login test
     describe('POST /users/login', () => {
+        // create a user before each test
+        beforeEach(async () => {
+             //create a user and login
+             const resUser = new User({
+                firstName: 'Test',
+                lastName: 'User',
+                email: 'test@example.com',
+                password: 'password123',
+                dateOfBirth: new Date()
+            });
+            await resUser.save();
+        });
+
         // valid login test
         it('should login successfully with correct credentials', async () => {
             const res = await agent
@@ -65,7 +85,11 @@ describe('Authentication Tests', () => {
             
             expect(res.statusCode).toEqual(200);
             expect(res.body).toHaveProperty('success', true);
-            expect(res.body.message).toBe('Welcome Test');
+            expect(res.body.message).toBe('Welcome, Test!');
+
+            // logout user
+                await agent
+                    .post('/users/logout');
         });
     
         // invalid login test with unregistered
@@ -77,7 +101,7 @@ describe('Authentication Tests', () => {
                     password: 'wrongpass' 
                 });
             expect(res.statusCode).toEqual(400);
-            expect(res.body).toBe('User not found');
+            expect(res.body.message).toBe('User not found');
         });
 
         // invalid login test with wrong password
@@ -89,7 +113,7 @@ describe('Authentication Tests', () => {
                     password: 'wrongpass' 
                 });
             expect(res.statusCode).toEqual(400);
-            expect(res.body).toBe('Invalid password');
+            expect(res.body.message).toBe('Invalid password');
         });
     });
 
@@ -100,7 +124,7 @@ describe('Authentication Tests', () => {
                 .get('/users/profile');
 
             expect(res.statusCode).toEqual(403);
-            expect(res.body).toHaveProperty('title', 'Access Denied')
+            expect(res.text).toMatch(/<title>Access Denied<\/title>/);
         });
     });
 

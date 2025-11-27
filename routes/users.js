@@ -67,12 +67,12 @@ router.post('/login', async (req, res) => {
       const user = await User.findOne({ email: email }).lean();
   
       if (!user) {
-        return res.status(400).send('User not found');
+        return res.status(400).json({ message: 'User not found' });
       }
   
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
-        return res.status(400).send('Invalid password');
+        return res.status(400).json({ message:'Invalid password' });
       }
   
       // Password matched

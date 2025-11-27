@@ -393,7 +393,7 @@ router.get('/:id/edit', isAuthenticated, isAdmin, async (req, res) => {
 
 
 //7
-      // POST /reservations/:id/edit - Handle edit submission
+// POST /reservations/:id/edit - Handle edit submission
 router.post('/:id/edit', isAuthenticated, isAdmin, async (req, res) => {
   try {
     const reservationId = req.params.id;

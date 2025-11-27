@@ -150,8 +150,6 @@ app.use('/reservations', require('./routes/reservations'));
 app.use('/admin', require('./routes/admin'));
 
 
-
-
 // 404 handler - for unmatched routes
 app.use((err, req, res, next) => {
     logger.error(`ERROR: ${err.message}`, { stack: err.stack });

@@ -44,6 +44,11 @@ const reservationSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  bookingReference: {
+    type: String,
+    required: true,
+    unique: true
+  },
   // Flight reference
   flight: [
     {

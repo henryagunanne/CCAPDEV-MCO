@@ -1,0 +1,68 @@
+<main class="container mt-5">
+    <h2 class="text-center fw-bold mb-3" style="color:#C81E2C;">Online Check-In</h2>
+    <p class="text-center text-muted">Enter your booking details to retrieve your boarding pass</p>
+
+    <!-- Check-In Form -->
+    <form id="checkinForm" class="w-50 mx-auto shadow p-4 rounded bg-light">
+        <label class="form-label fw-semibold">PNR / Booking Reference</label>
+        <input type="text" id="pnr" class="form-control" required>
+
+        <label class="form-label fw-semibold mt-3">Full Name</label>
+        <input type="text" id="fullName" class="form-control" required>
+
+        <button type="submit" class="btn btn-danger w-100 mt-4">Retrieve Boarding Pass</button>
+    </form>
+
+    <!-- CHECK-IN RESULT AREA -->
+    <div id="boardingContainer" class="mt-5 text-center d-none">
+        <h3 class="fw-bold" style="color:#C81E2C;">Check-In Successful!</h3>
+        <p class="text-muted">Here is your boarding pass — save or screenshot it.</p>
+
+            <div class="p-4 bg-white shadow rounded mx-auto mt-3 mb-5" style="max-width:450px;">
+            <h4 class="fw-bold" style="color:#C81E2C;">BOARDING PASS</h4>
+            <hr>
+
+            <p><strong>Passenger:</strong> <span id="bpName"></span></p>
+            <p><strong>Flight:</strong> <span id="bpFlight"></span></p>
+            <p><strong>Seat:</strong> <span id="bpSeat" class="text-danger fw-bold"></span></p>
+            <p><strong>PNR:</strong> <span id="bpPNR"></span></p>
+            <p><strong>Boarding Pass:</strong> <span id="bpCode" class="fw-bold"></span></p>
+
+            <hr>
+            <small class="text-muted">Please arrive 45 minutes before departure</small>
+        </div>
+    </div>
+</main>
+
+
+<!-- FINAL WORKING SCRIPT -->
+<script>
+document.getElementById("checkinForm").addEventListener("submit", async (e)=>{
+    e.preventDefault();
+
+    const pnr = document.getElementById("pnr").value.trim();
+    const fullName = document.getElementById("fullName").value.trim();
+
+    const res = await fetch("/reservations/check-in", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify({ pnr, fullName })
+    });
+
+    const data = await res.json();
+
+    if(!data.success){
+        return alert("Invalid booking details!");
+    }
+
+    const r = data.reservation;
+
+    // SHOW RESULT
+    document.getElementById("boardingContainer").classList.remove("d-none");
+    document.getElementById("bpName").innerText = r.passengers[0].fullName;
+    document.getElementById("bpPNR").innerText = pnr;
+    document.getElementById("bpSeat").innerText = r.passengers[0].seatNumber ?? "Not Assigned";
+    document.getElementById("bpFlight").innerText = `${r.flight[0].origin} → ${r.flight[0].destination}`;
+    document.getElementById("bpCode").innerText = data.boardingCode;
+});
+</script>

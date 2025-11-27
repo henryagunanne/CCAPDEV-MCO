@@ -27,7 +27,6 @@ function isAdmin(req, res, next) {
   next();
 }
 
-//1
 /* =============================
    CREATE
 ============================= */
@@ -40,27 +39,34 @@ router.post("/create", isAuthenticated, isAdmin, async (req, res) => {
     const parsedPassengers = Array.isArray(passengers)
       ? passengers
       : JSON.parse(passengers);
-      
+
+    // Generate PNR Code
+    const bookingReference = ("AA" + Math.random().toString(36).substring(2, 8)).toUpperCase();
 
     // Create new reservation with correct field names
     const newReservation = new Reservation({
       userId: req.session.user?._id || null,
-      flight: returnFlight ? [flight, returnFlight] : [flight], // field name matches schema
+      bookingReference,     
+      flight: returnFlight ? [flight, returnFlight] : [flight],
       travelClass,
       tripType,
       passengers: parsedPassengers,
-      price: parseFloat(totalAmount) || 0, // required Price field
+      price: parseFloat(totalAmount) || 0,
       status: "Pending"
     });
 
     await newReservation.save();
     console.log("New reservation created:", newReservation);
+    
     res.status(200).json({ redirect: `/reservations/${newReservation._id}/confirmation` });
+
   } catch (err) {
     console.error("Error creating reservation:", err);
     res.status(500).send("Error creating reservation");
   }
 });
+
+
 
 //2
 /* =============================
@@ -203,6 +209,60 @@ router.get("/:id/confirmation", isAuthenticated, async (req, res) => {
     console.error("Error loading reservation:", err);
     res.status(500).send("Error loading reservation");
   }
+});
+
+// =============================
+// CHECK-IN PAGE (VIEW)
+// =============================
+router.get("/check-in", isAuthenticated, async (req,res)=>{
+    try{
+        res.render("reservations/check-in");
+    }catch(err){
+        console.error("Check-in page error:", err);
+        res.status(500).send("Error loading reservation");
+    }
+});
+
+// =============================
+// CHECK-IN (POST) — VERIFY PNR
+// =============================
+router.post("/check-in", isAuthenticated, async (req,res)=>{
+
+    try{
+        let { pnr, fullName } = req.body;
+
+        // Validate FIRST
+        if(!pnr || !fullName){
+            return res.status(400).json({ success:false, message:"Missing fields" });
+        }
+
+        // Clean inputs
+        pnr = String(pnr).trim().toUpperCase();
+        fullName = String(fullName).trim();
+
+        const reservation = await Reservation.findOne({
+            bookingReference: pnr,
+            "passengers.fullName": { $regex: fullName, $options:"i" } // case-insensitive
+        })
+        .populate("flight")
+        .lean();
+
+        if(!reservation){
+            return res.status(404).json({ success:false, message:"Invalid PNR or Passenger Name" });
+        }
+
+        const boardingCode = "BP-" + Math.floor(100000 + Math.random()*900000);
+
+        return res.json({ 
+            success:true,
+            reservation,
+            boardingCode 
+        });
+
+    }catch(err){
+        console.log("CHECK-IN ERROR:", err);
+        return res.status(500).json({ success:false, message:"Server Error" });
+    }
 });
 
 //4

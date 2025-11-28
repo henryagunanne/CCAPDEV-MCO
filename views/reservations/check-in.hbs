@@ -50,7 +50,13 @@ document.getElementById("checkinForm").addEventListener("submit", async (e)=>{
     });
 
     const data = await res.json();
-    if(!data.success) return alert("Invalid PNR or Passenger Name!");
+    if(!data.success) {
+    if(data.message && data.message.includes("already")) {
+        return alert("This boarding pass has already been claimed.\nOnline check-in is only allowed once per passenger.");
+    }
+    return alert("Invalid PNR or Passenger Name!");
+}
+
 
     const r = data.reservation;
     const pax = r.passengers.find(p => p.fullName.toLowerCase() == fullName.toLowerCase());

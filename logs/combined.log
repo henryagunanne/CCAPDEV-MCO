@@ -108,3 +108,130 @@
 {"level":"info","message":"GET /src/css/book-select.css 404 162 - 13.681 ms","timestamp":"2025-11-28 22:19:11"}
 {"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 25.426 ms","timestamp":"2025-11-28 22:19:11"}
 {"level":"info","message":"POST /reservations/check-in 200 855 - 24.232 ms","timestamp":"2025-11-28 22:19:16"}
+{"level":"info","message":"GET /reservations/check-in 200 20092 - 104.804 ms","timestamp":"2025-11-28 22:27:18"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 4.827 ms","timestamp":"2025-11-28 22:27:19"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 1.458 ms","timestamp":"2025-11-28 22:27:19"}
+{"level":"info","message":"POST /reservations/check-in 200 854 - 78.006 ms","timestamp":"2025-11-28 22:27:47"}
+{"level":"info","message":"POST /reservations/check-in 200 858 - 8.297 ms","timestamp":"2025-11-28 22:28:15"}
+{"level":"info","message":"GET /reservations/check-in 200 20092 - 22.203 ms","timestamp":"2025-11-28 22:28:19"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 1.635 ms","timestamp":"2025-11-28 22:28:19"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 4.803 ms","timestamp":"2025-11-28 22:28:19"}
+{"level":"info","message":"GET /reservations/my-bookings 304 - - 44.938 ms","timestamp":"2025-11-28 22:28:20"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 1.377 ms","timestamp":"2025-11-28 22:28:20"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 1.908 ms","timestamp":"2025-11-28 22:28:20"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 2.236 ms","timestamp":"2025-11-28 22:28:21"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 4.773 ms","timestamp":"2025-11-28 22:28:21"}
+{"level":"info","message":"GET /reservations/check-in 304 - - 11.920 ms","timestamp":"2025-11-28 22:28:28"}
+{"level":"info","message":"POST /reservations/check-in 200 1350 - 21.276 ms","timestamp":"2025-11-28 22:28:36"}
+{"level":"info","message":"POST /reservations/check-in 200 1365 - 30.562 ms","timestamp":"2025-11-28 22:28:43"}
+{"level":"info","message":"GET /reservations/my-bookings 304 - - 48.389 ms","timestamp":"2025-11-28 22:29:17"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 1.927 ms","timestamp":"2025-11-28 22:29:17"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 2.721 ms","timestamp":"2025-11-28 22:29:17"}
+{"level":"info","message":"GET / 304 - - 33.488 ms","timestamp":"2025-11-28 22:29:19"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 4.052 ms","timestamp":"2025-11-28 22:29:19"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 13.161 ms","timestamp":"2025-11-28 22:29:19"}
+{"level":"info","message":"GET /reservations/my-bookings 304 - - 35.402 ms","timestamp":"2025-11-28 22:29:20"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 2.424 ms","timestamp":"2025-11-28 22:29:20"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 2.118 ms","timestamp":"2025-11-28 22:29:20"}
+{"level":"info","message":"Reservation with ID 692837ea271256cfec19c410 has been cancelled","timestamp":"2025-11-28 22:29:45"}
+{"level":"info","message":"POST /reservations/cancel/692837ea271256cfec19c410 200 868 - 25.620 ms","timestamp":"2025-11-28 22:29:45"}
+{"level":"info","message":"GET / 304 - - 35.024 ms","timestamp":"2025-11-28 22:30:07"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 3.477 ms","timestamp":"2025-11-28 22:30:08"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 1.617 ms","timestamp":"2025-11-28 22:30:08"}
+{"level":"info","message":"GET /reservations/book/692837e9271256cfec19be60?tripType=Round-Trip&depart=Nov%2015,%202025&return=Dec%2015,%202025 200 21117 - 38.964 ms","timestamp":"2025-11-28 22:30:11"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 2.433 ms","timestamp":"2025-11-28 22:30:11"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 27.121 ms","timestamp":"2025-11-28 22:30:11"}
+{"_message":"Reservation validation failed","errors":{"passengers.0.fullName":{"kind":"required","message":"Path `fullName` is required.","name":"ValidatorError","path":"fullName","properties":{"length":0,"message":"Path `fullName` is required.","path":"fullName","type":"required","value":""},"value":""},"passengers.0.gender":{"kind":"required","message":"Path `gender` is required.","name":"ValidatorError","path":"gender","properties":{"length":0,"message":"Path `gender` is required.","path":"gender","type":"required","value":""},"value":""},"passengers.0.passport":{"kind":"required","message":"Path `passport` is required.","name":"ValidatorError","path":"passport","properties":{"length":0,"message":"Path `passport` is required.","path":"passport","type":"required","value":""},"value":""}},"level":"error","message":"Error creating reservation: Reservation validation failed: passengers.0.fullName: Path `fullName` is required., passengers.0.gender: Path `gender` is required., passengers.0.passport: Path `passport` is required.","stack":"ValidationError: Reservation validation failed: passengers.0.fullName: Path `fullName` is required., passengers.0.gender: Path `gender` is required., passengers.0.passport: Path `passport` is required.\n    at Document.invalidate (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/node_modules/mongoose/lib/document.js:3362:32)\n    at Subdocument.invalidate (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/node_modules/mongoose/lib/types/subdocument.js:257:12)\n    at /Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/node_modules/mongoose/lib/document.js:3123:17\n    at /Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/node_modules/mongoose/lib/schemaType.js:1420:9\n    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)","timestamp":"2025-11-28 22:31:04"}
+{"level":"info","message":"POST /reservations/create 500 26 - 37.626 ms","timestamp":"2025-11-28 22:31:04"}
+{"_message":"Reservation validation failed","errors":{"passengers.0.gender":{"kind":"required","message":"Path `gender` is required.","name":"ValidatorError","path":"gender","properties":{"length":0,"message":"Path `gender` is required.","path":"gender","type":"required","value":""},"value":""},"passengers.0.passport":{"kind":"required","message":"Path `passport` is required.","name":"ValidatorError","path":"passport","properties":{"length":0,"message":"Path `passport` is required.","path":"passport","type":"required","value":""},"value":""}},"level":"error","message":"Error creating reservation: Reservation validation failed: passengers.0.gender: Path `gender` is required., passengers.0.passport: Path `passport` is required.","stack":"ValidationError: Reservation validation failed: passengers.0.gender: Path `gender` is required., passengers.0.passport: Path `passport` is required.\n    at Document.invalidate (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/node_modules/mongoose/lib/document.js:3362:32)\n    at Subdocument.invalidate (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/node_modules/mongoose/lib/types/subdocument.js:257:12)\n    at /Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/node_modules/mongoose/lib/document.js:3123:17\n    at /Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/node_modules/mongoose/lib/schemaType.js:1420:9\n    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)","timestamp":"2025-11-28 22:32:12"}
+{"level":"info","message":"POST /reservations/create 500 26 - 54.029 ms","timestamp":"2025-11-28 22:32:12"}
+{"level":"info","message":"GET /reservations/book/692837e9271256cfec19be60?tripType=Round-Trip&depart=Nov%2015,%202025&return=Dec%2015,%202025 200 21163 - 117.128 ms","timestamp":"2025-11-28 22:41:32"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 34.624 ms","timestamp":"2025-11-28 22:41:33"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 5.487 ms","timestamp":"2025-11-28 22:41:33"}
+{"level":"info","message":"New Reservation Created - id=6929b4c0048c12f3861fe477","timestamp":"2025-11-28 22:42:08"}
+{"level":"info","message":"POST /reservations/create 200 66 - 57.374 ms","timestamp":"2025-11-28 22:42:08"}
+{"level":"info","message":"GET /reservations/6929b4c0048c12f3861fe477/confirmation 200 20174 - 16.276 ms","timestamp":"2025-11-28 22:42:08"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 1.915 ms","timestamp":"2025-11-28 22:42:09"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 2.755 ms","timestamp":"2025-11-28 22:42:09"}
+{"level":"info","message":"GET /reservations/book-flight 304 - - 34.996 ms","timestamp":"2025-11-28 22:42:33"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 3.503 ms","timestamp":"2025-11-28 22:42:33"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 1.760 ms","timestamp":"2025-11-28 22:42:33"}
+{"level":"info","message":"✈️ Found 2 flights from Beijing (PEK) → Da Nang (DAD)","timestamp":"2025-11-28 22:42:36"}
+{"level":"info","message":"GET /reservations/search?origin=Beijing%20(PEK)&destination=Da%20Nang%20(DAD) 200 556 - 6.812 ms","timestamp":"2025-11-28 22:42:36"}
+{"level":"info","message":"GET /reservations/seats/692837e9271256cfec19c018 200 20 - 6.997 ms","timestamp":"2025-11-28 22:42:38"}
+{"level":"info","message":"GET /reservations/my-bookings 200 39959 - 43.723 ms","timestamp":"2025-11-28 22:42:49"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 31.120 ms","timestamp":"2025-11-28 22:42:50"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 37.139 ms","timestamp":"2025-11-28 22:42:50"}
+{"level":"info","message":"GET / 304 - - 556.394 ms","timestamp":"2025-11-28 22:47:22"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 45.827 ms","timestamp":"2025-11-28 22:47:22"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 1.848 ms","timestamp":"2025-11-28 22:47:22"}
+{"level":"info","message":"GET /reservations/book-flight 304 - - 35.513 ms","timestamp":"2025-11-28 22:47:24"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 4.941 ms","timestamp":"2025-11-28 22:47:24"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 5.807 ms","timestamp":"2025-11-28 22:47:24"}
+{"level":"info","message":"✈️ Found 2 flights from Brisbane (BNE) → Da Nang (DAD)","timestamp":"2025-11-28 22:47:28"}
+{"level":"info","message":"GET /reservations/search?origin=Brisbane%20(BNE)&destination=Da%20Nang%20(DAD) 200 577 - 21.392 ms","timestamp":"2025-11-28 22:47:28"}
+{"level":"info","message":"GET /reservations/seats/692837e9271256cfec19c194 200 20 - 5.263 ms","timestamp":"2025-11-28 22:47:30"}
+{"_message":"Reservation validation failed","errors":{"passengers.0.seatNumber":{"kind":"required","message":"Path `seatNumber` is required.","name":"ValidatorError","path":"seatNumber","properties":{"message":"Path `seatNumber` is required.","path":"seatNumber","type":"required","value":null},"value":null}},"level":"error","message":"Error creating reservation: Reservation validation failed: passengers.0.seatNumber: Path `seatNumber` is required.","stack":"ValidationError: Reservation validation failed: passengers.0.seatNumber: Path `seatNumber` is required.\n    at Document.invalidate (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/node_modules/mongoose/lib/document.js:3362:32)\n    at Subdocument.invalidate (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/node_modules/mongoose/lib/types/subdocument.js:257:12)\n    at /Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/node_modules/mongoose/lib/document.js:3123:17\n    at /Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/node_modules/mongoose/lib/schemaType.js:1420:9\n    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)","timestamp":"2025-11-28 22:47:58"}
+{"level":"info","message":"POST /reservations/create 500 26 - 59.291 ms","timestamp":"2025-11-28 22:47:59"}
+{"level":"info","message":"New Reservation Created - id=6929b62d048c12f3861fe48e","timestamp":"2025-11-28 22:48:13"}
+{"level":"info","message":"POST /reservations/create 200 66 - 17.421 ms","timestamp":"2025-11-28 22:48:13"}
+{"level":"info","message":"GET /reservations/6929b62d048c12f3861fe48e/confirmation 200 19324 - 21.254 ms","timestamp":"2025-11-28 22:48:13"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 2.283 ms","timestamp":"2025-11-28 22:48:14"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 1.666 ms","timestamp":"2025-11-28 22:48:14"}
+{"level":"info","message":"GET / 304 - - 132.738 ms","timestamp":"2025-11-28 22:48:38"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 6.694 ms","timestamp":"2025-11-28 22:48:38"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 2.414 ms","timestamp":"2025-11-28 22:48:38"}
+{"level":"info","message":"GET /reservations/book/692837e9271256cfec19bd79?tripType=One-Way&depart=Nov%2020,%202025&return=Dec%2020,%202025 200 20952 - 37.680 ms","timestamp":"2025-11-28 22:48:44"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 2.013 ms","timestamp":"2025-11-28 22:48:45"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 2.175 ms","timestamp":"2025-11-28 22:48:45"}
+{"level":"info","message":"New Reservation Created - id=6929b68e048c12f3861fe499","timestamp":"2025-11-28 22:49:50"}
+{"level":"info","message":"POST /reservations/create 200 66 - 64.594 ms","timestamp":"2025-11-28 22:49:50"}
+{"level":"info","message":"GET /reservations/6929b68e048c12f3861fe499/confirmation 200 19568 - 26.674 ms","timestamp":"2025-11-28 22:49:50"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 2.980 ms","timestamp":"2025-11-28 22:49:51"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 1.744 ms","timestamp":"2025-11-28 22:49:51"}
+{"level":"info","message":"GET /reservations/my-bookings 200 48631 - 66.249 ms","timestamp":"2025-11-28 22:49:59"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 1.027 ms","timestamp":"2025-11-28 22:49:59"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 0.959 ms","timestamp":"2025-11-28 22:49:59"}
+{"level":"info","message":"Reservation with ID 6929b68e048c12f3861fe499 has been cancelled","timestamp":"2025-11-28 22:51:11"}
+{"level":"info","message":"POST /reservations/cancel/6929b68e048c12f3861fe499 200 754 - 31.864 ms","timestamp":"2025-11-28 22:51:11"}
+{"level":"info","message":"Reservation with ID 6929b4c0048c12f3861fe477 has been cancelled","timestamp":"2025-11-28 22:51:31"}
+{"level":"info","message":"POST /reservations/cancel/6929b4c0048c12f3861fe477 200 785 - 9.804 ms","timestamp":"2025-11-28 22:51:31"}
+{"level":"info","message":"GET /reservations/6929b62d048c12f3861fe48e/edit 200 27637 - 36.661 ms","timestamp":"2025-11-28 22:51:34"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 2.305 ms","timestamp":"2025-11-28 22:51:35"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 4.113 ms","timestamp":"2025-11-28 22:51:35"}
+{"level":"info","message":"Reservation with ID 6929b62d048c12f3861fe48e has been updated","timestamp":"2025-11-28 22:51:42"}
+{"level":"info","message":"POST /reservations/6929b62d048c12f3861fe48e/edit 200 19093 - 43.948 ms","timestamp":"2025-11-28 22:51:42"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 7.430 ms","timestamp":"2025-11-28 22:51:42"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 26.838 ms","timestamp":"2025-11-28 22:51:42"}
+{"level":"info","message":"GET /reservations/my-bookings 200 47817 - 35.511 ms","timestamp":"2025-11-28 22:51:49"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 1.562 ms","timestamp":"2025-11-28 22:51:49"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 1.452 ms","timestamp":"2025-11-28 22:51:49"}
+{"level":"info","message":"GET /reservations/6929b62d048c12f3861fe48e/edit 200 27637 - 34.108 ms","timestamp":"2025-11-28 22:51:54"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 1.985 ms","timestamp":"2025-11-28 22:51:54"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 3.615 ms","timestamp":"2025-11-28 22:51:54"}
+{"level":"info","message":"GET / 304 - - 143.713 ms","timestamp":"2025-11-28 22:53:44"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 28.045 ms","timestamp":"2025-11-28 22:53:45"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 57.944 ms","timestamp":"2025-11-28 22:53:45"}
+{"level":"info","message":"GET /users/profile 200 23095 - 25.575 ms","timestamp":"2025-11-28 22:53:49"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 3.374 ms","timestamp":"2025-11-28 22:53:49"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 32.225 ms","timestamp":"2025-11-28 22:53:49"}
+{"level":"info","message":"GET / 304 - - 33.302 ms","timestamp":"2025-11-28 22:53:54"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 2.900 ms","timestamp":"2025-11-28 22:53:55"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 2.444 ms","timestamp":"2025-11-28 22:53:55"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2025-11-28 22:53:58"}
+{"level":"info","message":"GET /admin/reservations 200 77742 - 39.237 ms","timestamp":"2025-11-28 22:53:58"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2025-11-28 22:53:59"}
+{"level":"info","message":"GET /admin/create 304 - - 18.528 ms","timestamp":"2025-11-28 22:53:59"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2025-11-28 22:54:00"}
+{"level":"info","message":"GET /admin/flights 304 - - 82.129 ms","timestamp":"2025-11-28 22:54:00"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2025-11-28 22:54:01"}
+{"level":"info","message":"GET /admin 200 18330 - 56.211 ms","timestamp":"2025-11-28 22:54:01"}
+{"level":"info","message":"GET /admin 403 15880 - 38.517 ms","timestamp":"2025-11-28 22:54:05"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 4.145 ms","timestamp":"2025-11-28 22:54:06"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 1.753 ms","timestamp":"2025-11-28 22:54:06"}
+{"level":"info","message":"GET /admin 403 15880 - 11.143 ms","timestamp":"2025-11-28 22:54:09"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 2.715 ms","timestamp":"2025-11-28 22:54:09"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 5.293 ms","timestamp":"2025-11-28 22:54:09"}
+{"level":"info","message":"GET / 304 - - 52.001 ms","timestamp":"2025-11-28 22:54:13"}
+{"level":"info","message":"GET /src/css/book-select.css 404 162 - 10.511 ms","timestamp":"2025-11-28 22:54:13"}
+{"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 2.371 ms","timestamp":"2025-11-28 22:54:13"}

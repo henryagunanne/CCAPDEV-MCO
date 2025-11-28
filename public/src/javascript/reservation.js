@@ -50,7 +50,8 @@ $(document).ready(function () {
       <div class="row mb-2">
         <div class="col-md-6">
           <label class="form-label">Full Name</label>
-          <input type="text" name="passengers[${i - 1}][fullName]" class="form-control" required>
+          <input type="text" name="passengers[${i - 1}][fullName]" class="form-control" required pattern="^[A-Za-zÀ-ÿ' -]{2,} [A-Za-zÀ-ÿ' -]{2,}$">
+          <div class="invalid-feedback">Enter a valid Name</div>
         </div>
         <div class="col-md-6">
           <label class="form-label">Gender</label>
@@ -60,6 +61,7 @@ $(document).ready(function () {
             <option value="Female">Female</option>
             <option value="Other">Other</option>
           </select>
+          <div class="invalid-feedback">Select your Gender</div>
         </div>
       </div>
 
@@ -68,10 +70,12 @@ $(document).ready(function () {
         <div class="col-md-6">
           <label class="form-label">Age</label>
           <input type="number" name="passengers[${i - 1}][age]" class="form-control" min="0" required>
+          <div class="invalid-feedback">Enter your age</div>
         </div>
         <div class="col-md-6">
           <label class="form-label">Passport Number</label>
-          <input type="text" name="passengers[${i - 1}][passport]" class="form-control" required>
+          <input type="text" name="passengers[${i - 1}][passport]" class="form-control" required pattern="^[A-Za-z][A-Za-z0-9_-]{2,14}$">
+          <div class="invalid-feedback">Enter a valid Passport number</div>
         </div>
       </div>
 
@@ -202,8 +206,15 @@ $(document).on("click", ".seat.available, .seat.selected", function () {
 
 
   // -------- Submit Booking --------
-  $("#confirmBooking").on("click", function (e) {
+  $("#reservationForm").on("submit", function (e) {
     e.preventDefault();
+
+    // validate form inputs
+    if (!this.checkValidity()) {
+      e.stopPropagation();
+      this.classList.add('was-validated');
+      return;
+    }
 
     // Build passengers array from form cards
     const passengerData = [];

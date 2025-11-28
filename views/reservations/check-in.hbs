@@ -69,7 +69,7 @@ document.getElementById("checkinForm").addEventListener("submit", async (e)=>{
         document.getElementById("bpPNR").innerText = pnr;
         document.getElementById("bpSeat").innerText = pax.seatNumber;
         document.getElementById("bpFlight").innerText = `${r.flight[0].origin} → ${r.flight[0].destination}`;
-        document.getElementById("bpCode").innerText = data.boardingCode;
+        document.getElementById("bpCode").innerText = pax.boardingPass.outbound;
         return;
     }
 

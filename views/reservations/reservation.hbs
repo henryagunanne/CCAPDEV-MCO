@@ -31,7 +31,7 @@
 
 
     <div class="card-body">
-      <form id="reservationForm" action="/reservations/create" method="POST">
+      <form id="reservationForm" action="/reservations/create" method="POST" class="needs-validation" novalidate>
         <!-- Hidden Fields -->
         <input type="hidden" name="flight" value="{{flight._id}}">
         <input type="hidden" id="passengersData" name="passengers">
@@ -44,7 +44,7 @@
             <option value="One-Way" {{#if (eq tripType "One-Way")}}selected{{/if}}>One-Way</option>
             <option value="Round-Trip" {{#if (eq tripType "Round-Trip")}}selected{{/if}}>Round-Trip</option>
           </select>
-
+          
           </div>
         </div>
 

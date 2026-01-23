@@ -21,7 +21,7 @@ const logger = createLogger({
             format: format.combine(
                 format.colorize(),
                 format.simple()
-            )
+            ) 
         })
     ]
 });

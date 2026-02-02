@@ -205,6 +205,10 @@ The official MCO Project Specifications Document is included in this repository.
 This project is licensed under the **MIT License**.  
 See the [LICENSE](./LICENSE) file for full details.
 
+---
 
+## 📄 AI Assistance Disclosure
 
+This README file was generated with the assistance of ChatGPT and was reviewed, edited, and verified by the project authors.  
+All source code, system design, and implementation were fully developed by the authors. 
 

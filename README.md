@@ -72,6 +72,59 @@ Through this project, the team demonstrated the ability to:
 
 - Node.js (v18 or later)
 - npm
+- MongoDB Community Edition
+
+> ⚠️ **Important:**  
+> MongoDB **must be running** before starting the application. The server depends on an active MongoDB connection.
+
+---
+
+## 🗄️ Running MongoDB
+
+### macOS (using Homebrew)
+
+1. Install MongoDB (if not yet installed):
+
+```bash
+brew tap mongodb/brew
+brew install mongodb-community
+```
+
+2. Start the MongoDB service:
+
+```bash
+brew services start mongodb-community
+```
+
+3. Verify MongoDB is running:
+
+```bash
+mongosh
+```
+
+If the MongoDB shell opens successfully, the database is running.
+
+
+### Windows
+
+1. Download and install **MongoDB Community Server** from the official website:  
+   https://www.mongodb.com/try/download/community
+
+2. During installation, ensure that:
+   - **“Install MongoDB as a Service”** is checked (recommended)
+
+3. Start MongoDB manually (if it is not running automatically):
+   - Open **Services**
+   - Locate **MongoDB Server**
+   - Click **Start**
+
+4. Verify MongoDB is running:
+
+```bash
+mongosh
+```
+
+--- 
 
 ### Installation
 
@@ -96,6 +149,18 @@ npm server.js
 ```bash
 http://localhost:3000
 ```
+
+### Optional: Stopping MongoDB
+
+**macOS**
+
+```bash
+brew services stop mongodb-community
+```
+
+**Windows**
+- Stop MongoDB Server from the Services menu 
+
 
 ---
 

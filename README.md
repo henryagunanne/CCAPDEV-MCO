@@ -1,3 +1,6 @@
+# CCAPDEV-MCO
+
+---
 ![Course](https://img.shields.io/badge/Course-CCAPDEV-blue)
 ![Institution](https://img.shields.io/badge/Institution-De%20La%20Salle%20University-green)
 
@@ -13,9 +16,7 @@
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 ![Academic Project](https://img.shields.io/badge/Project-Type%3A%20Academic-lightgrey)
 
----
-
-# CCAPDEV-MCO
+--- 
 
 **Major Course Output (MCO) — CCAPDEV**  
 A full-stack web application developed as a major academic deliverable, demonstrating industry-standard backend architecture, frontend integration, and automated testing using modern JavaScript technologies.

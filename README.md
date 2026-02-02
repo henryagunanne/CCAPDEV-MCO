@@ -1,6 +1,15 @@
+![Course](https://img.shields.io/badge/Course-CCAPDEV-blue)
+![Institution](https://img.shields.io/badge/Institution-De%20La%20Salle%20University-green)
+
 ![Node.js](https://img.shields.io/badge/Node.js-v18+-green)
 ![Express](https://img.shields.io/badge/Framework-Express-blue)
 ![Jest](https://img.shields.io/badge/Testing-Jest-red)
+![HTML5](https://img.shields.io/badge/HTML5-%3E%3D5-E34F26?logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-%3E%3D3-1572B6?logo=css3&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-v5-purple?logo=bootstrap&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6-yellow?logo=javascript&logoColor=black)
+![jQuery](https://img.shields.io/badge/jQuery-v3.6-blue?logo=jquery&logoColor=white)
+
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 ![Academic Project](https://img.shields.io/badge/Project-Type%3A%20Academic-lightgrey)
 

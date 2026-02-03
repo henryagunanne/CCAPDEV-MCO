@@ -6,6 +6,7 @@
 
 ![Node.js](https://img.shields.io/badge/Node.js-v18+-green)
 ![Express](https://img.shields.io/badge/Framework-Express-blue)
+![Express%20Handlebars](https://img.shields.io/badge/View%20Engine-Express%20Handlebars-orange)
 ![Jest](https://img.shields.io/badge/Testing-Jest-red)
 ![HTML5](https://img.shields.io/badge/HTML5-%3E%3D5-E34F26?logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-%3E%3D3-1572B6?logo=css3&logoColor=white)
@@ -47,9 +48,11 @@ This repository is intended to serve both as an **academic submission** and a **
 Through this project, the team demonstrated the ability to:
 
 - Design a **scalable backend architecture** using Node.js and Express
-- Implement **RESTful routing and MVC principles**
-- Develop dynamic frontend views with clean separation of concerns
-- Apply **automated testing** using Jest
+- Implement **MVC principles** with clear separation of concerns
+- Render **dynamic server-side pages** using Express Handlebars
+- Develop reusable layouts, partials, and view templates
+- Apply **RESTful routing** and structured middleware
+- Implement **automated testing** using Jest
 - Follow **software engineering best practices** in structure, naming, and documentation
 - Collaborate effectively in a team-based development environment
 
@@ -60,7 +63,9 @@ Through this project, the team demonstrated the ability to:
 | Layer | Technologies Used |
 |------|------------------|
 | Frontend | HTML, CSS, JavaScript |
+| View Engine | Express Handlebars |
 | Backend | Node.js, Express |
+| Database | MongoDB |
 | Testing | Jest |
 | Tooling | npm, Git |
 | Architecture | MVC Pattern |
@@ -179,8 +184,9 @@ The official MCO Project Specifications Document is included in this repository.
 
 ---
 
-### 📌 Skills Demonstrated (Recruiter-Focused)
+### 📌 Skills Demonstrated
 - Full-Stack Web Development
+- Server-Side Rendering with Express Handlebars
 - RESTful API Design
 - MVC Architecture
 - Backend Engineering with Node.js

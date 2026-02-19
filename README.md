@@ -1,12 +1,23 @@
+# CCAPDEV-MCO
+
+---
+![Course](https://img.shields.io/badge/Course-CCAPDEV-blue)
+![Institution](https://img.shields.io/badge/Institution-De%20La%20Salle%20University-green)
+
 ![Node.js](https://img.shields.io/badge/Node.js-v18+-green)
 ![Express](https://img.shields.io/badge/Framework-Express-blue)
+![Express%20Handlebars](https://img.shields.io/badge/View%20Engine-Express%20Handlebars-orange)
 ![Jest](https://img.shields.io/badge/Testing-Jest-red)
+![HTML5](https://img.shields.io/badge/HTML5-%3E%3D5-E34F26?logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-%3E%3D3-1572B6?logo=css3&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-v5-purple?logo=bootstrap&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6-yellow?logo=javascript&logoColor=black)
+![jQuery](https://img.shields.io/badge/jQuery-v3.6-blue?logo=jquery&logoColor=white)
+
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 ![Academic Project](https://img.shields.io/badge/Project-Type%3A%20Academic-lightgrey)
 
----
-
-# CCAPDEV-MCO
+--- 
 
 **Major Course Output (MCO) — CCAPDEV**  
 A full-stack web application developed as a major academic deliverable, demonstrating industry-standard backend architecture, frontend integration, and automated testing using modern JavaScript technologies.
@@ -37,9 +48,11 @@ This repository is intended to serve both as an **academic submission** and a **
 Through this project, the team demonstrated the ability to:
 
 - Design a **scalable backend architecture** using Node.js and Express
-- Implement **RESTful routing and MVC principles**
-- Develop dynamic frontend views with clean separation of concerns
-- Apply **automated testing** using Jest
+- Implement **MVC principles** with clear separation of concerns
+- Render **dynamic server-side pages** using Express Handlebars
+- Develop reusable layouts, partials, and view templates
+- Apply **RESTful routing** and structured middleware
+- Implement **automated testing** using Jest
 - Follow **software engineering best practices** in structure, naming, and documentation
 - Collaborate effectively in a team-based development environment
 
@@ -50,7 +63,9 @@ Through this project, the team demonstrated the ability to:
 | Layer | Technologies Used |
 |------|------------------|
 | Frontend | HTML, CSS, JavaScript |
+| View Engine | Express Handlebars |
 | Backend | Node.js, Express |
+| Database | MongoDB |
 | Testing | Jest |
 | Tooling | npm, Git |
 | Architecture | MVC Pattern |
@@ -63,6 +78,59 @@ Through this project, the team demonstrated the ability to:
 
 - Node.js (v18 or later)
 - npm
+- MongoDB Community Edition
+
+> ⚠️ **Important:**  
+> MongoDB **must be running** before starting the application. The server depends on an active MongoDB connection.
+
+---
+
+## 🗄️ Running MongoDB
+
+### macOS (using Homebrew)
+
+1. Install MongoDB (if not yet installed):
+
+```bash
+brew tap mongodb/brew
+brew install mongodb-community
+```
+
+2. Start the MongoDB service:
+
+```bash
+brew services start mongodb-community
+```
+
+3. Verify MongoDB is running:
+
+```bash
+mongosh
+```
+
+If the MongoDB shell opens successfully, the database is running.
+
+
+### Windows
+
+1. Download and install **MongoDB Community Server** from the official website:  
+   https://www.mongodb.com/try/download/community
+
+2. During installation, ensure that:
+   - **“Install MongoDB as a Service”** is checked (recommended)
+
+3. Start MongoDB manually (if it is not running automatically):
+   - Open **Services**
+   - Locate **MongoDB Server**
+   - Click **Start**
+
+4. Verify MongoDB is running:
+
+```bash
+mongosh
+```
+
+--- 
 
 ### Installation
 
@@ -88,6 +156,18 @@ npm server.js
 http://localhost:3000
 ```
 
+### Optional: Stopping MongoDB
+
+**macOS**
+
+```bash
+brew services stop mongodb-community
+```
+
+**Windows**
+- Stop MongoDB Server from the Services menu 
+
+
 ---
 
 
@@ -104,8 +184,9 @@ The official MCO Project Specifications Document is included in this repository.
 
 ---
 
-### 📌 Skills Demonstrated (Recruiter-Focused)
+### 📌 Skills Demonstrated
 - Full-Stack Web Development
+- Server-Side Rendering with Express Handlebars
 - RESTful API Design
 - MVC Architecture
 - Backend Engineering with Node.js
@@ -128,9 +209,13 @@ The official MCO Project Specifications Document is included in this repository.
 ---
 
 ### 📄 License
-This project is licensed under the MIT License.
+This project is licensed under the **MIT License**.  
+See the [LICENSE](./LICENSE) file for full details.
 
+---
 
+## 📄 AI Assistance Disclosure
 
-
+This README file was generated with the assistance of ChatGPT and was reviewed, edited, and verified by the project authors.  
+All source code, system design, and implementation were fully developed by the authors. 
 

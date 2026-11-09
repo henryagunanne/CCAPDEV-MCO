@@ -539,3 +539,5 @@
 {"level":"info","message":"GET / 200 55958 - 35.139 ms","timestamp":"2026-01-23 11:11:18"}
 {"level":"info","message":"GET /src/css/book-select.css 404 162 - 1.844 ms","timestamp":"2026-01-23 11:11:18"}
 {"level":"info","message":"GET /src/javascript/book-select.js 404 168 - 1.789 ms","timestamp":"2026-01-23 11:11:18"}
+{"level":"info","message":"🚀 Server running at http://localhost:3000","timestamp":"2026-11-09 14:42:24"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-09 14:42:26"}

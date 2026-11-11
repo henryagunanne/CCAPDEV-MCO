@@ -1160,3 +1160,105 @@
 {"level":"info","message":"POST /users/login 200 79 - 78.143 ms","timestamp":"2026-11-11 17:28:01"}
 {"level":"info","message":"POST /users/logout 200 16 - 4.685 ms","timestamp":"2026-11-11 17:28:01"}
 {"level":"info","message":"POST /users/logout 403 15855 - 3.223 ms","timestamp":"2026-11-11 17:28:01"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-11 17:52:24"}
+{"level":"info","message":"Test - 6af43ad8cf600d582b4345f4 logged in","timestamp":"2026-11-11 17:52:26"}
+{"level":"info","message":"POST /users/login 200 79 - 1271.636 ms","timestamp":"2026-11-11 17:52:27"}
+{"level":"info","message":"New Reservation Created - id=6af43addcf600d582b43460a","timestamp":"2026-11-11 17:52:29"}
+{"level":"info","message":"POST /reservations/create 200 66 - 1608.087 ms","timestamp":"2026-11-11 17:52:29"}
+{"level":"info","message":"Test - 6af43addcf600d582b434615 logged in","timestamp":"2026-11-11 17:52:30"}
+{"level":"info","message":"POST /users/login 200 79 - 313.659 ms","timestamp":"2026-11-11 17:52:30"}
+{"level":"info","message":"Reservation with ID 6af43adecf600d582b43461d has been updated","timestamp":"2026-11-11 17:52:30"}
+{"level":"info","message":"POST /reservations/6af43adecf600d582b43461d/edit 200 19109 - 136.433 ms","timestamp":"2026-11-11 17:52:30"}
+{"level":"info","message":"Test - 6af43adecf600d582b43462e logged in","timestamp":"2026-11-11 17:52:30"}
+{"level":"info","message":"POST /users/login 200 79 - 340.710 ms","timestamp":"2026-11-11 17:52:30"}
+{"level":"info","message":"Reservation with ID 6af43adecf600d582b434636 has been cancelled","timestamp":"2026-11-11 17:52:30"}
+{"level":"info","message":"POST /reservations/cancel/6af43adecf600d582b434636 200 585 - 18.127 ms","timestamp":"2026-11-11 17:52:30"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-11 17:52:33"}
+{"level":"info","message":"Admin - 6af43ae133b01a25a44cfba3 logged in","timestamp":"2026-11-11 17:52:34"}
+{"level":"info","message":"POST /users/login 200 79 - 631.865 ms","timestamp":"2026-11-11 17:52:34"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2026-11-11 17:52:34"}
+{"$__":{"$versionError":null,"activePaths":{"paths":{"aircraft":"require","arrivalTime":"require","departureDate":"require","departureTime":"require","destination":"require","flightNumber":"require","origin":"require","price":"require","seatCapacity":"require"},"states":{"default":{},"modify":{},"require":{"aircraft":true,"arrivalTime":true,"departureDate":true,"departureTime":true,"destination":true,"flightNumber":true,"origin":true,"price":true,"seatCapacity":true}}},"backup":{"activePaths":{"default":{"_id":true},"modify":{"aircraft":true,"arrivalTime":true,"departureDate":true,"departureTime":true,"destination":true,"flightNumber":true,"origin":true,"price":true,"seatCapacity":true,"status":true}},"validationError":null},"cachedRequired":{},"inserting":true,"op":null,"saveOptions":null,"savedState":{},"saving":null,"validating":null},"$isNew":false,"_doc":{"__v":0,"_id":"6af43ae233b01a25a44cfbb7","aircraft":"Airbus A321","arrivalTime":"10:45","departureDate":"2025-11-20","departureTime":"08:30","destination":"Hong Kong (HKG)","flightNumber":"AA1001","origin":"Manila (MNL)","price":148,"seatCapacity":180,"status":"Scheduled"},"level":"info","message":"Flight created successfully.","timestamp":"2026-11-11 17:52:34"}
+{"level":"info","message":"POST /admin/create 201 326 - 58.541 ms","timestamp":"2026-11-11 17:52:34"}
+{"level":"info","message":"Test - 6af43ae333b01a25a44cfbc0 logged in","timestamp":"2026-11-11 17:52:35"}
+{"level":"info","message":"POST /users/login 200 79 - 328.813 ms","timestamp":"2026-11-11 17:52:35"}
+{"level":"info","message":"POST /admin/create 403 15895 - 19.413 ms","timestamp":"2026-11-11 17:52:35"}
+{"level":"info","message":"Step - 6af43ae333b01a25a44cfbcd logged in","timestamp":"2026-11-11 17:52:36"}
+{"level":"info","message":"POST /users/login 200 78 - 944.980 ms","timestamp":"2026-11-11 17:52:37"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2026-11-11 17:52:37"}
+{"level":"info","message":"POST /admin/sensitive-test 403 107 - 7.512 ms","timestamp":"2026-11-11 17:52:37"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-11 17:52:38"}
+{"level":"info","message":"New registered User - 6af43ae66e9a6d207101824f","timestamp":"2026-11-11 17:52:39"}
+{"level":"info","message":"POST /users/register 200 16 - 361.724 ms","timestamp":"2026-11-11 17:52:39"}
+{"level":"info","message":"POST /users/logout 403 15855 - 21.454 ms","timestamp":"2026-11-11 17:52:39"}
+{"level":"info","message":"New registered User - 6af43ae76e9a6d2071018265","timestamp":"2026-11-11 17:52:39"}
+{"level":"info","message":"POST /users/register 200 16 - 317.151 ms","timestamp":"2026-11-11 17:52:39"}
+{"level":"info","message":"POST /users/register 400 54 - 2.833 ms","timestamp":"2026-11-11 17:52:39"}
+{"level":"info","message":"POST /users/logout 403 15855 - 8.627 ms","timestamp":"2026-11-11 17:52:39"}
+{"level":"info","message":"Test - 6af43ae76e9a6d2071018271 logged in","timestamp":"2026-11-11 17:52:40"}
+{"level":"info","message":"POST /users/login 200 79 - 323.051 ms","timestamp":"2026-11-11 17:52:40"}
+{"level":"info","message":"POST /users/logout 200 16 - 92.012 ms","timestamp":"2026-11-11 17:52:40"}
+{"level":"info","message":"POST /users/login 401 56 - 4.604 ms","timestamp":"2026-11-11 17:52:40"}
+{"level":"info","message":"POST /users/logout 403 15855 - 8.474 ms","timestamp":"2026-11-11 17:52:40"}
+{"level":"info","message":"POST /users/login 401 56 - 324.564 ms","timestamp":"2026-11-11 17:52:41"}
+{"level":"info","message":"POST /users/logout 403 15855 - 11.280 ms","timestamp":"2026-11-11 17:52:41"}
+{"level":"info","message":"GET /users/profile 403 15855 - 5.205 ms","timestamp":"2026-11-11 17:52:41"}
+{"level":"info","message":"POST /users/logout 403 15855 - 5.507 ms","timestamp":"2026-11-11 17:52:41"}
+{"level":"info","message":"Test - 6af43ae96e9a6d207101829e logged in","timestamp":"2026-11-11 17:52:42"}
+{"level":"info","message":"POST /users/login 200 79 - 319.281 ms","timestamp":"2026-11-11 17:52:42"}
+{"level":"info","message":"POST /users/logout 200 16 - 32.709 ms","timestamp":"2026-11-11 17:52:42"}
+{"level":"info","message":"POST /users/logout 403 15855 - 6.906 ms","timestamp":"2026-11-11 17:52:42"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-11 17:56:11"}
+{"level":"info","message":"New registered User - 6af43bbb7de593ad8dea0c25","timestamp":"2026-11-11 17:56:11"}
+{"level":"info","message":"POST /users/register 200 16 - 432.931 ms","timestamp":"2026-11-11 17:56:11"}
+{"level":"info","message":"POST /users/logout 403 15855 - 20.581 ms","timestamp":"2026-11-11 17:56:11"}
+{"level":"info","message":"New registered User - 6af43bbb7de593ad8dea0c3d","timestamp":"2026-11-11 17:56:12"}
+{"level":"info","message":"POST /users/register 200 16 - 332.568 ms","timestamp":"2026-11-11 17:56:12"}
+{"level":"info","message":"POST /users/register 400 54 - 1.381 ms","timestamp":"2026-11-11 17:56:12"}
+{"level":"info","message":"POST /users/logout 403 15855 - 5.857 ms","timestamp":"2026-11-11 17:56:12"}
+{"level":"info","message":"Test - 6af43bbc7de593ad8dea0c47 logged in","timestamp":"2026-11-11 17:56:13"}
+{"level":"info","message":"POST /users/login 200 79 - 1281.490 ms","timestamp":"2026-11-11 17:56:14"}
+{"level":"info","message":"POST /users/logout 200 16 - 1079.010 ms","timestamp":"2026-11-11 17:56:15"}
+{"level":"info","message":"POST /users/login 401 56 - 2.149 ms","timestamp":"2026-11-11 17:56:16"}
+{"level":"info","message":"POST /users/logout 403 15855 - 5.409 ms","timestamp":"2026-11-11 17:56:16"}
+{"level":"info","message":"POST /users/login 401 56 - 463.902 ms","timestamp":"2026-11-11 17:56:17"}
+{"level":"info","message":"POST /users/logout 403 15855 - 7.666 ms","timestamp":"2026-11-11 17:56:17"}
+{"level":"info","message":"GET /users/profile 403 15855 - 3.402 ms","timestamp":"2026-11-11 17:56:17"}
+{"level":"info","message":"POST /users/logout 403 15855 - 2.409 ms","timestamp":"2026-11-11 17:56:17"}
+{"level":"info","message":"Test - 6af43bc17de593ad8dea0c74 logged in","timestamp":"2026-11-11 17:56:17"}
+{"level":"info","message":"POST /users/login 200 79 - 281.873 ms","timestamp":"2026-11-11 17:56:17"}
+{"level":"info","message":"POST /users/logout 200 16 - 6.027 ms","timestamp":"2026-11-11 17:56:17"}
+{"level":"info","message":"POST /users/logout 403 15855 - 3.901 ms","timestamp":"2026-11-11 17:56:17"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-11 17:58:45"}
+{"level":"info","message":"Test - 6af43c55ec667744f65f128b logged in","timestamp":"2026-11-11 17:58:46"}
+{"level":"info","message":"POST /users/login 200 79 - 957.244 ms","timestamp":"2026-11-11 17:58:48"}
+{"level":"info","message":"New Reservation Created - id=6af43c58ec667744f65f12a1","timestamp":"2026-11-11 17:58:48"}
+{"level":"info","message":"POST /reservations/create 200 66 - 234.203 ms","timestamp":"2026-11-11 17:58:48"}
+{"level":"info","message":"Test - 6af43c58ec667744f65f12ac logged in","timestamp":"2026-11-11 17:58:49"}
+{"level":"info","message":"POST /users/login 200 79 - 685.872 ms","timestamp":"2026-11-11 17:58:49"}
+{"level":"info","message":"Reservation with ID 6af43c59ec667744f65f12b4 has been updated","timestamp":"2026-11-11 17:58:50"}
+{"level":"info","message":"POST /reservations/6af43c59ec667744f65f12b4/edit 200 19109 - 152.730 ms","timestamp":"2026-11-11 17:58:50"}
+{"level":"info","message":"Test - 6af43c5aec667744f65f12c5 logged in","timestamp":"2026-11-11 17:58:50"}
+{"level":"info","message":"POST /users/login 200 79 - 341.948 ms","timestamp":"2026-11-11 17:58:50"}
+{"level":"info","message":"Reservation with ID 6af43c5aec667744f65f12cd has been cancelled","timestamp":"2026-11-11 17:58:50"}
+{"level":"info","message":"POST /reservations/cancel/6af43c5aec667744f65f12cd 200 585 - 6.148 ms","timestamp":"2026-11-11 17:58:50"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-11 17:58:52"}
+{"level":"info","message":"Admin - 6af43c5dd21785ec0551e707 logged in","timestamp":"2026-11-11 17:58:53"}
+{"level":"info","message":"POST /users/login 200 79 - 308.905 ms","timestamp":"2026-11-11 17:58:53"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2026-11-11 17:58:53"}
+{"$__":{"$versionError":null,"activePaths":{"paths":{"aircraft":"require","arrivalTime":"require","departureDate":"require","departureTime":"require","destination":"require","flightNumber":"require","origin":"require","price":"require","seatCapacity":"require"},"states":{"default":{},"modify":{},"require":{"aircraft":true,"arrivalTime":true,"departureDate":true,"departureTime":true,"destination":true,"flightNumber":true,"origin":true,"price":true,"seatCapacity":true}}},"backup":{"activePaths":{"default":{"_id":true},"modify":{"aircraft":true,"arrivalTime":true,"departureDate":true,"departureTime":true,"destination":true,"flightNumber":true,"origin":true,"price":true,"seatCapacity":true,"status":true}},"validationError":null},"cachedRequired":{},"inserting":true,"op":null,"saveOptions":null,"savedState":{},"saving":null,"validating":null},"$isNew":false,"_doc":{"__v":0,"_id":"6af43c5dd21785ec0551e71b","aircraft":"Airbus A321","arrivalTime":"10:45","departureDate":"2025-11-20","departureTime":"08:30","destination":"Hong Kong (HKG)","flightNumber":"AA1001","origin":"Manila (MNL)","price":148,"seatCapacity":180,"status":"Scheduled"},"level":"info","message":"Flight created successfully.","timestamp":"2026-11-11 17:58:53"}
+{"level":"info","message":"POST /admin/create 201 326 - 27.579 ms","timestamp":"2026-11-11 17:58:53"}
+{"level":"info","message":"Test - 6af43c5dd21785ec0551e724 logged in","timestamp":"2026-11-11 17:58:54"}
+{"level":"info","message":"POST /users/login 200 79 - 289.740 ms","timestamp":"2026-11-11 17:58:54"}
+{"level":"info","message":"POST /admin/create 403 15895 - 9.788 ms","timestamp":"2026-11-11 17:58:54"}
+{"level":"info","message":"Step - 6af43c5ed21785ec0551e731 logged in","timestamp":"2026-11-11 17:58:55"}
+{"level":"info","message":"POST /users/login 200 78 - 315.251 ms","timestamp":"2026-11-11 17:58:55"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2026-11-11 17:58:55"}
+{"level":"info","message":"POST /admin/sensitive-test 403 107 - 9.443 ms","timestamp":"2026-11-11 17:58:55"}
+{"level":"info","message":"🚀 Server running at http://localhost:3000","timestamp":"2026-11-11 17:59:03"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-11 17:59:04"}
+{"level":"info","message":"POST /users/login 401 56 - 433.760 ms","timestamp":"2026-11-11 17:59:05"}
+{"level":"info","message":"POST /users/login 401 56 - 344.159 ms","timestamp":"2026-11-11 17:59:05"}
+{"level":"info","message":"POST /users/login 401 56 - 325.176 ms","timestamp":"2026-11-11 17:59:06"}
+{"level":"info","message":"POST /users/login 401 56 - 299.656 ms","timestamp":"2026-11-11 17:59:06"}
+{"level":"info","message":"POST /users/login 401 56 - 399.938 ms","timestamp":"2026-11-11 17:59:06"}
+{"level":"info","message":"POST /users/login 403 56 - 2.069 ms","timestamp":"2026-11-11 17:59:06"}

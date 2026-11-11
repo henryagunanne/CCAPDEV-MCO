@@ -7,6 +7,9 @@ const session = require('express-session'); // Session management
 const MongoStore = require('connect-mongo'); // MongoDB session store
 const path = require('path');
 const { mongoUri, sessionSecret, isTestEnvironment } = require('./config/env');
+
+const SESSION_IDLE_TIMEOUT_MS = 30 * 60 * 1000;
+const SESSION_ABSOLUTE_TIMEOUT_MS = 8 * 60 * 60 * 1000;
 const seedPopularFlights = require('./seeds/seedPopularFlights'); // Seed popular flights
 const seedFlights = require('./seeds/seedFlights'); // Seed flights
 const seedUsers = require('./seeds/seedUsers'); // Seed Users
@@ -126,20 +129,54 @@ app.use(session({
     secret: sessionSecret,
     resave: false,  // Don't save session if unmodified
     saveUninitialized: false,   // Don't create session until something stored
+    rolling: true,
     store: MongoStore.create({ mongoUrl: mongoUri }),   // Store sessions in MongoDB
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // secure cookies in prod
       sameSite: 'lax',
-      maxAge: 1000 * 60 * 60 * 24 // 1 day
+      maxAge: SESSION_IDLE_TIMEOUT_MS
     }
 }));
 
-
-// Make user data available in all views
 app.use((req, res, next) => {
-    res.locals.user = req.session.user;
-    next();
+  const sessionUser = req.session && req.session.user ? req.session.user : null;
+
+  if (sessionUser) {
+    const now = Date.now();
+    const absoluteExpiresAt = Number(req.session.absoluteExpiresAt || sessionUser.absoluteExpiresAt || 0);
+    const lastActivityAt = Number(req.session.lastActivityAt || sessionUser.lastActivityAt || req.session.authenticatedAt || now);
+    const isExpired = (absoluteExpiresAt && now > absoluteExpiresAt) || (now - lastActivityAt > SESSION_IDLE_TIMEOUT_MS);
+
+    if (isExpired) {
+      req.session.destroy((err) => {
+        if (err) logger.error('Session cleanup failed:', err);
+      });
+
+      if (req.accepts('html')) {
+        return res.status(401).render('error/access-denied', {
+          title: 'Session Expired',
+          message: 'Your session expired. Please sign in again.'
+        });
+      }
+
+      return res.status(401).json({ success: false, message: 'Session expired.' });
+    }
+
+    req.session.lastActivityAt = now;
+    req.session.absoluteExpiresAt = req.session.absoluteExpiresAt || now + SESSION_ABSOLUTE_TIMEOUT_MS;
+    req.session.cookie.maxAge = SESSION_IDLE_TIMEOUT_MS;
+    req.session.user = {
+      ...sessionUser,
+      authenticatedAt: req.session.authenticatedAt || now,
+      lastActivityAt: now,
+      absoluteExpiresAt: req.session.absoluteExpiresAt
+    };
+  }
+
+  res.locals.user = req.session ? req.session.user : null;
+  req.user = req.session ? req.session.user : null;
+  next();
 });
 
 

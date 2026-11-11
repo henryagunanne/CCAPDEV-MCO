@@ -2,6 +2,8 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
+const BCRYPT_HASH_PATTERN = /^\$2[aby]\$\d{2}\$/;
+
 const ADMIN_ROLE_NAMES = [
   'flight_operations_admin',
   'reservation_support_admin',
@@ -30,7 +32,8 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true
+        required: true,
+        minlength: [8, 'Password must be at least 8 characters long.']
     },
     dateOfBirth: {
         type: Date,
@@ -104,14 +107,24 @@ const userSchema = new mongoose.Schema({
 
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
+    if (typeof this.password !== 'string' || this.password.trim() === '') {
+      return next(new Error('Password is required.'));
+    }
+    if (BCRYPT_HASH_PATTERN.test(this.password)) {
+      return next();
+    }
     try {
-      const salt = await bcrypt.genSalt(10);
+      const salt = await bcrypt.genSalt(12);
       this.password = await bcrypt.hash(this.password, salt);
       next();
     } catch (err) {
       next(err);
     }
 });
+
+userSchema.methods.comparePassword = async function (candidatePassword) {
+    return bcrypt.compare(candidatePassword, this.password);
+};
 
 userSchema.methods.toSafeSession = function () {
     return {

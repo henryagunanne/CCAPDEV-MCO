@@ -8,13 +8,13 @@ const logger = require('../logs/logger');
 
 // Helper middleware to check if user is authenticated
 function isAuthenticated(req, res, next) {
-  if (req.session.user) {
-    return next();
+  if (!req.session || !req.session.user) {
+    return res.status(403).render('error/access-denied', { 
+      title: 'Access Denied',
+      isAdmin: false
+    });
   }
-  res.status(403).render('error/access-denied', { 
-    title: 'Access Denied',
-    isAdmin: req.session.user?.role === 'Admin'
-  });  
+  return next();
 }
 
 // Middleware to ensure admin cannot access user routes
@@ -22,9 +22,9 @@ function isAdmin(req, res, next) {
   if (req.session.user && req.session.user.role === 'Admin') {
     return res.status(403).render('error/user-only', { 
       title: 'Access Denied',
-    });  
+    });
   }
-  next();
+  return next();
 }
 
 /* =============================
@@ -187,8 +187,7 @@ router.get('/search', isAuthenticated, async (req, res) => {
 // Confirmation Route 
 router.get("/:id/confirmation", isAuthenticated, isAdmin, async (req, res) => {
   try {
-    // fetch reservation data
-    const reservationDoc = await Reservation.findById(req.params.id)
+    const reservationDoc = await Reservation.findOne({ _id: req.params.id, userId: req.session.user._id })
       .populate("flight")
       .populate("userId");
 
@@ -325,8 +324,8 @@ router.post('/cancel/:reservationId', isAuthenticated, isAdmin, async (req, res)
   const { reservationId } = req.params;
 
   try{
-    const cancelledReservation = await Reservation.findByIdAndUpdate(
-      reservationId,
+    const cancelledReservation = await Reservation.findOneAndUpdate(
+      { _id: reservationId, userId: req.session.user._id },
       { status: 'Cancelled' },
       { new: true }
     );
@@ -351,7 +350,7 @@ router.post('/cancel/:reservationId', isAuthenticated, isAdmin, async (req, res)
 // GET reservations/:id/edit - Display edit page
 router.get('/:id/edit', isAuthenticated, isAdmin, async (req, res) => {
   try {
-    const reservation = await Reservation.findById(req.params.id)
+    const reservation = await Reservation.findOne({ _id: req.params.id, userId: req.session.user._id })
       .populate('flight')
       .lean();
 
@@ -434,7 +433,7 @@ router.post('/:id/edit', isAuthenticated, isAdmin, async (req, res) => {
     const { passengersJSON, totalPrice } = req.body;
 
     const updatedPassengers = JSON.parse(passengersJSON || "[]");
-    const existingReservation = await Reservation.findById(reservationId);
+    const existingReservation = await Reservation.findOne({ _id: reservationId, userId: req.session.user._id });
 
     if (!existingReservation) {
       return res.status(404).send('Reservation not found');
@@ -530,7 +529,7 @@ router.get("/seats/:flightId", async (req, res) => {
 ============================= */
 router.get('/:id', isAuthenticated, isAdmin, async (req, res) => {
   try {
-    const reservation = await Reservation.findById(req.params.id)
+    const reservation = await Reservation.findOne({ _id: req.params.id, userId: req.session.user._id })
       .populate('flight')
       .lean();
 
@@ -546,14 +545,17 @@ router.get('/:id', isAuthenticated, isAdmin, async (req, res) => {
 router.post('/update/:id', isAuthenticated, isAdmin, async (req, res) => {
   try {
     const { passengers, totalPrice } = req.body;
-    const updated = await Reservation.findByIdAndUpdate(
-      req.params.id,
+    const updated = await Reservation.findOneAndUpdate(
+      { _id: req.params.id, userId: req.session.user._id },
       {
         passengers,
         price: totalPrice
       },
       { new: true }
     );
+    if (!updated) {
+      return res.status(404).json({ success: false, message: 'Reservation not found' });
+    }
     res.json({ success: true, updated });
   } catch (err) {
     logger.error("Error updating reservation:", err);

@@ -7,7 +7,9 @@
     "test": "NODE_ENV=test jest --detectOpenHandles --runInBand",
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "provision:admin": "node scripts/provision-admin.js"
+    "provision:admin": "node scripts/provision-admin.js",
+    "import:aircraft-configurations": "node scripts/import-aircraft-configurations.js",
+    "migrate:booking-integrity": "node scripts/migrate-booking-integrity.js"
   },
   "repository": {
     "type": "git",

@@ -169,6 +169,26 @@ The script will prompt for:
 
 It refuses to create another administrator if one already exists, and it does not print the password to the console.
 
+### Preparing Flight Seat Configurations
+
+Before bookings are enabled, import the supplied synthetic seat configurations and reconcile existing reservations. Both commands are read-only by default and require an explicit `--apply` to write data. Configure `MONGODB_URI` in `.env` first.
+
+```bash
+# Review the planned flight/layout matches
+npm run import:aircraft-configurations
+
+# Apply the layout import only after reviewing the dry-run output
+npm run import:aircraft-configurations -- --apply
+
+# Audit active reservations, seat claims, and capacity
+npm run migrate:booking-integrity
+
+# Apply the allocation/index/capacity migration only when the audit reports no conflicts
+npm run migrate:booking-integrity -- --apply
+```
+
+The migration intentionally stops when existing reservations need reconciliation, including round trips without a return seat. Resolve those conflicts before applying. Do not run either `--apply` command against a production database without an approved backup and deployment window. Booking and seat-availability endpoints remain unavailable until the migration verifies the unique seat index and marks booking integrity ready.
+
 ### Running the Application
 
 ```bash
@@ -246,4 +266,3 @@ See the [LICENSE](./LICENSE) file for full details.
 
 This README file was generated with the assistance of ChatGPT and was reviewed, edited, and verified by the project authors.  
 All source code, system design, and implementation were fully developed by the authors. 
-

@@ -37,6 +37,17 @@ const flightSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    bookedSeats: {
+        type: Number,
+        required: true,
+        default: 0,
+        min: 0
+    },
+    aircraftLayoutId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'AircraftLayout',
+        default: null
+    },
     price: {
         type: Number,
         required: true

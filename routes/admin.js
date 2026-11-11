@@ -7,6 +7,17 @@ const User = require('../models/User');
 const Reservation = require('../models/Reservation');
 const AdminApprovalRequest = require('../models/AdminApprovalRequest');
 const EmergencyAccessGrant = require('../models/EmergencyAccessGrant');
+const {
+  BookingInputError,
+  validateObjectId,
+  assertSafeKeys,
+  assertAllowedKeys
+} = require('../services/bookingValidation');
+const {
+  BookingConflictError,
+  cancelReservation,
+  deleteReservation
+} = require('../services/bookingService');
 const logger = require('../logs/logger');
 const { permissions } = require('../config/rbac');
 const { requireAdminAccess, requirePermission, requireStepUpAuthentication } = require('../middleware/adminAuth');
@@ -220,16 +231,33 @@ router.get('/reservations', requirePermission(permissions.RESERVATION_READ), asy
 
 // POST /admin/edit-reservation/:id 
 router.post('/edit-reservation/:reservationId', requirePermission(permissions.RESERVATION_UPDATE), async (req, res) => {
-  const { status } = req.body;
-  const { reservationId } = req.params;
   try{
-    const updatedReservation = await Reservation.findByIdAndUpdate(
-      reservationId,
-      { status },
-      { new: true }
-    ).lean();
+    assertSafeKeys(req.body);
+    assertAllowedKeys(req.body, new Set(['status']), 'Request');
+    const reservationId = validateObjectId(req.params.reservationId, 'Reservation ID');
+    const { status } = req.body;
 
+    if (!['Confirmed', 'Pending', 'Cancelled'].includes(status)) {
+      throw new BookingInputError('Reservation status is invalid.');
+    }
 
+    const reservation = await Reservation.findById(reservationId);
+    if (!reservation) return res.status(404).send('Reservation not found');
+    if (status === 'Cancelled') {
+      await cancelReservation(reservation);
+    } else {
+      if (reservation.status === 'Cancelled') {
+        throw new BookingConflictError('Cancelled reservations cannot be reactivated without a new seat allocation.');
+      }
+      const result = await Reservation.updateOne(
+        { _id: reservationId, __v: reservation.__v },
+        { $set: { status }, $inc: { __v: 1 } }
+      );
+      if (result.modifiedCount !== 1) {
+        throw new BookingConflictError('Reservation changed; reload and try again.');
+      }
+    }
+    const updatedReservation = await Reservation.findById(reservationId).lean();
     if (!updatedReservation) {
       return res.status(404).send('Reservation not found');
     }
@@ -240,6 +268,9 @@ router.post('/edit-reservation/:reservationId', requirePermission(permissions.RE
       updatedReservation
     });
   }catch (err) {
+    if (err instanceof BookingInputError || err instanceof BookingConflictError) {
+      return res.status(err.statusCode).json({ success: false, message: err.message });
+    }
     logger.error('Reservation update error:', err);
     res.status(500).send('Server error during Reservation update');
   }
@@ -247,16 +278,16 @@ router.post('/edit-reservation/:reservationId', requirePermission(permissions.RE
 
 // POST /admin/delete-reservation/:reservationId
 router.post('/delete-reservation/:reservationId', requirePermission(permissions.RESERVATION_CANCEL), async (req, res) => {
-  const { reservationId } = req.params;
   try {
-    const deletedReservation = await Reservation.findByIdAndDelete(reservationId);
-  
-    if (!deletedReservation) {
-      return res.status(404).send('Reservation not found');
-    }
-
+    const reservationId = validateObjectId(req.params.reservationId, 'Reservation ID');
+    const reservation = await Reservation.findById(reservationId);
+    if (!reservation) return res.status(404).send('Reservation not found');
+    await deleteReservation(reservation);
     res.json({ success: true });
   } catch (error) {
+    if (error instanceof BookingInputError || error instanceof BookingConflictError) {
+      return res.status(error.statusCode).json({ success: false, message: error.message });
+    }
     logger.error('Reservation deletion error:', error);
     res.status(500).send('Server error during Reservation deletion');
   }

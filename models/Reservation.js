@@ -16,7 +16,9 @@ const passengerSchema = new mongoose.Schema({
   age: {
       type: Number,
       required: true,
-      min: 0
+      min: 0,
+      max: 120,
+      validate: Number.isInteger
   },
   gender: {
       type: String,
@@ -27,11 +29,18 @@ const passengerSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    unique: true
+    unique: true,
+    match: /^[A-Za-z0-9]{6,9}$/
   },
   seatNumber: {
       type: String,
-      required: true
+      required: true,
+      match: /^(?:[1-9]|[12][0-9]|30)[A-J]$/
+  },
+  returnSeatNumber: {
+      type: String,
+      default: null,
+      match: /^(?:[1-9]|[12][0-9]|30)[A-J]$/
   },
   meal: {
       type: String,
@@ -40,7 +49,10 @@ const passengerSchema = new mongoose.Schema({
   },
   baggageAllowance: {
       type: Number,
-      default: 0
+      default: 0,
+      min: 0,
+      max: 100,
+      validate: Number.isInteger
   }
 });
 
@@ -92,7 +104,7 @@ const reservationSchema = new mongoose.Schema({
     enum: ['Confirmed', 'Cancelled', 'Pending'],
     default: 'Pending'
   }
-});
+}, { optimisticConcurrency: true });
 
 // Export the model for use in other files
 module.exports = mongoose.model('Reservation', reservationSchema);

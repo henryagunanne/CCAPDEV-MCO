@@ -1262,3 +1262,428 @@
 {"level":"info","message":"POST /users/login 401 56 - 299.656 ms","timestamp":"2026-11-11 17:59:06"}
 {"level":"info","message":"POST /users/login 401 56 - 399.938 ms","timestamp":"2026-11-11 17:59:06"}
 {"level":"info","message":"POST /users/login 403 56 - 2.069 ms","timestamp":"2026-11-11 17:59:06"}
+{"level":"info","message":"🚀 Server running at http://localhost:3000","timestamp":"2026-11-11 19:01:38"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-11 19:01:39"}
+{"level":"info","message":"GET / 200 55944 - 2382.006 ms","timestamp":"2026-11-11 19:02:05"}
+{"level":"info","message":"Admin - 692837e9271256cfec19c404 logged in","timestamp":"2026-11-11 19:03:53"}
+{"level":"info","message":"POST /users/login 200 79 - 230.100 ms","timestamp":"2026-11-11 19:03:53"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2026-11-11 19:03:56"}
+{"level":"info","message":"GET /admin 403 15973 - 198.648 ms","timestamp":"2026-11-11 19:03:56"}
+{"level":"info","message":"GET / 200 56221 - 242.654 ms","timestamp":"2026-11-11 19:03:59"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2026-11-11 19:04:07"}
+{"level":"info","message":"GET /admin 403 15973 - 82.228 ms","timestamp":"2026-11-11 19:04:07"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2026-11-11 19:04:10"}
+{"level":"info","message":"GET /admin 403 15973 - 22.960 ms","timestamp":"2026-11-11 19:04:10"}
+{"level":"info","message":"GET / 304 - - 211.969 ms","timestamp":"2026-11-11 19:04:15"}
+{"level":"info","message":"GET /reservations/book-flight 403 16195 - 22.637 ms","timestamp":"2026-11-11 19:04:17"}
+{"level":"info","message":"GET /reservations/my-bookings 403 16195 - 19.151 ms","timestamp":"2026-11-11 19:04:18"}
+{"level":"info","message":"GET /reservations/check-in 403 16195 - 14.580 ms","timestamp":"2026-11-11 19:04:19"}
+{"level":"info","message":"GET / 304 - - 30.110 ms","timestamp":"2026-11-11 19:04:21"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-11 23:04:32"}
+{"level":"info","message":"Test - 6af48400471839bf359f1f71 logged in","timestamp":"2026-11-11 23:04:33"}
+{"level":"info","message":"POST /users/login 200 79 - 338.326 ms","timestamp":"2026-11-11 23:04:33"}
+{"level":"error","message":"Error creating reservation: Cannot read properties of undefined (reading '_id')","stack":"TypeError: Cannot read properties of undefined (reading '_id')\n    at _id (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/services/bookingService.js:157:35)\n    at Array.forEach (<anonymous>)\n    at forEach (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/services/bookingService.js:155:14)\n    at claimsForPassengers (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/services/bookingService.js:344:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at /Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/routes/reservations.js:54:25","timestamp":"2026-11-11 23:04:33"}
+{"level":"info","message":"POST /reservations/create 500 59 - 48.627 ms","timestamp":"2026-11-11 23:04:33"}
+{"level":"info","message":"Test - 6af48401471839bf359f1f9e logged in","timestamp":"2026-11-11 23:04:34"}
+{"level":"info","message":"POST /users/login 200 79 - 315.864 ms","timestamp":"2026-11-11 23:04:34"}
+{"level":"info","message":"POST /reservations/create 400 51 - 4.613 ms","timestamp":"2026-11-11 23:04:34"}
+{"level":"info","message":"POST /reservations/create 400 64 - 2.112 ms","timestamp":"2026-11-11 23:04:34"}
+{"level":"info","message":"POST /reservations/create 400 64 - 2.374 ms","timestamp":"2026-11-11 23:04:34"}
+{"level":"info","message":"POST /reservations/create 400 90 - 2.684 ms","timestamp":"2026-11-11 23:04:34"}
+{"level":"info","message":"POST /reservations/create 400 94 - 6.887 ms","timestamp":"2026-11-11 23:04:34"}
+{"level":"info","message":"POST /reservations/create 400 87 - 2.667 ms","timestamp":"2026-11-11 23:04:34"}
+{"level":"info","message":"POST /reservations/create 400 55 - 1.823 ms","timestamp":"2026-11-11 23:04:34"}
+{"level":"info","message":"Test - 6af48402471839bf359f1fb4 logged in","timestamp":"2026-11-11 23:04:35"}
+{"level":"info","message":"POST /users/login 200 79 - 304.437 ms","timestamp":"2026-11-11 23:04:35"}
+{"level":"error","message":"Error creating reservation: Cannot read properties of undefined (reading '_id')","stack":"TypeError: Cannot read properties of undefined (reading '_id')\n    at _id (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/services/bookingService.js:157:35)\n    at Array.forEach (<anonymous>)\n    at forEach (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/services/bookingService.js:155:14)\n    at claimsForPassengers (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/services/bookingService.js:344:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at /Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/routes/reservations.js:54:25","timestamp":"2026-11-11 23:04:35"}
+{"level":"info","message":"POST /reservations/create 500 59 - 19.478 ms","timestamp":"2026-11-11 23:04:35"}
+{"level":"error","message":"Error creating reservation: Cannot read properties of undefined (reading '_id')","stack":"TypeError: Cannot read properties of undefined (reading '_id')\n    at _id (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/services/bookingService.js:157:35)\n    at Array.forEach (<anonymous>)\n    at forEach (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/services/bookingService.js:155:14)\n    at claimsForPassengers (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/services/bookingService.js:344:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at /Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/routes/reservations.js:54:25","timestamp":"2026-11-11 23:04:35"}
+{"level":"info","message":"POST /reservations/create 500 59 - 33.995 ms","timestamp":"2026-11-11 23:04:35"}
+{"level":"info","message":"Test - 6af48403471839bf359f1fd3 logged in","timestamp":"2026-11-11 23:04:36"}
+{"level":"info","message":"POST /users/login 200 79 - 297.310 ms","timestamp":"2026-11-11 23:04:36"}
+{"level":"error","message":"Error creating reservation: Cannot read properties of undefined (reading '_id')","stack":"TypeError: Cannot read properties of undefined (reading '_id')\n    at _id (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/services/bookingService.js:157:35)\n    at Array.forEach (<anonymous>)\n    at forEach (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/services/bookingService.js:155:14)\n    at claimsForPassengers (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/services/bookingService.js:344:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at /Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/routes/reservations.js:54:25","timestamp":"2026-11-11 23:04:36"}
+{"level":"info","message":"POST /reservations/create 500 59 - 13.299 ms","timestamp":"2026-11-11 23:04:36"}
+{"level":"info","message":"Test - 6af48404471839bf359f1fee logged in","timestamp":"2026-11-11 23:04:37"}
+{"level":"info","message":"POST /users/login 200 79 - 277.156 ms","timestamp":"2026-11-11 23:04:37"}
+{"level":"error","message":"Error creating reservation: Cannot read properties of undefined (reading '_id')","stack":"TypeError: Cannot read properties of undefined (reading '_id')\n    at _id (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/services/bookingService.js:157:35)\n    at Array.forEach (<anonymous>)\n    at forEach (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/services/bookingService.js:155:14)\n    at claimsForPassengers (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/services/bookingService.js:344:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at /Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/routes/reservations.js:54:25","timestamp":"2026-11-11 23:04:37"}
+{"level":"info","message":"POST /reservations/create 500 59 - 10.169 ms","timestamp":"2026-11-11 23:04:37"}
+{"level":"info","message":"Test - 6af48405471839bf359f2008 logged in","timestamp":"2026-11-11 23:04:37"}
+{"level":"info","message":"POST /users/login 200 79 - 301.171 ms","timestamp":"2026-11-11 23:04:37"}
+{"level":"error","message":"Error creating reservation: Cannot read properties of undefined (reading '_id')","stack":"TypeError: Cannot read properties of undefined (reading '_id')\n    at _id (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/services/bookingService.js:157:35)\n    at Array.forEach (<anonymous>)\n    at forEach (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/services/bookingService.js:155:14)\n    at claimsForPassengers (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/services/bookingService.js:344:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at /Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/routes/reservations.js:54:25","timestamp":"2026-11-11 23:04:38"}
+{"level":"info","message":"POST /reservations/create 500 59 - 15.393 ms","timestamp":"2026-11-11 23:04:38"}
+{"level":"info","message":"Test - 6af48406471839bf359f2023 logged in","timestamp":"2026-11-11 23:04:38"}
+{"level":"info","message":"POST /users/login 200 79 - 277.822 ms","timestamp":"2026-11-11 23:04:38"}
+{"level":"info","message":"Test - 6af48407471839bf359f203a logged in","timestamp":"2026-11-11 23:04:39"}
+{"level":"info","message":"POST /users/login 200 79 - 314.490 ms","timestamp":"2026-11-11 23:04:39"}
+{"level":"error","message":"Error creating reservation: Cannot read properties of undefined (reading '_id')","stack":"TypeError: Cannot read properties of undefined (reading '_id')\n    at _id (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/services/bookingService.js:157:35)\n    at Array.forEach (<anonymous>)\n    at forEach (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/services/bookingService.js:155:14)\n    at claimsForPassengers (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/services/bookingService.js:344:18)\n    at processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at /Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/routes/reservations.js:54:25","timestamp":"2026-11-11 23:04:40"}
+{"level":"info","message":"POST /reservations/create 500 59 - 35.597 ms","timestamp":"2026-11-11 23:04:40"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-11 23:11:44"}
+{"level":"info","message":"Test - 6af485b0439848908d2a3e99 logged in","timestamp":"2026-11-11 23:11:46"}
+{"level":"info","message":"POST /users/login 200 79 - 1119.904 ms","timestamp":"2026-11-11 23:11:47"}
+{"level":"info","message":"New Reservation Created - id=6af485b4439848908d2a3eb9","timestamp":"2026-11-11 23:11:48"}
+{"level":"info","message":"POST /reservations/create 200 122 - 717.591 ms","timestamp":"2026-11-11 23:11:48"}
+{"level":"info","message":"Test - 6af485b4439848908d2a3ed3 logged in","timestamp":"2026-11-11 23:11:49"}
+{"level":"info","message":"POST /users/login 200 79 - 471.487 ms","timestamp":"2026-11-11 23:11:49"}
+{"level":"info","message":"POST /reservations/create 400 51 - 7.870 ms","timestamp":"2026-11-11 23:11:50"}
+{"level":"info","message":"POST /reservations/create 400 64 - 107.248 ms","timestamp":"2026-11-11 23:11:50"}
+{"level":"info","message":"POST /reservations/create 400 64 - 88.981 ms","timestamp":"2026-11-11 23:11:50"}
+{"level":"info","message":"POST /reservations/create 400 90 - 50.087 ms","timestamp":"2026-11-11 23:11:50"}
+{"level":"info","message":"POST /reservations/create 400 94 - 4.340 ms","timestamp":"2026-11-11 23:11:50"}
+{"level":"info","message":"POST /reservations/create 400 87 - 3.017 ms","timestamp":"2026-11-11 23:11:50"}
+{"level":"info","message":"POST /reservations/create 400 55 - 6.249 ms","timestamp":"2026-11-11 23:11:50"}
+{"level":"info","message":"Test - 6af485b6439848908d2a3ee9 logged in","timestamp":"2026-11-11 23:11:51"}
+{"level":"info","message":"POST /users/login 200 79 - 501.886 ms","timestamp":"2026-11-11 23:11:51"}
+{"level":"info","message":"New Reservation Created - id=6af485b8439848908d2a3ef7","timestamp":"2026-11-11 23:11:52"}
+{"level":"info","message":"POST /reservations/create 200 122 - 44.491 ms","timestamp":"2026-11-11 23:11:52"}
+{"level":"info","message":"POST /reservations/create 409 69 - 121.879 ms","timestamp":"2026-11-11 23:11:52"}
+{"level":"info","message":"Test - 6af485b8439848908d2a3f18 logged in","timestamp":"2026-11-11 23:11:53"}
+{"level":"info","message":"POST /users/login 200 79 - 374.619 ms","timestamp":"2026-11-11 23:11:53"}
+{"level":"info","message":"New Reservation Created - id=6af485b9439848908d2a3f26","timestamp":"2026-11-11 23:11:53"}
+{"level":"info","message":"POST /reservations/create 200 122 - 40.924 ms","timestamp":"2026-11-11 23:11:53"}
+{"level":"info","message":"POST /reservations/create 400 87 - 3.096 ms","timestamp":"2026-11-11 23:11:53"}
+{"level":"info","message":"Test - 6af485b9439848908d2a3f3f logged in","timestamp":"2026-11-11 23:11:54"}
+{"level":"info","message":"POST /users/login 200 79 - 315.593 ms","timestamp":"2026-11-11 23:11:54"}
+{"level":"info","message":"New Reservation Created - id=6af485ba439848908d2a3f4d","timestamp":"2026-11-11 23:11:54"}
+{"level":"info","message":"POST /reservations/create 200 122 - 45.318 ms","timestamp":"2026-11-11 23:11:54"}
+{"level":"info","message":"Reservation with ID 6af485ba439848908d2a3f4d has been updated","timestamp":"2026-11-11 23:11:54"}
+{"level":"info","message":"POST /reservations/6af485ba439848908d2a3f4d/edit 200 19117 - 185.663 ms","timestamp":"2026-11-11 23:11:54"}
+{"level":"info","message":"Test - 6af485bb439848908d2a3f77 logged in","timestamp":"2026-11-11 23:11:55"}
+{"level":"info","message":"POST /users/login 200 79 - 334.065 ms","timestamp":"2026-11-11 23:11:55"}
+{"level":"info","message":"New Reservation Created - id=6af485bc439848908d2a3f85","timestamp":"2026-11-11 23:11:56"}
+{"level":"info","message":"POST /reservations/create 200 122 - 116.375 ms","timestamp":"2026-11-11 23:11:56"}
+{"level":"info","message":"Reservation with ID 6af485bc439848908d2a3f85 has been cancelled","timestamp":"2026-11-11 23:11:56"}
+{"level":"info","message":"POST /reservations/cancel/6af485bc439848908d2a3f85 200 609 - 36.674 ms","timestamp":"2026-11-11 23:11:56"}
+{"level":"info","message":"Reservation with ID 6af485bc439848908d2a3f85 has been cancelled","timestamp":"2026-11-11 23:11:56"}
+{"level":"info","message":"POST /reservations/cancel/6af485bc439848908d2a3f85 200 609 - 9.898 ms","timestamp":"2026-11-11 23:11:56"}
+{"level":"info","message":"Test - 6af485bc439848908d2a3fa8 logged in","timestamp":"2026-11-11 23:11:57"}
+{"level":"info","message":"POST /users/login 200 79 - 384.970 ms","timestamp":"2026-11-11 23:11:57"}
+{"level":"info","message":"Test - 6af485be439848908d2a3fbf logged in","timestamp":"2026-11-11 23:11:58"}
+{"level":"info","message":"POST /users/login 200 79 - 319.511 ms","timestamp":"2026-11-11 23:11:58"}
+{"level":"info","message":"New Reservation Created - id=6af485bf439848908d2a3fcd","timestamp":"2026-11-11 23:11:59"}
+{"level":"info","message":"POST /reservations/create 200 122 - 55.079 ms","timestamp":"2026-11-11 23:11:59"}
+{"level":"info","message":"POST /reservations/update/6af485bf439848908d2a3fcd 200 875 - 26.874 ms","timestamp":"2026-11-11 23:11:59"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-11 23:15:59"}
+{"level":"info","message":"Test - 6af486afffe62eaf42f14626 logged in","timestamp":"2026-11-11 23:16:00"}
+{"level":"info","message":"POST /users/login 200 79 - 421.926 ms","timestamp":"2026-11-11 23:16:00"}
+{"level":"info","message":"New Reservation Created - id=6af486b1ffe62eaf42f14646","timestamp":"2026-11-11 23:16:01"}
+{"level":"info","message":"POST /reservations/create 200 122 - 110.598 ms","timestamp":"2026-11-11 23:16:01"}
+{"level":"info","message":"Test - 6af486b1ffe62eaf42f14660 logged in","timestamp":"2026-11-11 23:16:01"}
+{"level":"info","message":"POST /users/login 200 79 - 349.543 ms","timestamp":"2026-11-11 23:16:01"}
+{"level":"info","message":"POST /reservations/create 400 51 - 39.337 ms","timestamp":"2026-11-11 23:16:02"}
+{"level":"info","message":"POST /reservations/create 400 64 - 3.148 ms","timestamp":"2026-11-11 23:16:02"}
+{"level":"info","message":"POST /reservations/create 400 64 - 2.022 ms","timestamp":"2026-11-11 23:16:02"}
+{"level":"info","message":"POST /reservations/create 400 90 - 2.977 ms","timestamp":"2026-11-11 23:16:02"}
+{"level":"info","message":"POST /reservations/create 400 94 - 23.610 ms","timestamp":"2026-11-11 23:16:02"}
+{"level":"info","message":"POST /reservations/create 400 87 - 2.491 ms","timestamp":"2026-11-11 23:16:02"}
+{"level":"info","message":"POST /reservations/create 400 55 - 2.403 ms","timestamp":"2026-11-11 23:16:02"}
+{"level":"info","message":"Test - 6af486b2ffe62eaf42f14676 logged in","timestamp":"2026-11-11 23:16:03"}
+{"level":"info","message":"POST /users/login 200 79 - 290.628 ms","timestamp":"2026-11-11 23:16:03"}
+{"level":"info","message":"New Reservation Created - id=6af486b3ffe62eaf42f14684","timestamp":"2026-11-11 23:16:03"}
+{"level":"info","message":"POST /reservations/create 200 122 - 21.738 ms","timestamp":"2026-11-11 23:16:03"}
+{"level":"info","message":"POST /reservations/create 409 69 - 116.946 ms","timestamp":"2026-11-11 23:16:03"}
+{"level":"info","message":"Test - 6af486b3ffe62eaf42f146a5 logged in","timestamp":"2026-11-11 23:16:04"}
+{"level":"info","message":"POST /users/login 200 79 - 279.875 ms","timestamp":"2026-11-11 23:16:04"}
+{"level":"info","message":"New Reservation Created - id=6af486b4ffe62eaf42f146b3","timestamp":"2026-11-11 23:16:04"}
+{"level":"info","message":"POST /reservations/create 200 122 - 45.823 ms","timestamp":"2026-11-11 23:16:04"}
+{"level":"info","message":"POST /reservations/create 400 87 - 2.493 ms","timestamp":"2026-11-11 23:16:04"}
+{"level":"info","message":"Test - 6af486b4ffe62eaf42f146cc logged in","timestamp":"2026-11-11 23:16:05"}
+{"level":"info","message":"POST /users/login 200 79 - 447.925 ms","timestamp":"2026-11-11 23:16:05"}
+{"level":"info","message":"New Reservation Created - id=6af486b5ffe62eaf42f146da","timestamp":"2026-11-11 23:16:06"}
+{"level":"info","message":"POST /reservations/create 200 122 - 21.043 ms","timestamp":"2026-11-11 23:16:06"}
+{"level":"info","message":"Reservation with ID 6af486b5ffe62eaf42f146da has been updated","timestamp":"2026-11-11 23:16:06"}
+{"level":"info","message":"POST /reservations/6af486b5ffe62eaf42f146da/edit 200 19151 - 130.482 ms","timestamp":"2026-11-11 23:16:06"}
+{"level":"info","message":"Test - 6af486b6ffe62eaf42f14705 logged in","timestamp":"2026-11-11 23:16:06"}
+{"level":"info","message":"POST /users/login 200 79 - 394.716 ms","timestamp":"2026-11-11 23:16:06"}
+{"level":"info","message":"New Reservation Created - id=6af486b7ffe62eaf42f14713","timestamp":"2026-11-11 23:16:07"}
+{"level":"info","message":"POST /reservations/create 200 122 - 45.102 ms","timestamp":"2026-11-11 23:16:07"}
+{"level":"info","message":"Reservation with ID 6af486b7ffe62eaf42f14713 has been cancelled","timestamp":"2026-11-11 23:16:07"}
+{"level":"info","message":"POST /reservations/cancel/6af486b7ffe62eaf42f14713 200 609 - 16.381 ms","timestamp":"2026-11-11 23:16:07"}
+{"level":"info","message":"Reservation with ID 6af486b7ffe62eaf42f14713 has been cancelled","timestamp":"2026-11-11 23:16:07"}
+{"level":"info","message":"POST /reservations/cancel/6af486b7ffe62eaf42f14713 200 609 - 4.197 ms","timestamp":"2026-11-11 23:16:07"}
+{"level":"info","message":"Test - 6af486b7ffe62eaf42f14736 logged in","timestamp":"2026-11-11 23:16:08"}
+{"level":"info","message":"POST /users/login 200 79 - 288.016 ms","timestamp":"2026-11-11 23:16:08"}
+{"level":"info","message":"New Reservation Created - id=6af486b8ffe62eaf42f1474b","timestamp":"2026-11-11 23:16:08"}
+{"level":"info","message":"POST /reservations/create 200 122 - 27.701 ms","timestamp":"2026-11-11 23:16:08"}
+{"level":"info","message":"Test - 6af486b8ffe62eaf42f14765 logged in","timestamp":"2026-11-11 23:16:09"}
+{"level":"info","message":"POST /users/login 200 79 - 289.878 ms","timestamp":"2026-11-11 23:16:09"}
+{"level":"info","message":"New Reservation Created - id=6af486b9ffe62eaf42f14773","timestamp":"2026-11-11 23:16:09"}
+{"level":"info","message":"POST /reservations/create 200 122 - 27.086 ms","timestamp":"2026-11-11 23:16:09"}
+{"level":"info","message":"POST /reservations/update/6af486b9ffe62eaf42f14773 200 875 - 25.195 ms","timestamp":"2026-11-11 23:16:09"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-11 23:17:04"}
+{"level":"info","message":"New registered User - 6af486f040ddc1fd21d836bb","timestamp":"2026-11-11 23:17:05"}
+{"level":"info","message":"POST /users/register 200 16 - 326.529 ms","timestamp":"2026-11-11 23:17:05"}
+{"level":"info","message":"POST /users/logout 403 15855 - 42.846 ms","timestamp":"2026-11-11 23:17:05"}
+{"level":"info","message":"New registered User - 6af486f140ddc1fd21d836d9","timestamp":"2026-11-11 23:17:05"}
+{"level":"info","message":"POST /users/register 200 16 - 284.181 ms","timestamp":"2026-11-11 23:17:05"}
+{"level":"info","message":"POST /users/register 400 54 - 2.263 ms","timestamp":"2026-11-11 23:17:05"}
+{"level":"info","message":"POST /users/logout 403 15855 - 6.139 ms","timestamp":"2026-11-11 23:17:05"}
+{"level":"info","message":"Test - 6af486f140ddc1fd21d836e7 logged in","timestamp":"2026-11-11 23:17:07"}
+{"level":"info","message":"POST /users/login 200 79 - 1498.759 ms","timestamp":"2026-11-11 23:17:08"}
+{"level":"info","message":"POST /users/logout 200 16 - 758.823 ms","timestamp":"2026-11-11 23:17:09"}
+{"level":"info","message":"POST /users/login 401 56 - 5.664 ms","timestamp":"2026-11-11 23:17:09"}
+{"level":"info","message":"POST /users/logout 403 15855 - 9.432 ms","timestamp":"2026-11-11 23:17:09"}
+{"level":"info","message":"POST /users/login 401 56 - 283.957 ms","timestamp":"2026-11-11 23:17:10"}
+{"level":"info","message":"POST /users/logout 403 15855 - 7.453 ms","timestamp":"2026-11-11 23:17:10"}
+{"level":"info","message":"GET /users/profile 403 15855 - 14.626 ms","timestamp":"2026-11-11 23:17:10"}
+{"level":"info","message":"POST /users/logout 403 15855 - 6.516 ms","timestamp":"2026-11-11 23:17:10"}
+{"level":"info","message":"Test - 6af486f640ddc1fd21d83720 logged in","timestamp":"2026-11-11 23:17:11"}
+{"level":"info","message":"POST /users/login 200 79 - 282.889 ms","timestamp":"2026-11-11 23:17:11"}
+{"level":"info","message":"POST /users/logout 200 16 - 25.486 ms","timestamp":"2026-11-11 23:17:11"}
+{"level":"info","message":"POST /users/logout 403 15855 - 78.099 ms","timestamp":"2026-11-11 23:17:11"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-11 23:17:14"}
+{"level":"info","message":"Test - 6af486fa2c912a81f2cac70f logged in","timestamp":"2026-11-11 23:17:16"}
+{"level":"info","message":"POST /users/login 200 79 - 670.806 ms","timestamp":"2026-11-11 23:17:16"}
+{"_message":"Reservation validation failed","errors":{"passengers.0.baggageAllowance":{"kind":"max","message":"Path `baggageAllowance` (25) is more than maximum allowed value (10).","name":"ValidatorError","path":"baggageAllowance","properties":{"max":10,"message":"Path `baggageAllowance` (25) is more than maximum allowed value (10).","path":"baggageAllowance","type":"max","value":25},"value":25},"passengers.1.baggageAllowance":{"kind":"max","message":"Path `baggageAllowance` (25) is more than maximum allowed value (10).","name":"ValidatorError","path":"baggageAllowance","properties":{"max":10,"message":"Path `baggageAllowance` (25) is more than maximum allowed value (10).","path":"baggageAllowance","type":"max","value":25},"value":25}},"level":"error","message":"Error creating reservation: Reservation validation failed: passengers.0.baggageAllowance: Path `baggageAllowance` (25) is more than maximum allowed value (10)., passengers.1.baggageAllowance: Path `baggageAllowance` (25) is more than maximum allowed value (10).","stack":"ValidationError: Reservation validation failed: passengers.0.baggageAllowance: Path `baggageAllowance` (25) is more than maximum allowed value (10)., passengers.1.baggageAllowance: Path `baggageAllowance` (25) is more than maximum allowed value (10).\n    at model.Document.invalidate (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/node_modules/mongoose/lib/document.js:3362:32)\n    at EmbeddedDocument.Subdocument.invalidate (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/node_modules/mongoose/lib/types/subdocument.js:257:12)\n    at /Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/node_modules/mongoose/lib/document.js:3123:17\n    at /Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/node_modules/mongoose/lib/schemaType.js:1420:9\n    at processTicksAndRejections (node:internal/process/task_queues:85:11)","timestamp":"2026-11-11 23:17:18"}
+{"level":"info","message":"POST /reservations/create 500 59 - 1404.704 ms","timestamp":"2026-11-11 23:17:20"}
+{"level":"info","message":"Test - 6af487002c912a81f2cac748 logged in","timestamp":"2026-11-11 23:17:20"}
+{"level":"info","message":"POST /users/login 200 79 - 446.866 ms","timestamp":"2026-11-11 23:17:21"}
+{"level":"info","message":"POST /reservations/create 400 51 - 462.982 ms","timestamp":"2026-11-11 23:17:21"}
+{"level":"info","message":"POST /reservations/create 400 64 - 23.106 ms","timestamp":"2026-11-11 23:17:21"}
+{"level":"info","message":"POST /reservations/create 400 64 - 39.054 ms","timestamp":"2026-11-11 23:17:21"}
+{"level":"info","message":"POST /reservations/create 400 90 - 27.849 ms","timestamp":"2026-11-11 23:17:21"}
+{"level":"info","message":"POST /reservations/create 400 94 - 2.369 ms","timestamp":"2026-11-11 23:17:21"}
+{"level":"info","message":"POST /reservations/create 400 87 - 2.390 ms","timestamp":"2026-11-11 23:17:21"}
+{"level":"info","message":"POST /reservations/create 400 55 - 2.083 ms","timestamp":"2026-11-11 23:17:21"}
+{"level":"info","message":"Test - 6af487012c912a81f2cac75e logged in","timestamp":"2026-11-11 23:17:22"}
+{"level":"info","message":"POST /users/login 200 79 - 288.854 ms","timestamp":"2026-11-11 23:17:22"}
+{"level":"info","message":"New Reservation Created - id=6af487022c912a81f2cac76c","timestamp":"2026-11-11 23:17:22"}
+{"level":"info","message":"POST /reservations/create 200 122 - 25.989 ms","timestamp":"2026-11-11 23:17:22"}
+{"level":"info","message":"POST /reservations/create 409 69 - 228.551 ms","timestamp":"2026-11-11 23:17:23"}
+{"level":"info","message":"Test - 6af487032c912a81f2cac78d logged in","timestamp":"2026-11-11 23:17:23"}
+{"level":"info","message":"POST /users/login 200 79 - 518.765 ms","timestamp":"2026-11-11 23:17:23"}
+{"level":"info","message":"New Reservation Created - id=6af487042c912a81f2cac79b","timestamp":"2026-11-11 23:17:24"}
+{"level":"info","message":"POST /reservations/create 200 122 - 28.353 ms","timestamp":"2026-11-11 23:17:24"}
+{"level":"info","message":"POST /reservations/create 400 87 - 2.060 ms","timestamp":"2026-11-11 23:17:24"}
+{"level":"info","message":"Test - 6af487042c912a81f2cac7b4 logged in","timestamp":"2026-11-11 23:17:24"}
+{"level":"info","message":"POST /users/login 200 79 - 329.331 ms","timestamp":"2026-11-11 23:17:25"}
+{"level":"info","message":"New Reservation Created - id=6af487052c912a81f2cac7c2","timestamp":"2026-11-11 23:17:25"}
+{"level":"info","message":"POST /reservations/create 200 122 - 20.873 ms","timestamp":"2026-11-11 23:17:25"}
+{"level":"info","message":"Reservation with ID 6af487052c912a81f2cac7c2 has been updated","timestamp":"2026-11-11 23:17:25"}
+{"level":"info","message":"POST /reservations/6af487052c912a81f2cac7c2/edit 200 19151 - 57.767 ms","timestamp":"2026-11-11 23:17:25"}
+{"level":"info","message":"Test - 6af487052c912a81f2cac7ed logged in","timestamp":"2026-11-11 23:17:26"}
+{"level":"info","message":"POST /users/login 200 79 - 281.727 ms","timestamp":"2026-11-11 23:17:26"}
+{"level":"info","message":"New Reservation Created - id=6af487062c912a81f2cac7fb","timestamp":"2026-11-11 23:17:26"}
+{"level":"info","message":"POST /reservations/create 200 122 - 21.012 ms","timestamp":"2026-11-11 23:17:26"}
+{"level":"info","message":"Reservation with ID 6af487062c912a81f2cac7fb has been cancelled","timestamp":"2026-11-11 23:17:26"}
+{"level":"info","message":"POST /reservations/cancel/6af487062c912a81f2cac7fb 200 609 - 13.037 ms","timestamp":"2026-11-11 23:17:26"}
+{"level":"info","message":"Reservation with ID 6af487062c912a81f2cac7fb has been cancelled","timestamp":"2026-11-11 23:17:26"}
+{"level":"info","message":"POST /reservations/cancel/6af487062c912a81f2cac7fb 200 609 - 4.686 ms","timestamp":"2026-11-11 23:17:26"}
+{"level":"info","message":"Test - 6af487062c912a81f2cac81e logged in","timestamp":"2026-11-11 23:17:26"}
+{"level":"info","message":"POST /users/login 200 79 - 284.367 ms","timestamp":"2026-11-11 23:17:27"}
+{"level":"info","message":"New Reservation Created - id=6af487072c912a81f2cac833","timestamp":"2026-11-11 23:17:27"}
+{"level":"info","message":"POST /reservations/create 200 122 - 35.314 ms","timestamp":"2026-11-11 23:17:27"}
+{"level":"info","message":"Test - 6af487072c912a81f2cac84d logged in","timestamp":"2026-11-11 23:17:28"}
+{"level":"info","message":"POST /users/login 200 79 - 281.151 ms","timestamp":"2026-11-11 23:17:28"}
+{"level":"info","message":"New Reservation Created - id=6af487082c912a81f2cac85b","timestamp":"2026-11-11 23:17:28"}
+{"level":"info","message":"POST /reservations/create 200 122 - 26.090 ms","timestamp":"2026-11-11 23:17:28"}
+{"level":"info","message":"POST /reservations/update/6af487082c912a81f2cac85b 200 875 - 31.934 ms","timestamp":"2026-11-11 23:17:28"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-11 23:17:29"}
+{"level":"info","message":"Admin - 6af48709636c8c45e27ff109 logged in","timestamp":"2026-11-11 23:17:30"}
+{"level":"info","message":"POST /users/login 200 79 - 305.136 ms","timestamp":"2026-11-11 23:17:30"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2026-11-11 23:17:30"}
+{"$__":{"$versionError":null,"activePaths":{"paths":{"aircraft":"require","arrivalTime":"require","bookedSeats":"require","departureDate":"require","departureTime":"require","destination":"require","flightNumber":"require","origin":"require","price":"require","seatCapacity":"require"},"states":{"default":{},"modify":{},"require":{"aircraft":true,"arrivalTime":true,"bookedSeats":true,"departureDate":true,"departureTime":true,"destination":true,"flightNumber":true,"origin":true,"price":true,"seatCapacity":true}}},"backup":{"activePaths":{"default":{"_id":true,"aircraftLayoutId":true,"bookedSeats":true},"modify":{"aircraft":true,"arrivalTime":true,"departureDate":true,"departureTime":true,"destination":true,"flightNumber":true,"origin":true,"price":true,"seatCapacity":true,"status":true}},"validationError":null},"cachedRequired":{},"inserting":true,"op":null,"saveOptions":null,"savedState":{},"saving":null,"validating":null},"$isNew":false,"_doc":{"__v":0,"_id":"6af4870a636c8c45e27ff121","aircraft":"Airbus A321","aircraftLayoutId":null,"arrivalTime":"10:45","bookedSeats":0,"departureDate":"2025-11-20","departureTime":"08:30","destination":"Hong Kong (HKG)","flightNumber":"AA1001","origin":"Manila (MNL)","price":148,"seatCapacity":180,"status":"Scheduled"},"level":"info","message":"Flight created successfully.","timestamp":"2026-11-11 23:17:30"}
+{"level":"info","message":"POST /admin/create 201 366 - 16.811 ms","timestamp":"2026-11-11 23:17:30"}
+{"level":"info","message":"Test - 6af4870a636c8c45e27ff12d logged in","timestamp":"2026-11-11 23:17:31"}
+{"level":"info","message":"POST /users/login 200 79 - 384.402 ms","timestamp":"2026-11-11 23:17:31"}
+{"level":"info","message":"POST /admin/create 403 15895 - 12.569 ms","timestamp":"2026-11-11 23:17:31"}
+{"level":"info","message":"Step - 6af4870b636c8c45e27ff13d logged in","timestamp":"2026-11-11 23:17:31"}
+{"level":"info","message":"POST /users/login 200 78 - 348.754 ms","timestamp":"2026-11-11 23:17:31"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2026-11-11 23:17:31"}
+{"level":"info","message":"POST /admin/sensitive-test 403 107 - 5.360 ms","timestamp":"2026-11-11 23:17:31"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-11 23:19:47"}
+{"level":"info","message":"Test - 6af487932de9ce559456215d logged in","timestamp":"2026-11-11 23:19:48"}
+{"level":"info","message":"POST /users/login 200 79 - 618.411 ms","timestamp":"2026-11-11 23:19:49"}
+{"level":"info","message":"New Reservation Created - id=6af487962de9ce559456217d","timestamp":"2026-11-11 23:19:50"}
+{"level":"info","message":"POST /reservations/create 200 122 - 864.179 ms","timestamp":"2026-11-11 23:19:50"}
+{"level":"info","message":"Test - 6af487962de9ce5594562197 logged in","timestamp":"2026-11-11 23:19:51"}
+{"level":"info","message":"POST /users/login 200 79 - 323.730 ms","timestamp":"2026-11-11 23:19:51"}
+{"level":"info","message":"POST /reservations/create 400 51 - 64.070 ms","timestamp":"2026-11-11 23:19:51"}
+{"level":"info","message":"POST /reservations/create 400 64 - 23.555 ms","timestamp":"2026-11-11 23:19:51"}
+{"level":"info","message":"POST /reservations/create 400 64 - 2.951 ms","timestamp":"2026-11-11 23:19:51"}
+{"level":"info","message":"POST /reservations/create 400 90 - 6.332 ms","timestamp":"2026-11-11 23:19:51"}
+{"level":"info","message":"POST /reservations/create 400 83 - 3.808 ms","timestamp":"2026-11-11 23:19:51"}
+{"level":"info","message":"POST /reservations/create 400 94 - 1.947 ms","timestamp":"2026-11-11 23:19:51"}
+{"level":"info","message":"POST /reservations/create 400 87 - 4.444 ms","timestamp":"2026-11-11 23:19:51"}
+{"level":"info","message":"POST /reservations/create 400 55 - 4.341 ms","timestamp":"2026-11-11 23:19:51"}
+{"level":"info","message":"Test - 6af487972de9ce55945621ad logged in","timestamp":"2026-11-11 23:19:52"}
+{"level":"info","message":"POST /users/login 200 79 - 285.884 ms","timestamp":"2026-11-11 23:19:52"}
+{"level":"info","message":"New Reservation Created - id=6af487982de9ce55945621bb","timestamp":"2026-11-11 23:19:52"}
+{"level":"info","message":"POST /reservations/create 200 122 - 37.163 ms","timestamp":"2026-11-11 23:19:52"}
+{"level":"info","message":"POST /reservations/create 409 69 - 345.191 ms","timestamp":"2026-11-11 23:19:52"}
+{"level":"info","message":"Test - 6af487982de9ce55945621dc logged in","timestamp":"2026-11-11 23:19:53"}
+{"level":"info","message":"POST /users/login 200 79 - 300.227 ms","timestamp":"2026-11-11 23:19:53"}
+{"level":"info","message":"New Reservation Created - id=6af487992de9ce55945621ea","timestamp":"2026-11-11 23:19:53"}
+{"level":"info","message":"POST /reservations/create 200 122 - 24.982 ms","timestamp":"2026-11-11 23:19:53"}
+{"level":"info","message":"POST /reservations/create 400 87 - 1.681 ms","timestamp":"2026-11-11 23:19:53"}
+{"level":"info","message":"Test - 6af487992de9ce5594562203 logged in","timestamp":"2026-11-11 23:19:54"}
+{"level":"info","message":"POST /users/login 200 79 - 284.397 ms","timestamp":"2026-11-11 23:19:54"}
+{"level":"info","message":"New Reservation Created - id=6af4879a2de9ce5594562211","timestamp":"2026-11-11 23:19:54"}
+{"level":"info","message":"POST /reservations/create 200 122 - 18.257 ms","timestamp":"2026-11-11 23:19:54"}
+{"level":"info","message":"Reservation with ID 6af4879a2de9ce5594562211 has been updated","timestamp":"2026-11-11 23:19:54"}
+{"level":"info","message":"POST /reservations/6af4879a2de9ce5594562211/edit 200 19151 - 114.018 ms","timestamp":"2026-11-11 23:19:54"}
+{"level":"info","message":"Test - 6af4879a2de9ce559456223c logged in","timestamp":"2026-11-11 23:19:55"}
+{"level":"info","message":"POST /users/login 200 79 - 328.201 ms","timestamp":"2026-11-11 23:19:55"}
+{"level":"info","message":"New Reservation Created - id=6af4879b2de9ce559456224a","timestamp":"2026-11-11 23:19:55"}
+{"level":"info","message":"POST /reservations/create 200 122 - 28.379 ms","timestamp":"2026-11-11 23:19:55"}
+{"level":"info","message":"Reservation with ID 6af4879b2de9ce559456224a has been cancelled","timestamp":"2026-11-11 23:19:55"}
+{"level":"info","message":"POST /reservations/cancel/6af4879b2de9ce559456224a 200 609 - 12.872 ms","timestamp":"2026-11-11 23:19:55"}
+{"level":"info","message":"Reservation with ID 6af4879b2de9ce559456224a has been cancelled","timestamp":"2026-11-11 23:19:55"}
+{"level":"info","message":"POST /reservations/cancel/6af4879b2de9ce559456224a 200 609 - 4.339 ms","timestamp":"2026-11-11 23:19:55"}
+{"level":"info","message":"Test - 6af4879b2de9ce559456226d logged in","timestamp":"2026-11-11 23:19:56"}
+{"level":"info","message":"POST /users/login 200 79 - 285.729 ms","timestamp":"2026-11-11 23:19:56"}
+{"level":"info","message":"New Reservation Created - id=6af4879d2de9ce5594562282","timestamp":"2026-11-11 23:19:57"}
+{"level":"info","message":"POST /reservations/create 200 122 - 151.229 ms","timestamp":"2026-11-11 23:19:57"}
+{"level":"info","message":"Test - 6af4879d2de9ce559456229c logged in","timestamp":"2026-11-11 23:19:58"}
+{"level":"info","message":"POST /users/login 200 79 - 345.879 ms","timestamp":"2026-11-11 23:19:58"}
+{"level":"info","message":"New Reservation Created - id=6af4879e2de9ce55945622aa","timestamp":"2026-11-11 23:19:58"}
+{"level":"info","message":"POST /reservations/create 200 122 - 42.268 ms","timestamp":"2026-11-11 23:19:58"}
+{"level":"info","message":"POST /reservations/update/6af4879e2de9ce55945622aa 200 875 - 36.817 ms","timestamp":"2026-11-11 23:19:58"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-11 23:20:01"}
+{"level":"info","message":"Admin - 6af487a17ae134130e9ccee3 logged in","timestamp":"2026-11-11 23:20:02"}
+{"level":"info","message":"POST /users/login 200 79 - 377.826 ms","timestamp":"2026-11-11 23:20:02"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2026-11-11 23:20:02"}
+{"$__":{"$versionError":null,"activePaths":{"paths":{"aircraft":"require","arrivalTime":"require","bookedSeats":"require","departureDate":"require","departureTime":"require","destination":"require","flightNumber":"require","origin":"require","price":"require","seatCapacity":"require"},"states":{"default":{},"modify":{},"require":{"aircraft":true,"arrivalTime":true,"bookedSeats":true,"departureDate":true,"departureTime":true,"destination":true,"flightNumber":true,"origin":true,"price":true,"seatCapacity":true}}},"backup":{"activePaths":{"default":{"_id":true,"aircraftLayoutId":true,"bookedSeats":true},"modify":{"aircraft":true,"arrivalTime":true,"departureDate":true,"departureTime":true,"destination":true,"flightNumber":true,"origin":true,"price":true,"seatCapacity":true,"status":true}},"validationError":null},"cachedRequired":{},"inserting":true,"op":null,"saveOptions":null,"savedState":{},"saving":null,"validating":null},"$isNew":false,"_doc":{"__v":0,"_id":"6af487a27ae134130e9ccefb","aircraft":"Airbus A321","aircraftLayoutId":null,"arrivalTime":"10:45","bookedSeats":0,"departureDate":"2025-11-20","departureTime":"08:30","destination":"Hong Kong (HKG)","flightNumber":"AA1001","origin":"Manila (MNL)","price":148,"seatCapacity":180,"status":"Scheduled"},"level":"info","message":"Flight created successfully.","timestamp":"2026-11-11 23:20:02"}
+{"level":"info","message":"POST /admin/create 201 366 - 33.522 ms","timestamp":"2026-11-11 23:20:02"}
+{"level":"info","message":"Test - 6af487a27ae134130e9ccf07 logged in","timestamp":"2026-11-11 23:20:03"}
+{"level":"info","message":"POST /users/login 200 79 - 311.370 ms","timestamp":"2026-11-11 23:20:03"}
+{"level":"info","message":"POST /admin/create 403 15895 - 13.384 ms","timestamp":"2026-11-11 23:20:03"}
+{"level":"info","message":"Step - 6af487a37ae134130e9ccf17 logged in","timestamp":"2026-11-11 23:20:03"}
+{"level":"info","message":"POST /users/login 200 78 - 280.309 ms","timestamp":"2026-11-11 23:20:03"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2026-11-11 23:20:03"}
+{"level":"info","message":"POST /admin/sensitive-test 403 107 - 5.318 ms","timestamp":"2026-11-11 23:20:03"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-11 23:20:39"}
+{"level":"info","message":"New registered User - 6af487c7ab604f3ae52035ab","timestamp":"2026-11-11 23:20:40"}
+{"level":"info","message":"POST /users/register 200 16 - 513.915 ms","timestamp":"2026-11-11 23:20:40"}
+{"level":"info","message":"POST /users/logout 403 15855 - 56.005 ms","timestamp":"2026-11-11 23:20:40"}
+{"level":"info","message":"New registered User - 6af487c8ab604f3ae52035ca","timestamp":"2026-11-11 23:20:40"}
+{"level":"info","message":"POST /users/register 200 16 - 357.808 ms","timestamp":"2026-11-11 23:20:40"}
+{"level":"info","message":"POST /users/register 400 54 - 3.110 ms","timestamp":"2026-11-11 23:20:40"}
+{"level":"info","message":"POST /users/logout 403 15855 - 24.587 ms","timestamp":"2026-11-11 23:20:40"}
+{"level":"info","message":"Test - 6af487c8ab604f3ae52035d7 logged in","timestamp":"2026-11-11 23:20:43"}
+{"level":"info","message":"POST /users/login 200 79 - 2101.480 ms","timestamp":"2026-11-11 23:20:44"}
+{"level":"info","message":"POST /users/logout 200 16 - 4406.576 ms","timestamp":"2026-11-11 23:20:48"}
+{"level":"info","message":"POST /users/login 401 56 - 29.018 ms","timestamp":"2026-11-11 23:20:48"}
+{"level":"info","message":"POST /users/logout 403 15855 - 24.240 ms","timestamp":"2026-11-11 23:20:49"}
+{"level":"info","message":"POST /users/login 401 56 - 298.265 ms","timestamp":"2026-11-11 23:20:49"}
+{"level":"info","message":"POST /users/logout 403 15855 - 26.169 ms","timestamp":"2026-11-11 23:20:49"}
+{"level":"info","message":"GET /users/profile 403 15855 - 30.908 ms","timestamp":"2026-11-11 23:20:49"}
+{"level":"info","message":"POST /users/logout 403 15855 - 6.773 ms","timestamp":"2026-11-11 23:20:49"}
+{"level":"info","message":"Test - 6af487d1ab604f3ae5203610 logged in","timestamp":"2026-11-11 23:20:50"}
+{"level":"info","message":"POST /users/login 200 79 - 389.933 ms","timestamp":"2026-11-11 23:20:51"}
+{"level":"info","message":"POST /users/logout 200 16 - 1413.806 ms","timestamp":"2026-11-11 23:20:52"}
+{"level":"info","message":"POST /users/logout 403 15855 - 9.571 ms","timestamp":"2026-11-11 23:20:52"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-11 23:20:54"}
+{"level":"info","message":"Test - 6af487d6e91ba76b704c5645 logged in","timestamp":"2026-11-11 23:20:55"}
+{"level":"info","message":"POST /users/login 200 79 - 328.988 ms","timestamp":"2026-11-11 23:20:55"}
+{"level":"info","message":"New Reservation Created - id=6af487d8e91ba76b704c5665","timestamp":"2026-11-11 23:20:56"}
+{"level":"info","message":"POST /reservations/create 200 122 - 308.151 ms","timestamp":"2026-11-11 23:20:56"}
+{"level":"info","message":"Test - 6af487d8e91ba76b704c567f logged in","timestamp":"2026-11-11 23:20:56"}
+{"level":"info","message":"POST /users/login 200 79 - 298.554 ms","timestamp":"2026-11-11 23:20:56"}
+{"level":"info","message":"POST /reservations/create 400 51 - 4.229 ms","timestamp":"2026-11-11 23:20:57"}
+{"level":"info","message":"POST /reservations/create 400 64 - 23.976 ms","timestamp":"2026-11-11 23:20:57"}
+{"level":"info","message":"POST /reservations/create 400 64 - 1.863 ms","timestamp":"2026-11-11 23:20:57"}
+{"level":"info","message":"POST /reservations/create 400 90 - 1.616 ms","timestamp":"2026-11-11 23:20:57"}
+{"level":"info","message":"POST /reservations/create 400 83 - 1.492 ms","timestamp":"2026-11-11 23:20:57"}
+{"level":"info","message":"POST /reservations/create 400 94 - 1.566 ms","timestamp":"2026-11-11 23:20:57"}
+{"level":"info","message":"POST /reservations/create 400 87 - 1.543 ms","timestamp":"2026-11-11 23:20:57"}
+{"level":"info","message":"POST /reservations/create 400 55 - 1.983 ms","timestamp":"2026-11-11 23:20:57"}
+{"level":"info","message":"Test - 6af487d9e91ba76b704c5695 logged in","timestamp":"2026-11-11 23:20:57"}
+{"level":"info","message":"POST /users/login 200 79 - 291.299 ms","timestamp":"2026-11-11 23:20:57"}
+{"level":"info","message":"New Reservation Created - id=6af487dae91ba76b704c56a3","timestamp":"2026-11-11 23:20:58"}
+{"level":"info","message":"POST /reservations/create 200 122 - 32.230 ms","timestamp":"2026-11-11 23:20:58"}
+{"level":"info","message":"POST /reservations/create 409 69 - 545.528 ms","timestamp":"2026-11-11 23:20:58"}
+{"level":"info","message":"Test - 6af487dae91ba76b704c56c4 logged in","timestamp":"2026-11-11 23:20:59"}
+{"level":"info","message":"POST /users/login 200 79 - 289.070 ms","timestamp":"2026-11-11 23:20:59"}
+{"level":"info","message":"New Reservation Created - id=6af487dbe91ba76b704c56d2","timestamp":"2026-11-11 23:20:59"}
+{"level":"info","message":"POST /reservations/create 200 122 - 25.884 ms","timestamp":"2026-11-11 23:20:59"}
+{"level":"info","message":"POST /reservations/create 400 87 - 9.072 ms","timestamp":"2026-11-11 23:20:59"}
+{"level":"info","message":"Test - 6af487dbe91ba76b704c56eb logged in","timestamp":"2026-11-11 23:21:00"}
+{"level":"info","message":"POST /users/login 200 79 - 417.725 ms","timestamp":"2026-11-11 23:21:00"}
+{"level":"info","message":"New Reservation Created - id=6af487dce91ba76b704c56f9","timestamp":"2026-11-11 23:21:00"}
+{"level":"info","message":"POST /reservations/create 200 122 - 79.716 ms","timestamp":"2026-11-11 23:21:01"}
+{"level":"info","message":"Reservation with ID 6af487dce91ba76b704c56f9 has been updated","timestamp":"2026-11-11 23:21:01"}
+{"level":"info","message":"POST /reservations/6af487dce91ba76b704c56f9/edit 200 19151 - 166.824 ms","timestamp":"2026-11-11 23:21:01"}
+{"level":"info","message":"Test - 6af487dde91ba76b704c5724 logged in","timestamp":"2026-11-11 23:21:02"}
+{"level":"info","message":"POST /users/login 200 79 - 466.482 ms","timestamp":"2026-11-11 23:21:02"}
+{"level":"info","message":"New Reservation Created - id=6af487dee91ba76b704c5732","timestamp":"2026-11-11 23:21:02"}
+{"level":"info","message":"POST /reservations/create 200 122 - 60.947 ms","timestamp":"2026-11-11 23:21:02"}
+{"level":"info","message":"Reservation with ID 6af487dee91ba76b704c5732 has been cancelled","timestamp":"2026-11-11 23:21:02"}
+{"level":"info","message":"POST /reservations/cancel/6af487dee91ba76b704c5732 200 609 - 35.850 ms","timestamp":"2026-11-11 23:21:02"}
+{"level":"info","message":"Reservation with ID 6af487dee91ba76b704c5732 has been cancelled","timestamp":"2026-11-11 23:21:02"}
+{"level":"info","message":"POST /reservations/cancel/6af487dee91ba76b704c5732 200 609 - 6.712 ms","timestamp":"2026-11-11 23:21:02"}
+{"level":"info","message":"Test - 6af487dee91ba76b704c5755 logged in","timestamp":"2026-11-11 23:21:03"}
+{"level":"info","message":"POST /users/login 200 79 - 357.494 ms","timestamp":"2026-11-11 23:21:03"}
+{"level":"info","message":"New Reservation Created - id=6af487e0e91ba76b704c576a","timestamp":"2026-11-11 23:21:04"}
+{"level":"info","message":"POST /reservations/create 200 122 - 26.571 ms","timestamp":"2026-11-11 23:21:04"}
+{"level":"info","message":"Test - 6af487e0e91ba76b704c5784 logged in","timestamp":"2026-11-11 23:21:04"}
+{"level":"info","message":"POST /users/login 200 79 - 293.871 ms","timestamp":"2026-11-11 23:21:04"}
+{"level":"info","message":"New Reservation Created - id=6af487e1e91ba76b704c5792","timestamp":"2026-11-11 23:21:05"}
+{"level":"info","message":"POST /reservations/create 200 122 - 26.090 ms","timestamp":"2026-11-11 23:21:05"}
+{"level":"info","message":"POST /reservations/update/6af487e1e91ba76b704c5792 200 875 - 24.692 ms","timestamp":"2026-11-11 23:21:05"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-11 23:21:06"}
+{"level":"info","message":"Admin - 6af487e2d37859470a654455 logged in","timestamp":"2026-11-11 23:21:07"}
+{"level":"info","message":"POST /users/login 200 79 - 414.123 ms","timestamp":"2026-11-11 23:21:07"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2026-11-11 23:21:07"}
+{"$__":{"$versionError":null,"activePaths":{"paths":{"aircraft":"require","arrivalTime":"require","bookedSeats":"require","departureDate":"require","departureTime":"require","destination":"require","flightNumber":"require","origin":"require","price":"require","seatCapacity":"require"},"states":{"default":{},"modify":{},"require":{"aircraft":true,"arrivalTime":true,"bookedSeats":true,"departureDate":true,"departureTime":true,"destination":true,"flightNumber":true,"origin":true,"price":true,"seatCapacity":true}}},"backup":{"activePaths":{"default":{"_id":true,"aircraftLayoutId":true,"bookedSeats":true},"modify":{"aircraft":true,"arrivalTime":true,"departureDate":true,"departureTime":true,"destination":true,"flightNumber":true,"origin":true,"price":true,"seatCapacity":true,"status":true}},"validationError":null},"cachedRequired":{},"inserting":true,"op":null,"saveOptions":null,"savedState":{},"saving":null,"validating":null},"$isNew":false,"_doc":{"__v":0,"_id":"6af487e3d37859470a65446d","aircraft":"Airbus A321","aircraftLayoutId":null,"arrivalTime":"10:45","bookedSeats":0,"departureDate":"2025-11-20","departureTime":"08:30","destination":"Hong Kong (HKG)","flightNumber":"AA1001","origin":"Manila (MNL)","price":148,"seatCapacity":180,"status":"Scheduled"},"level":"info","message":"Flight created successfully.","timestamp":"2026-11-11 23:21:07"}
+{"level":"info","message":"POST /admin/create 201 366 - 47.965 ms","timestamp":"2026-11-11 23:21:07"}
+{"level":"info","message":"Test - 6af487e4d37859470a654479 logged in","timestamp":"2026-11-11 23:21:08"}
+{"level":"info","message":"POST /users/login 200 79 - 365.951 ms","timestamp":"2026-11-11 23:21:08"}
+{"level":"info","message":"POST /admin/create 403 15895 - 17.768 ms","timestamp":"2026-11-11 23:21:08"}
+{"level":"info","message":"Step - 6af487e4d37859470a654489 logged in","timestamp":"2026-11-11 23:21:09"}
+{"level":"info","message":"POST /users/login 200 78 - 297.392 ms","timestamp":"2026-11-11 23:21:09"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2026-11-11 23:21:09"}
+{"level":"info","message":"POST /admin/sensitive-test 403 107 - 10.016 ms","timestamp":"2026-11-11 23:21:09"}
+{"level":"info","message":"🚀 Server running at http://localhost:3000","timestamp":"2026-11-11 23:33:06"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-11 23:33:07"}
+{"level":"info","message":"GET / 200 55944 - 943.035 ms","timestamp":"2026-11-11 23:33:43"}
+{"level":"info","message":"GET / 200 55944 - 283.276 ms","timestamp":"2026-11-11 23:33:51"}
+{"level":"info","message":"GET /reservations/book-flight 403 15855 - 34.541 ms","timestamp":"2026-11-11 23:34:02"}
+{"level":"info","message":"Juan - 692837e9271256cfec19c400 logged in","timestamp":"2026-11-11 23:34:20"}
+{"level":"info","message":"POST /users/login 200 79 - 2753.064 ms","timestamp":"2026-11-11 23:34:20"}
+{"level":"info","message":"GET /reservations/book-flight 200 23166 - 1369.810 ms","timestamp":"2026-11-11 23:34:24"}
+{"level":"info","message":"GET / 200 55989 - 119.858 ms","timestamp":"2026-11-11 23:34:27"}
+{"level":"info","message":"GET /users/profile 200 23070 - 32.007 ms","timestamp":"2026-11-11 23:34:30"}
+{"level":"info","message":"GET / 304 - - 141.943 ms","timestamp":"2026-11-11 23:34:40"}
+{"level":"info","message":"GET /reservations/book-flight 304 - - 109.089 ms","timestamp":"2026-11-11 23:34:47"}
+{"level":"info","message":"✈️ Found 0 flights from Bangkok (BKK) → Beijing (PEK)","timestamp":"2026-11-11 23:34:51"}
+{"level":"info","message":"GET /reservations/search?origin=Bangkok+%28BKK%29&destination=Beijing+%28PEK%29 200 14 - 81.270 ms","timestamp":"2026-11-11 23:34:52"}
+{"level":"info","message":"✈️ Found 0 flights from Bangkok (BKK) → Beijing (PEK)","timestamp":"2026-11-11 23:34:55"}
+{"level":"info","message":"GET /reservations/search?origin=Bangkok+%28BKK%29&destination=Beijing+%28PEK%29 304 - - 24.393 ms","timestamp":"2026-11-11 23:34:55"}
+{"level":"info","message":"✈️ Found 0 flights from Beijing (PEK) → Bangkok (BKK)","timestamp":"2026-11-11 23:34:55"}
+{"level":"info","message":"GET /reservations/search?origin=Beijing+%28PEK%29&destination=Bangkok+%28BKK%29 200 14 - 5.656 ms","timestamp":"2026-11-11 23:34:55"}
+{"level":"info","message":"GET /reservations/book-flight 200 23166 - 273.133 ms","timestamp":"2026-11-11 23:35:17"}
+{"level":"info","message":"✈️ Found 0 flights from Manila (MNL) → Cebu (CEB)","timestamp":"2026-11-11 23:35:34"}
+{"level":"info","message":"GET /reservations/search?origin=Manila+%28MNL%29&destination=Cebu+%28CEB%29 200 14 - 4400.965 ms","timestamp":"2026-11-11 23:35:36"}
+{"level":"info","message":"GET /reservations/my-bookings 200 29560 - 268.141 ms","timestamp":"2026-11-11 23:36:14"}
+{"level":"info","message":"GET /reservations/6af186534149190f0897348a/edit 200 19521 - 51.381 ms","timestamp":"2026-11-11 23:36:17"}
+{"level":"info","message":"GET /reservations/seats/6af186514149190f089726fd?excludeReservation=6af186534149190f0897348a 409 70 - 4.238 ms","timestamp":"2026-11-11 23:36:17"}
+{"level":"info","message":"GET /reservations/6af186534149190f08973498/edit 200 19520 - 1938.642 ms","timestamp":"2026-11-11 23:37:01"}
+{"level":"info","message":"GET /reservations/seats/6af186514149190f08972728?excludeReservation=6af186534149190f08973498 409 70 - 93.083 ms","timestamp":"2026-11-11 23:37:02"}
+{"level":"info","message":"GET /reservations/check-in 200 20107 - 93.513 ms","timestamp":"2026-11-11 23:37:09"}
+{"level":"info","message":"POST /users/logout 200 16 - 420.707 ms","timestamp":"2026-11-11 23:37:13"}
+{"level":"info","message":"GET / 200 55944 - 192.742 ms","timestamp":"2026-11-11 23:37:15"}
+{"level":"info","message":"POST /users/login 401 56 - 650.682 ms","timestamp":"2026-11-11 23:37:26"}
+{"level":"info","message":"Admin - 692837e9271256cfec19c404 logged in","timestamp":"2026-11-11 23:39:30"}
+{"level":"info","message":"POST /users/login 200 79 - 296.500 ms","timestamp":"2026-11-11 23:39:30"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2026-11-11 23:39:32"}
+{"level":"info","message":"GET /admin 403 15973 - 244.313 ms","timestamp":"2026-11-11 23:39:32"}
+{"level":"info","message":"GET / 200 56221 - 59.178 ms","timestamp":"2026-11-11 23:39:35"}
+{"level":"info","message":"GET /reservations/check-in 403 16195 - 20.160 ms","timestamp":"2026-11-11 23:39:38"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2026-11-11 23:39:40"}
+{"level":"info","message":"GET /admin 403 15973 - 27.334 ms","timestamp":"2026-11-11 23:39:40"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2026-11-11 23:39:44"}
+{"level":"info","message":"GET /admin 403 15973 - 11.730 ms","timestamp":"2026-11-11 23:39:44"}
+{"level":"info","message":"🚀 Server running at http://localhost:3000","timestamp":"2026-11-11 23:45:44"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-11 23:45:46"}
+{"level":"info","message":"ADMIN ROUTE:","timestamp":"2026-11-11 23:49:37"}
+{"level":"info","message":"GET /admin 403 15973 - 544.851 ms","timestamp":"2026-11-11 23:49:38"}
+{"level":"info","message":"GET /users/profile 200 23296 - 19.528 ms","timestamp":"2026-11-11 23:49:41"}
+{"level":"info","message":"POST /users/logout 200 16 - 211.078 ms","timestamp":"2026-11-11 23:49:46"}
+{"level":"info","message":"GET / 200 55944 - 114.024 ms","timestamp":"2026-11-11 23:49:48"}
+{"level":"info","message":"POST /users/login 401 56 - 676.833 ms","timestamp":"2026-11-11 23:50:03"}
+{"level":"info","message":"Juan - 692837e9271256cfec19c400 logged in","timestamp":"2026-11-11 23:50:17"}
+{"level":"info","message":"POST /users/login 200 79 - 149.329 ms","timestamp":"2026-11-11 23:50:17"}
+{"level":"info","message":"GET / 200 55989 - 141.583 ms","timestamp":"2026-11-11 23:50:19"}
+{"level":"info","message":"GET /reservations/my-bookings 304 - - 2489.461 ms","timestamp":"2026-11-11 23:50:58"}
+{"level":"info","message":"GET /reservations/6af186534149190f0897348a/edit 304 - - 686.213 ms","timestamp":"2026-11-11 23:51:02"}
+{"level":"info","message":"GET /reservations/seats/6af186514149190f089726fd?excludeReservation=6af186534149190f0897348a 409 70 - 3.235 ms","timestamp":"2026-11-11 23:51:02"}

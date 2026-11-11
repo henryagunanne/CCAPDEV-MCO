@@ -24,8 +24,12 @@
 
 
 <!-- Hidden Inputs -->
-<input type="hidden" id="travelClass" name="travelClass" value="{{travelClass}}">
-<input type="hidden" id="tripType" name="tripType" value="{{tripType}}">
+<select id="travelClassSelect" name="travelClass" class="form-select" aria-label="Travel class">
+  <option value="Economy" {{#if (eq travelClass "Economy")}}selected{{/if}}>Economy</option>
+  <option value="Premium Economy" {{#if (eq travelClass "Premium Economy")}}selected{{/if}}>Premium Economy</option>
+  <option value="Business" {{#if (eq travelClass "Business")}}selected{{/if}}>Business</option>
+  <option value="First" {{#if (eq travelClass "First")}}selected{{/if}}>First</option>
+</select>
 <input type="hidden" id="departDate" name="departDate" value="{{departDate}}">
 <input type="hidden" id="returnDate" name="returnDate" value="{{returnDate}}">
 
@@ -33,8 +37,7 @@
     <div class="card-body">
       <form id="reservationForm" action="/reservations/create" method="POST" class="needs-validation" novalidate>
         <!-- Hidden Fields -->
-        <input type="hidden" name="flight" value="{{flight._id}}">
-        <input type="hidden" id="passengersData" name="passengers">
+        <input type="hidden" name="flight" value="{{flight._id}}" data-origin="{{flight.origin}}" data-destination="{{flight.destination}}">
 
         <!-- Trip Type Selector -->
         <div class="row mb-3">
@@ -60,7 +63,7 @@
           >
             <option value="">-- Choose Return Flight --</option>
             {{#each returnFlights}}
-              <option value="{{this._id}}">
+              <option value="{{this._id}}" data-price="{{this.price}}">
                 {{this.origin}} → {{this.destination}} | ₱{{this.price}} 
                 ({{formatDate this.departureDate}} {{this.departureTime}} → {{formatDate this.arrivalDate}} {{this.arrivalTime}})
               </option>
@@ -85,13 +88,18 @@
         <div id="passengerFields"></div>
 
         <!-- Seat Selection -->
-        <h5 class="text-center text-danger mt-4">Seat Selection</h5>
-        <div id="seat-map" class="my-3"></div>
+        <h5 class="text-center text-danger mt-4">Outbound Seat Selection</h5>
+        <div id="seat-map-outbound" class="my-3"></div>
+        <section id="returnSeatSection" class="d-none">
+          <h5 class="text-center text-danger mt-4">Return Seat Selection</h5>
+          <div id="seat-map-return" class="my-3"></div>
+        </section>
 
         <!-- Legend -->
         <div class="d-flex justify-content-center gap-2 mb-3 flex-wrap">
           <span class="badge bg-danger">First Class</span>
           <span class="badge bg-light text-dark border border-purple">Business</span>
+          <span class="badge bg-info text-dark">Premium Economy</span>
           <span class="badge bg-primary">Economy</span>
           <span class="badge bg-secondary">Occupied</span>
           <span class="badge bg-warning text-dark">Selected</span>
@@ -101,7 +109,7 @@
         <div class="card bg-light p-3 mb-4 summary-card mx-auto">
           <h5 class="text-danger fw-bold">Price Summary</h5>
 
-          <p>Base Fare: ₱<span id="baseFare">{{flight.price}}</span></p>
+          <p>Base Fare: ₱<span id="baseFare" data-fare="{{flight.price}}">{{flight.price}}</span></p>
 
         <p>Return Fare: ₱<span id="returnFare">0</span></p>
 
@@ -113,6 +121,7 @@
           <h5>Total: ₱<span id="totalPrice">{{flight.price}}</span></h5>
         </div>
 
+        <div id="formMessage" class="text-danger mb-3" role="alert"></div>
 
         <!-- Buttons -->
         <div class="d-flex justify-content-center gap-2">
@@ -123,34 +132,3 @@
     </div>
   </div>
 </main>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const returnFlightSelect = document.getElementById("returnFlight");
-  const returnFareElement = document.getElementById("returnFare");
-  const baseFareElement = document.getElementById("baseFare");
-  const totalPriceElement = document.getElementById("totalPrice");
-
-  let baseFare = parseInt(baseFareElement.textContent) || 0;
-
-  // Update return fare and total when a return flight is chosen
-  returnFlightSelect.addEventListener("change", function () {
-    const selectedOption = returnFlightSelect.options[returnFlightSelect.selectedIndex];
-    const priceMatch = selectedOption.textContent.match(/₱(\d+)/);
-    const returnFare = priceMatch ? parseInt(priceMatch[1]) : 0;
-
-    returnFareElement.textContent = returnFare;
-
-    // Compute total (base + return + extras)
-    const meal = parseInt(document.getElementById("mealFee").textContent) || 0;
-    const baggage = parseInt(document.getElementById("baggageFee").textContent) || 0;
-    const seat = parseInt(document.getElementById("seatFee").textContent) || 0;
-
-    const total = baseFare + returnFare + meal + baggage + seat;
-    totalPriceElement.textContent = total;
-  });
-});
-
-
-const occupiedSeats = {{{occupiedSeats}}} || [];
-</script>

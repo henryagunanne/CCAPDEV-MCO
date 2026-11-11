@@ -80,6 +80,7 @@
                 <th>Gender</th>
                 <th>Age</th>
                 <th>Seat</th>
+                {{#if (eq reservation.tripType "Round-Trip")}}<th>Return Seat</th>{{/if}}
                 <th>Meal</th>
                 <th>Baggage (kg)</th>
               </tr>
@@ -92,6 +93,7 @@
                 <td>{{this.gender}}</td>
                 <td>{{this.age}}</td>
                 <td>{{this.seatNumber}}</td>
+                {{#if (eq ../reservation.tripType "Round-Trip")}}<td>{{this.returnSeatNumber}}</td>{{/if}}
                 <td>{{this.meal}}</td>
                 <td>{{this.baggageAllowance}}</td>
               </tr>
@@ -111,12 +113,12 @@
       <tbody>
         <tr>
           <th class="bg-danger-subtle text-dark">Base Fare</th>
-          <td>₱{{reservation.flight.[0].price}}</td>
+          <td>₱{{reservation.baseFareTotal}}</td>
         </tr>
         {{#if reservation.flight.[1]}}
         <tr>
           <th class="bg-danger-subtle text-dark">Return Fare</th>
-          <td>₱{{reservation.flight.[1].price}}</td>
+          <td>₱{{reservation.returnFareTotal}}</td>
         </tr>
         {{/if}}
         <tr>
@@ -126,6 +128,10 @@
         <tr>
           <th class="bg-danger-subtle text-dark">Baggage Total</th>
           <td>₱{{reservation.baggageTotal}}</td>
+        </tr>
+        <tr>
+          <th class="bg-danger-subtle text-dark">Seat Total</th>
+          <td>₱{{reservation.seatTotal}}</td>
         </tr>
         <tr class="table-danger fw-bold">
           <th>Total Price</th>

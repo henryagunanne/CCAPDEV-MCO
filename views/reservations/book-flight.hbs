@@ -177,7 +177,7 @@ document.addEventListener("DOMContentLoaded", function () {
       flightSelection.classList.remove("d-none");
 
       if (type === "Round-Trip") {
-        const rev = await fetch(`/reservations/search?origin=${d}&destination=${o}`);
+        const rev = await fetch(`/reservations/search?origin=${d}&destination=${o}`); 
         const rd = await rev.json();
         returnSection.classList.remove("d-none");
         returnFlight.innerHTML = `<option value="">-- Choose Return Flight --</option>`;

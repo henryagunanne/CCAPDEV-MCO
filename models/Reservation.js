@@ -27,7 +27,7 @@ const passengerSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-    Unique: true
+    unique: true
   },
   seatNumber: {
       type: String,

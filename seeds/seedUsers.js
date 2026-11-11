@@ -39,19 +39,11 @@ async function seedUsers() {
                 password: await bcrypt.hash('password123', 10),
                 dateOfBirth: new Date('1992-08-19'),
                 role: 'User'
-              },
-              {
-                firstName: 'Admin',
-                lastName: 'User',
-                email: 'admin@example.com',
-                password: await bcrypt.hash('adminpass', 10),
-                dateOfBirth: new Date('1980-01-01'),
-                role: 'Admin'
               }
         ]);
         
         console.log('Users collection seeded successfully.');
-    }else {
+    } else {
         console.log('Users collection already has data. Skipping seeding.');
     }
 

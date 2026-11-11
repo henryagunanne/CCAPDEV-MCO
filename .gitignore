@@ -1,2 +1,10 @@
 node_modules/
 node_modules/.cache/
+.env
+.env.*
+!.env.example
+logs/
+*.log
+coverage/
+.DS_Store
+npm-debug.log*

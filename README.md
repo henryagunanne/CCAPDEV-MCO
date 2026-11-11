@@ -138,8 +138,36 @@ mongosh
 git clone https://github.com/henryagunanne/CCAPDEV-MCO.git
 cd CCAPDEV-MCO
 npm install
-
+cp .env.example .env
 ```
+
+### Environment Configuration
+
+Before starting the application, configure the required environment variables in `.env`:
+
+```bash
+PORT=3000
+NODE_ENV=development
+MONGODB_URI=mongodb://127.0.0.1:27017/airlineDB
+SESSION_SECRET=replace-with-a-long-random-secret
+ADMIN_EMAIL=admin@yourdomain.com
+```
+
+The application will refuse to start when the required values are missing in a non-test environment.
+
+### Provisioning the First Administrator
+
+The first administrator is created with a dedicated one-time CLI command. This avoids automatically creating a default admin account during normal startup.
+
+```bash
+npm run provision:admin
+```
+
+The script will prompt for:
+- the approved administrator email address
+- the initial password, entered securely without echoing it back to the terminal
+
+It refuses to create another administrator if one already exists, and it does not print the password to the console.
 
 ### Running the Application
 
@@ -148,7 +176,7 @@ npm start
 ```
 or
 ```bash
-npm server.js
+node server.js
 ```
 
 ### The application will be available at:

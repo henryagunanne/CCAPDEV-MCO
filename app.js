@@ -6,6 +6,7 @@ const exphbs = require('express-handlebars'); // Handlebars templating engine
 const session = require('express-session'); // Session management
 const MongoStore = require('connect-mongo'); // MongoDB session store
 const path = require('path');
+const { mongoUri, sessionSecret, isTestEnvironment } = require('./config/env');
 const seedPopularFlights = require('./seeds/seedPopularFlights'); // Seed popular flights
 const seedFlights = require('./seeds/seedFlights'); // Seed flights
 const seedUsers = require('./seeds/seedUsers'); // Seed Users
@@ -18,8 +19,8 @@ const logger = require('./logs/logger');
  
 
 // Connect to MongoDB
-if (process.env.NODE_ENV !== 'test') {
-    mongoose.connect('mongodb://127.0.0.1:27017/airlineDB')
+if (!isTestEnvironment) {
+    mongoose.connect(mongoUri)
     .then(async () => {
         logger.info('✅ MongoDB connected.');
         await seedFlights(); // seeds flights if empty
@@ -122,10 +123,10 @@ app.use(httpLogger);    // HTTP Request Logging
 
 // Session management
 app.use(session({
-    secret: 'AASecret23',
+    secret: sessionSecret,
     resave: false,  // Don't save session if unmodified
     saveUninitialized: false,   // Don't create session until something stored
-    store: MongoStore.create({ mongoUrl: 'mongodb://127.0.0.1:27017/airlineDB' }),   // Store sessions in MongoDB
+    store: MongoStore.create({ mongoUrl: mongoUri }),   // Store sessions in MongoDB
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // secure cookies in prod

@@ -139,7 +139,7 @@ $(document).on("click", ".seat.available, .seat.selected", function () {
   const seatPrice = parseInt($(this).data("price"));
   const seatClass = $(this).data("class");
 
-    // 🧩 Update travelClass hidden input based on clicked seat
+    // Update travelClass hidden input based on clicked seat
   $("#travelClass").val(seatClass.charAt(0).toUpperCase() + seatClass.slice(1));
   console.log("Travel Class Selected:", $("#travelClass").val());
 
@@ -238,7 +238,7 @@ $(document).on("click", ".seat.available, .seat.selected", function () {
     // Compute total from summary
     const totalAmount = parseFloat($("#totalPrice").text()) || 0;
 
-    // ✅ FIXED JSON REQUEST
+    // FIXED JSON REQUEST
     $.ajax({
       url: "/reservations/create",
       method: "POST",

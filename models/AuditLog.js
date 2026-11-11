@@ -37,6 +37,10 @@ const auditLogSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  reasonCode: {
+    type: String,
+    default: ''
+  },
   correlationId: {
     type: String,
     default: ''

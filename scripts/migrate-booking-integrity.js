@@ -1,4 +1,15 @@
 #!/usr/bin/env node
+
+/**
+ * This script migrates the booking integrity state and backfills seat allocations for existing reservations.
+ * It can be run in dry-run mode or apply mode.
+ * Usage:
+ *   node migrate-booking-integrity.js [--apply]
+ *
+ * Options:
+ *   --apply: Apply the migration changes to the database.
+ */
+
 'use strict';
 
 const mongoose = require('mongoose');

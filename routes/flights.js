@@ -3,6 +3,7 @@ const express = require('express');
 const Flight = require('../models/Flight');
 const router = express.Router();
 const logger = require('../logs/logger'); 
+const { flightSearchLimits } = require('../middleware/rateLimits');
 
 
 /* ===========================
@@ -10,7 +11,7 @@ const logger = require('../logs/logger');
 =========================== */
 
 // GET /flights/search - Search for flights by origin, destination, and date
-router.get('/search', async (req, res) => {
+router.get('/search', ...flightSearchLimits, async (req, res) => {
     try {
         const { tripType, origin, destination, departureDate, returnDate } = req.query;
         const departureQuery = {};
@@ -83,8 +84,8 @@ router.get('/search', async (req, res) => {
             });
         }
     } catch (error) {
-        res.status(500).json({ message: 'Error searching for flights', error });
-        logger.error('Error searching for flights', error);
+        logger.error('Flight search failed.', { code: error.code || 'QUERY_ERROR' });
+        res.status(500).json({ message: 'Error searching for flights' });
     }
 });
 
@@ -104,7 +105,7 @@ router.get('/:id/book', async (req, res) => {
         flight
     });
   } catch (err) {
-    logger.error('Error loading flight booking page:', err);
+    logger.error('Flight booking page request failed.', { code: err.code || 'FLIGHT_BOOKING_PAGE_ERROR' });
     res.status(500).send('Error loading flight booking page');
   }
 });
@@ -112,4 +113,3 @@ router.get('/:id/book', async (req, res) => {
 
 // Export the router
 module.exports = router;
-

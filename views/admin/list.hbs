@@ -4,7 +4,7 @@
   <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
     <h1 class="fw-bold text-danger m-0">Flights</h1>
     <div class="d-flex gap-2">
-      <button class="btn btn-outline-secondary" onclick="window.location.reload()">
+      <button class="btn btn-outline-secondary" data-action="reload" type="button">
         <i class="bi bi-arrow-clockwise me-1"></i> Refresh
       </button>
       <a href="/admin/create" class="btn btn-danger">
@@ -129,7 +129,7 @@
 
 </style>
 
-<script>
+<script nonce="{{cspNonce}}">
 // Persist flight search (localStorage) — safe add
 document.addEventListener("DOMContentLoaded", () => {
   const input = document.getElementById("flightFilter");

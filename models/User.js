@@ -9,7 +9,8 @@ const ADMIN_ROLE_NAMES = [
   'reservation_support_admin',
   'finance_admin',
   'user_access_admin',
-  'security_audit_admin'
+  'security_audit_admin',
+  'data_protection_officer'
 ];
 
 const userSchema = new mongoose.Schema({
@@ -34,10 +35,6 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         minlength: [8, 'Password must be at least 8 characters long.']
-    },
-    dateOfBirth: {
-        type: Date,
-        required: true
     },
     role: {
         type: String,

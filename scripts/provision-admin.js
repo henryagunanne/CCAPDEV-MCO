@@ -1,5 +1,19 @@
 #!/usr/bin/env node
 
+/**
+ * This script provisions the initial administrator account for the application.
+ * It prompts for an email and password, validates them, and creates the admin user in the database.
+ * Usage:
+ *   node provision-admin.js [ADMIN_EMAIL]
+ *
+ * If ADMIN_EMAIL is provided as a command-line argument, it will be used; otherwise, the script will prompt for it.
+ *
+ * The script requires an interactive terminal to securely input the password.
+ * The password must be at least 12 characters long.
+ *
+ * The script will fail if an administrator account already exists or if a user with the provided email already exists.
+ */
+
 const mongoose = require('mongoose');
 const User = require('../models/User');
 const { mongoUri } = require('../config/env');

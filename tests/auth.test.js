@@ -3,6 +3,14 @@ const app = require('../server'); // Import the Express app
 const User = require('../models/User');
 
 let agent; 
+let csrfToken;
+
+async function refreshCsrfToken() {
+    const response = await agent.get('/');
+    const match = response.text.match(/<meta name="csrf-token" content="([^"]+)"/);
+    if (!match) throw new Error('CSRF token was not rendered.');
+    csrfToken = match[1];
+}
 
 describe('Authentication Tests', () => {
 
@@ -10,9 +18,12 @@ describe('Authentication Tests', () => {
         agent = request.agent(app);
     });
 
+    beforeEach(async () => {
+        await refreshCsrfToken();
+    });
+
     afterEach(async () => {
-        await agent
-                .post('/users/logout');
+        await agent.post('/users/logout').set('x-csrf-token', csrfToken);
     });
 
     // Registration test
@@ -21,12 +32,14 @@ describe('Authentication Tests', () => {
         it('User Registration - Valid', async () => {
             const res = await agent
                 .post('/users/register')
+                .set('x-csrf-token', csrfToken)
                 .send({
                     firstName: 'Test',
                     lastName: 'User',
                     email: 'test@example.com',
                     password: 'password123',
-                    dateOfBirth: new Date()
+                    isAdult: true,
+                    privacyNoticeAccepted: true
                 });
             expect(res.statusCode).toEqual(200);
             expect(res.body).toHaveProperty('success', true)
@@ -37,23 +50,27 @@ describe('Authentication Tests', () => {
             // create user first
             await agent
                 .post('/users/register')
+                .set('x-csrf-token', csrfToken)
                 .send({
                     firstName: 'Duplicate',
                     lastName: 'User',
                     email: 'duplicate@test.com',
                     password: 'password123',
-                    dateOfBirth: '1990-01-01'
+                    isAdult: true,
+                    privacyNoticeAccepted: true
                 });
 
             // Try to create the same user again
             const res = await agent 
                 .post('/users/register')
+                .set('x-csrf-token', csrfToken)
                 .send({
                     firstName: 'Dup',
                     lastName: 'User',
                     email: 'duplicate@test.com', // duplicate email
                     password: 'password123',
-                    dateOfBirth: new Date()
+                    isAdult: true,
+                    privacyNoticeAccepted: true
                 });
 
             expect(res.statusCode).toEqual(400);   
@@ -83,6 +100,7 @@ describe('Authentication Tests', () => {
         it('should login successfully with correct credentials', async () => {
             const res = await agent
                 .post('/users/login')
+                .set('x-csrf-token', csrfToken)
                 .send({ 
                     email: 'test@example.com',
                     password: 'password123'
@@ -91,30 +109,33 @@ describe('Authentication Tests', () => {
             expect(res.statusCode).toEqual(200);
             expect(res.body).toHaveProperty('success', true);
             expect(res.body.message).toBe('Welcome, Test!');
+            await refreshCsrfToken();
         });
     
         // invalid login test with unregistered
         it('should fail login with incorrect credentials', async () => {
             const res = await agent
                 .post('/users/login')
+                .set('x-csrf-token', csrfToken)
                 .send({ 
                     email: 'wrong@example.com', 
                     password: 'wrongpass' 
                 });
-            expect(res.statusCode).toEqual(400);
-            expect(res.body.message).toBe('User not found');
+            expect(res.statusCode).toEqual(401);
+            expect(res.body.message).toBe('Invalid email or password.');
         });
 
         // invalid login test with wrong password
         it('should fail login with incorrect password', async () => {
             const res = await agent
                 .post('/users/login')
+                .set('x-csrf-token', csrfToken)
                 .send({ 
                     email: 'test@example.com', 
                     password: 'wrongpass' 
                 });
-            expect(res.statusCode).toEqual(400);
-            expect(res.body.message).toBe('Invalid password');
+            expect(res.statusCode).toEqual(401);
+            expect(res.body.message).toBe('Invalid email or password.');
         });
     });
 
@@ -145,14 +166,17 @@ describe('Authentication Tests', () => {
             // login user
             const resLogin = await agent
             .post('/users/login')
+            .set('x-csrf-token', csrfToken)
             .send({ 
                 email: 'test@example.com',
                 password: 'password123'
             });
+            await refreshCsrfToken();
 
             // logout user
             const res = await agent
-                .post('/users/logout');
+                .post('/users/logout')
+                .set('x-csrf-token', csrfToken);
 
             expect(res.statusCode).toEqual(200);
             expect(res.body).toHaveProperty('success', true);
@@ -160,4 +184,3 @@ describe('Authentication Tests', () => {
     });
 
 });
-

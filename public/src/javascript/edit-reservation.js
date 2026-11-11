@@ -125,6 +125,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Add event listeners to meal and baggage inputs for each passenger card to update the summary when changed
   cards.forEach(card => {
     card.querySelector('.meal-option').addEventListener('change', updateSummary);
+    card.querySelector('.meal-option').addEventListener('change', event => {
+      const consent = card.querySelector('.meal-consent-input');
+      const required = event.target.value !== 'None';
+      consent.required = required;
+      card.querySelector('.meal-consent-wrap').classList.toggle('d-none', !required);
+      if (!required) consent.checked = false;
+    });
     card.querySelector('.baggage-input').addEventListener('input', updateSummary);
   });
 
@@ -150,11 +157,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
     const passengers = cards.map((card, index) => ({
-      fullName: card.dataset.fullName,
-      age: Number(card.dataset.age),
-      gender: card.dataset.gender,
-      passport: card.dataset.passport,
+      fullName: card.querySelector('.passenger-name')?.value.trim() || card.dataset.fullName,
+      ageCategory: card.querySelector('.passenger-age-category')?.value || card.dataset.ageCategory,
+      gender: card.querySelector('.passenger-gender')?.value || card.dataset.gender,
+      ...(card.querySelector('.passenger-passport')
+        ? { passport: card.querySelector('.passenger-passport').value.trim() }
+        : {}),
       meal: card.querySelector('.meal-option').value,
+      mealConsent: card.querySelector('.meal-consent-input').checked,
       baggageAllowance: Number(card.querySelector('.baggage-input').value),
       seatNumber: seatSelections.outbound[index],
       ...(tripType === 'Round-Trip' ? { returnSeatNumber: seatSelections.returning[index] } : {})
@@ -172,13 +182,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           totalPrice: document.querySelector('#totalPriceInput').value
         })
       });
+      const result = await response.json();
       if (!response.ok) {
-        say(await response.text());
+        say(result.message || 'Unable to save reservation changes.');
         return;
       }
-      document.open();
-      document.write(await response.text());
-      document.close();
+      window.location.assign(result.redirect);
     } catch {
       say('Unable to save reservation changes.');
     } finally {

@@ -15,12 +15,13 @@ const {
 } = require('../services/bookingValidation');
 const {
   BookingConflictError,
-  cancelReservation,
-  deleteReservation
+  cancelReservation
 } = require('../services/bookingService');
 const logger = require('../logs/logger');
 const { permissions } = require('../config/rbac');
 const { requireAdminAccess, requirePermission, requireStepUpAuthentication } = require('../middleware/adminAuth');
+const { cancellationLimits } = require('../middleware/rateLimits');
+const { recordAuditEvent } = require('../services/auditService');
 
 /* ======================================================
    Admin Access Middleware
@@ -28,34 +29,28 @@ const { requireAdminAccess, requirePermission, requireStepUpAuthentication } = r
 router.use(requireAdminAccess);
 
 /* ======================================================
-  DEBUG LOGGER (optional)
-====================================================== */
-router.use((req, res, next) => {
-  logger.info("ADMIN ROUTE:", req.method, req.originalUrl);
-  next();
-});
-
-/* ======================================================
   Dashboard Route 
 ====================================================== */
 router.get('/', requirePermission(permissions.FLIGHT_READ), async (req, res) => {
   try {
-    const flights = await Flight.find().lean();
-    const users = await User.find().lean();
-    const reservations = await Reservation.find().lean();
+    const [totalFlights, totalUsers, totalReservations] = await Promise.all([
+      Flight.countDocuments(),
+      User.countDocuments(),
+      Reservation.countDocuments()
+    ]);
 
     res.render('admin/dashboard', {
       layout: 'admin',
       title: 'Admin Dashboard',
       admin: req.session.user,
       stats: {
-        totalFlights: flights.length,
-        totalUsers: users.length,
-        totalReservations: reservations.length
+        totalFlights,
+        totalUsers: totalUsers < 5 ? '<5' : totalUsers,
+        totalReservations: totalReservations < 5 ? '<5' : totalReservations
       }
     });
   } catch (err) {
-    logger.error(err);
+    logger.error('Admin dashboard request failed.', { code: err.code || 'ADMIN_DASHBOARD_ERROR' });
     res.status(500).render('error/server-error');
   }
 });
@@ -81,7 +76,7 @@ router.get('/edit/:id', async (req, res) => {
     });
 
   } catch (err) {
-    logger.error("Edit route error:", err);
+    logger.error('Flight edit page request failed.', { code: err.code || 'FLIGHT_EDIT_PAGE_ERROR' });
     res.status(500).render('error/server-error');
   }
 });
@@ -115,7 +110,7 @@ router.get('/flights', requirePermission(permissions.FLIGHT_READ), async (req, r
     });
 
   } catch (error) {
-    logger.error('Error retrieving flights:', error);
+    logger.error('Flight list request failed.', { code: error.code || 'FLIGHT_LIST_ERROR' });
     res.status(500).json({ message: 'Error retrieving flights' });
   }
 });
@@ -139,7 +134,7 @@ router.get('/flights/:flightNumber', async (req, res) => {
     });
 
   } catch (err) {
-    logger.error('Search error:', err);
+    logger.error('Flight search request failed.', { code: err.code || 'ADMIN_FLIGHT_SEARCH_ERROR' });
     res.status(500).json({ message: 'Error retrieving flight' });
   }
 });
@@ -157,9 +152,9 @@ router.post('/create', requirePermission(permissions.FLIGHT_CREATE), async (req,
       flight: saved
     });
 
-    logger.info('Flight created successfully.', saved)
+    logger.info('Flight created successfully.');
   } catch (err) {
-    logger.error('Create flight error:', err);
+    logger.error('Flight creation failed.', { code: err.code || 'FLIGHT_CREATE_ERROR' });
     res.status(500).json({ message: 'Error creating flight.' });
   }
 });
@@ -180,10 +175,10 @@ router.put('/update/:id', requirePermission(permissions.FLIGHT_UPDATE), async (r
     }
 
     res.json({ message: 'Flight updated successfully.', flight: updatedFlight });
-    logger.info('Flight updated successfully.', updatedFlight);
+    logger.info('Flight updated successfully.');
 
   } catch (err) {
-    logger.error('Update flight error:', err);
+    logger.error('Flight update failed.', { code: err.code || 'FLIGHT_UPDATE_ERROR' });
     res.status(500).json({ message: 'Error updating flight.' });
   }
 });
@@ -200,10 +195,10 @@ router.delete('/delete/:id', requirePermission(permissions.FLIGHT_DELETE), async
     }
 
     res.json({ message: 'Flight deleted successfully.' });
-    logger.info('Flight deleted successfully', deletedFlight);
+    logger.info('Flight deleted successfully.');
 
   } catch (err) {
-    logger.error('Delete flight error:', err);
+    logger.error('Flight deletion failed.', { code: err.code || 'FLIGHT_DELETE_ERROR' });
     res.status(500).json({ message: 'Error deleting flight.' });
   }
 });
@@ -217,20 +212,29 @@ router.get('/reservations', requirePermission(permissions.RESERVATION_READ), asy
       .populate('flight')
       .populate('userId')
       .lean();
+    const safeReservations = reservations.map(reservation => ({
+      ...reservation,
+      passengers: reservation.passengers.map(passenger => ({
+        _id: passenger._id,
+        fullName: passenger.fullName,
+        ageCategory: passenger.ageCategory,
+        passportLast3: passenger.passportLast3
+      }))
+    }));
 
     res.render('admin/bookings', {
       layout: 'admin',
       title: 'All Reservations',
-      reservations
+      reservations: safeReservations
     });
   } catch (error) {
-    logger.error('Error retrieving reservations:', error);
-    res.status(500).json({ message: 'Error retrieving reservations', error });
+    logger.error('Error retrieving reservations.', { code: error.code || 'RESERVATION_READ_ERROR' });
+    res.status(500).json({ message: 'Error retrieving reservations' });
   }
 });
 
 // POST /admin/edit-reservation/:id 
-router.post('/edit-reservation/:reservationId', requirePermission(permissions.RESERVATION_UPDATE), async (req, res) => {
+router.post('/edit-reservation/:reservationId', ...cancellationLimits, requirePermission(permissions.RESERVATION_UPDATE), async (req, res) => {
   try{
     assertSafeKeys(req.body);
     assertAllowedKeys(req.body, new Set(['status']), 'Request');
@@ -249,6 +253,13 @@ router.post('/edit-reservation/:reservationId', requirePermission(permissions.RE
       if (reservation.status === 'Cancelled') {
         throw new BookingConflictError('Cancelled reservations cannot be reactivated without a new seat allocation.');
       }
+      await recordAuditEvent({
+        actorId: req.session.user._id,
+        actorRole: req.session.user.role || 'Admin',
+        action: status === 'Cancelled' ? 'reservation:cancel' : 'reservation:status:update',
+        resourceType: 'Reservation',
+        resourceId: reservation._id
+      });
       const result = await Reservation.updateOne(
         { _id: reservationId, __v: reservation.__v },
         { $set: { status }, $inc: { __v: 1 } }
@@ -257,38 +268,42 @@ router.post('/edit-reservation/:reservationId', requirePermission(permissions.RE
         throw new BookingConflictError('Reservation changed; reload and try again.');
       }
     }
-    const updatedReservation = await Reservation.findById(reservationId).lean();
-    if (!updatedReservation) {
-      return res.status(404).send('Reservation not found');
-    }
-
     res.json({ 
       success: true, 
-      message: 'Reservation updated successfully!',
-      updatedReservation
+      message: 'Reservation updated successfully!'
     });
   }catch (err) {
     if (err instanceof BookingInputError || err instanceof BookingConflictError) {
       return res.status(err.statusCode).json({ success: false, message: err.message });
     }
-    logger.error('Reservation update error:', err);
+    logger.error('Admin reservation update failed.', { code: err.code || 'ADMIN_RESERVATION_UPDATE_ERROR' });
     res.status(500).send('Server error during Reservation update');
   }
 });
 
 // POST /admin/delete-reservation/:reservationId
-router.post('/delete-reservation/:reservationId', requirePermission(permissions.RESERVATION_CANCEL), async (req, res) => {
+router.post('/delete-reservation/:reservationId', ...cancellationLimits, requirePermission(permissions.RESERVATION_CANCEL), async (req, res) => {
   try {
     const reservationId = validateObjectId(req.params.reservationId, 'Reservation ID');
     const reservation = await Reservation.findById(reservationId);
     if (!reservation) return res.status(404).send('Reservation not found');
-    await deleteReservation(reservation);
-    res.json({ success: true });
+    await cancelReservation(reservation);
+    await recordAuditEvent({
+      actorId: req.session.user._id,
+      actorRole: req.session.user.role || 'Admin',
+      action: 'reservation:cancel',
+      resourceType: 'Reservation',
+      resourceId: reservation._id
+    });
+    res.json({
+      success: true,
+      message: 'Reservation cancelled. Transaction records remain subject to the five-year retention period.'
+    });
   } catch (error) {
     if (error instanceof BookingInputError || error instanceof BookingConflictError) {
       return res.status(error.statusCode).json({ success: false, message: error.message });
     }
-    logger.error('Reservation deletion error:', error);
+    logger.error('Admin reservation deletion failed.', { code: error.code || 'ADMIN_RESERVATION_DELETE_ERROR' });
     res.status(500).send('Server error during Reservation deletion');
   }
 });
@@ -307,7 +322,7 @@ router.get('/security', requirePermission(permissions.SECURITY_REVIEW), async (r
       user: req.session.user
     });
   } catch (error) {
-    logger.error('Security center retrieval failed:', error);
+    logger.error('Security center request failed.', { code: error.code || 'SECURITY_CENTER_ERROR' });
     res.status(500).render('error/server-error', { layout: 'admin', title: 'Security Error' });
   }
 });
@@ -323,7 +338,7 @@ router.get('/approvals', requirePermission(permissions.ADMIN_ROLE_ASSIGN), async
       user: req.session.user
     });
   } catch (error) {
-    logger.error('Approval page retrieval failed:', error);
+    logger.error('Approval page request failed.', { code: error.code || 'APPROVAL_PAGE_ERROR' });
     res.status(500).render('error/server-error', { layout: 'admin', title: 'Approval Queue Error' });
   }
 });
@@ -340,7 +355,7 @@ router.get('/emergency-access', requirePermission(permissions.SECURITY_REVIEW), 
       user: req.session.user
     });
   } catch (error) {
-    logger.error('Emergency access page retrieval failed:', error);
+    logger.error('Emergency access page request failed.', { code: error.code || 'EMERGENCY_ACCESS_PAGE_ERROR' });
     res.status(500).render('error/server-error', { layout: 'admin', title: 'Emergency Access Error' });
   }
 });
@@ -385,7 +400,7 @@ router.post('/approvals', requirePermission(permissions.ADMIN_ROLE_ASSIGN), asyn
       expiresAt: request.expiresAt
     });
   } catch (error) {
-    logger.error('Approval request creation failed:', error);
+    logger.error('Approval request creation failed.', { code: error.code || 'APPROVAL_CREATE_ERROR' });
     res.status(500).json({ success: false, message: 'Unable to create approval request.' });
   }
 });
@@ -399,7 +414,7 @@ router.get('/approvals', requirePermission(permissions.ADMIN_ROLE_ASSIGN), async
 
     res.status(200).json({ success: true, approvals });
   } catch (error) {
-    logger.error('Approval retrieval failed:', error);
+    logger.error('Approval retrieval failed.', { code: error.code || 'APPROVAL_READ_ERROR' });
     res.status(500).json({ success: false, message: 'Unable to retrieve approvals.' });
   }
 });
@@ -456,7 +471,7 @@ router.post('/approvals/:approvalId/approve', requirePermission(permissions.ADMI
       approvals: request.approvals.length
     });
   } catch (error) {
-    logger.error('Approval failed:', error);
+    logger.error('Approval action failed.', { code: error.code || 'APPROVAL_ACTION_ERROR' });
     res.status(500).json({ success: false, message: 'Unable to approve request.' });
   }
 });
@@ -481,7 +496,7 @@ router.post('/emergency-access', requirePermission(permissions.SECURITY_REVIEW),
 
     res.status(202).json({ success: true, grantId: request._id, status: request.status });
   } catch (error) {
-    logger.error('Emergency access request failed:', error);
+    logger.error('Emergency access request failed.', { code: error.code || 'EMERGENCY_ACCESS_CREATE_ERROR' });
     res.status(500).json({ success: false, message: 'Unable to create emergency access request.' });
   }
 });
@@ -515,7 +530,7 @@ router.post('/emergency-access/:grantId/approve', requirePermission(permissions.
 
     res.status(200).json({ success: true, grantId: grant._id, status: grant.status, approvals: grant.approvals.length });
   } catch (error) {
-    logger.error('Emergency approval failed:', error);
+    logger.error('Emergency approval failed.', { code: error.code || 'EMERGENCY_APPROVAL_ERROR' });
     res.status(500).json({ success: false, message: 'Unable to approve emergency access.' });
   }
 });
@@ -536,7 +551,7 @@ router.post('/emergency-access/:grantId/revoke', requirePermission(permissions.S
 
     res.status(200).json({ success: true, grantId: grant._id, status: grant.status });
   } catch (error) {
-    logger.error('Emergency revoke failed:', error);
+    logger.error('Emergency access revocation failed.', { code: error.code || 'EMERGENCY_REVOKE_ERROR' });
     res.status(500).json({ success: false, message: 'Unable to revoke emergency access.' });
   }
 });

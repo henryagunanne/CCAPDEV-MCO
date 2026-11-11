@@ -36,6 +36,12 @@
 
     <div class="card-body">
       <form id="reservationForm" action="/reservations/create" method="POST" class="needs-validation" novalidate>
+        <div class="alert alert-info">
+          I have told each passenger how their name, age category and passport number will be used. See the
+          <a href="/privacy-policy">Privacy Notice</a>.
+          <label class="d-block mt-2"><input id="passengerNoticeAccepted" type="checkbox" required>
+            I confirm the passenger notice was provided.</label>
+        </div>
         <!-- Hidden Fields -->
         <input type="hidden" name="flight" value="{{flight._id}}" data-origin="{{flight.origin}}" data-destination="{{flight.destination}}">
 

@@ -17,8 +17,7 @@ jQuery(function (){
         const formData = {
             firstName: $("#editFirstName").val(),
             lastName: $("#editLastName").val(),
-            email: $("#editEmail").val(),
-            dateOfBirth: $("#editDateOfBirth").val()
+            email: $("#editEmail").val()
         };
         
         // Send AJAX request to update profile
@@ -121,11 +120,14 @@ jQuery(function (){
         event.preventDefault(); // Prevent default form submission
 
         const userId = $(this).data("user-id");
+        const currentPassword = $("#deleteAccountPassword").val();
 
         // Send AJAX request to delete account
         $.ajax({
             url: `/users/delete/${userId}`,
             type: 'POST',
+            data: JSON.stringify({ currentPassword }),
+            contentType: 'application/json',
             success: function(res) {
                 if (res.success) {
                     $('#deleteAccountModal').modal('hide');

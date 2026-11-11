@@ -17,6 +17,8 @@ const permissions = {
   ADMIN_ACCESS_REVOKE: 'admin:access:revoke',
   AUDIT_READ: 'audit:read',
   SECURITY_REVIEW: 'security:review',
+  PRIVACY_REQUEST_MANAGE: 'privacy:request:manage',
+  PASSPORT_REVEAL: 'passport:reveal',
   PASSENGER_EDIT: 'passenger:edit',
   OPERATIONAL_FLIGHT_UPDATE: 'operational:flight:update',
   AIRCRAFT_ASSIGN: 'aircraft:assign'
@@ -52,6 +54,9 @@ const rolePermissions = {
   security_audit_admin: [
     permissions.AUDIT_READ,
     permissions.SECURITY_REVIEW
+  ],
+  data_protection_officer: [
+    permissions.PRIVACY_REQUEST_MANAGE
   ],
   user: []
 };

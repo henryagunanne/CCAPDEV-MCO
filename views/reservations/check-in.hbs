@@ -1,6 +1,7 @@
 <main class="container mt-5">
     <h2 class="text-center fw-bold mb-3" style="color:#C81E2C;">Online Check-In</h2>
     <p class="text-center text-muted">Enter your booking details to retrieve your boarding pass</p>
+    <p class="text-center"><a href="/privacy-policy">Read the Privacy Notice before check-in.</a></p>
 
     <!-- Check-In Form -->
     <form id="checkinForm" class="w-50 mx-auto shadow p-4 rounded bg-light">
@@ -36,68 +37,74 @@
 
 
 <!-- FINAL WORKING SCRIPT -->
-<script>
-document.getElementById("checkinForm").addEventListener("submit", async (e)=>{
-    e.preventDefault();
+<script nonce="{{cspNonce}}">
+const checkinForm = document.getElementById("checkinForm");
+const boardingContainer = document.getElementById("boardingContainer");
 
-    const pnr = document.getElementById("pnr").value.trim();
-    const fullName = document.getElementById("fullName").value.trim();
-
-    const res = await fetch("/reservations/check-in", {
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body:JSON.stringify({ pnr, fullName })
-    });
-
-    const data = await res.json();
-    if(!data.success) {
-    if(data.message && data.message.includes("already")) {
-        return alert("This boarding pass has already been claimed.\nOnline check-in is only allowed once per passenger.");
+function makeBoardingPass(title, passenger, flight, seat, pnr, code) {
+    const card = document.createElement('div');
+    card.className = 'p-4 bg-white shadow rounded mx-auto mt-3 mb-5';
+    card.style.maxWidth = '450px';
+    const heading = document.createElement('h4');
+    heading.className = 'fw-bold text-danger';
+    heading.textContent = title;
+    card.append(heading, document.createElement('hr'));
+    for (const [label, value] of [
+        ['Passenger:', passenger.fullName],
+        ['Flight:', `${flight.origin} → ${flight.destination}`],
+        ['Seat:', seat],
+        ['PNR:', pnr],
+        ['Boarding Pass:', code]
+    ]) {
+        const paragraph = document.createElement('p');
+        const strong = document.createElement('strong');
+        strong.textContent = `${label} `;
+        paragraph.append(strong, document.createTextNode(value));
+        card.append(paragraph);
     }
-    return alert("Invalid PNR or Passenger Name!");
+    return card;
 }
 
+checkinForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    const pnr = document.getElementById("pnr").value.trim();
+    const fullName = document.getElementById("fullName").value.trim();
+    try {
+        const response = await fetch("/reservations/check-in", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ pnr, fullName })
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+            alert(data.message?.includes("already")
+                ? "This boarding pass has already been claimed."
+                : "Invalid PNR or Passenger Name!");
+            return;
+        }
 
-    const r = data.reservation;
-    const pax = r.passengers.find(p => p.fullName.toLowerCase() == fullName.toLowerCase());
-
-    document.getElementById("boardingContainer").classList.remove("d-none");
-
-    // If ONE WAY = normal output
-    if(r.flight.length === 1){
-        document.getElementById("bpName").innerText = pax.fullName;
-        document.getElementById("bpPNR").innerText = pnr;
-        document.getElementById("bpSeat").innerText = pax.seatNumber;
-        document.getElementById("bpFlight").innerText = `${r.flight[0].origin} → ${r.flight[0].destination}`;
-        document.getElementById("bpCode").innerText = pax.boardingPass.outbound;
-        return;
+        const { reservation } = data;
+        const passenger = reservation.passenger;
+        const heading = document.createElement('h3');
+        heading.className = 'fw-bold text-danger';
+        heading.textContent = 'Check-In Successful!';
+        const description = document.createElement('p');
+        description.className = 'text-muted';
+        description.textContent = reservation.flight.length === 1
+            ? 'Here is your boarding pass — save or screenshot it.'
+            : 'Here are your boarding passes — save or screenshot them.';
+        const cards = reservation.flight.map((flight, index) => makeBoardingPass(
+            index === 0 ? 'DEPARTURE BOARDING PASS' : 'RETURN BOARDING PASS',
+            passenger,
+            flight,
+            index === 0 ? passenger.seatNumber : passenger.returnSeatNumber,
+            pnr,
+            index === 0 ? passenger.boardingPass.outbound : passenger.boardingPass.return
+        ));
+        boardingContainer.replaceChildren(heading, description, ...cards);
+        boardingContainer.classList.remove('d-none');
+    } catch {
+        alert('Unable to complete check-in.');
     }
-
-    // ROUNDTRIP = show two segments
-    document.getElementById("boardingContainer").innerHTML = `
-        <h3 class="fw-bold" style="color:#C81E2C;">Check-In Successful!</h3>
-        <p class="text-muted">Here are your boarding passes — save / screenshot them.</p>
-
-        <div class="p-4 bg-white shadow rounded mx-auto mt-3 mb-5" style="max-width:450px;">
-            <h4 class="fw-bold text-danger">DEPARTURE BOARDING PASS</h4>
-            <hr>
-            <p><strong>Passenger:</strong> ${pax.fullName}</p>
-            <p><strong>Flight:</strong> ${r.flight[0].origin} → ${r.flight[0].destination}</p>
-            <p><strong>Seat:</strong> <span class="text-danger fw-bold">${pax.seatNumber}</span></p>
-            <p><strong>PNR:</strong> ${pnr}</p>
-            <p><strong>Boarding Pass:</strong> <b>${pax.boardingPass.outbound}</b></p>
-        </div>
-
-        <div class="p-4 bg-white shadow rounded mx-auto mt-3 mb-5" style="max-width:450px;">
-            <h4 class="fw-bold text-danger">RETURN BOARDING PASS</h4>
-            <hr>
-            <p><strong>Passenger:</strong> ${pax.fullName}</p>
-            <p><strong>Flight:</strong> ${r.flight[1].origin} → ${r.flight[1].destination}</p>
-            <p><strong>Seat:</strong> <span class="text-danger fw-bold">${pax.seatNumber}</span></p>
-            <p><strong>PNR:</strong> ${pnr}</p>
-            <p><strong>Boarding Pass:</strong> <b>${pax.boardingPass.return}</b></p>
-        </div>
-    `;
 });
-
 </script>

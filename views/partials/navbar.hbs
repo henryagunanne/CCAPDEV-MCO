@@ -132,11 +132,6 @@
               <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
             </div>
             <div class="mb-3">
-              <label for="dateOfBirth" class="form-label">Date of Birth</label>
-              <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth" required>
-              <div class="invalid-feedback">Please enter your Date of Birth.</div>
-            </div>
-            <div class="mb-3">
               <label for="password" class="form-label">Password</label>
               <input type="password" class="form-control" id="password" name="password" minlength="8" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$" required>
               <div class="invalid-feedback">Passwords must follow requirments.</div>
@@ -168,15 +163,14 @@
                 </div>
 
                 <div>
-                  <label for="termsCheck" class="form-text"> I confirm that I have read, understood, and
-                    agree to the <a id="terms" href="#">Terms and Conditions</a> and the
-                    updated Archers Airlines <a id="privacyPolicy" href="#">Privacy Policy</a>. I
-                    consent to the collection, use, processing
-                    and sharing of my personal information in
-                    accordance therewith.</label>
+                  <label for="termsCheck" class="form-text">I have read the <a id="privacyPolicy" href="/privacy-policy">Privacy Notice</a> and agree to its terms.</label>
                 </div>
-                
               </div>
+            </div>
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" id="isAdult" required>
+              <label class="form-check-label" for="isAdult">I confirm that I am 18 years of age or older.</label>
+              <div class="invalid-feedback">You must confirm that you are at least 18.</div>
             </div>
 
             <div class="mb-3">

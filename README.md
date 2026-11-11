@@ -150,10 +150,23 @@ PORT=3000
 NODE_ENV=development
 MONGODB_URI=mongodb://127.0.0.1:27017/airlineDB
 SESSION_SECRET=replace-with-a-long-random-secret
+PASSPORT_ENCRYPTION_KEY=base64-encoded-32-byte-key
 ADMIN_EMAIL=admin@yourdomain.com
+DPO_CONTACT=approved-DPO-contact
 ```
 
-The application will refuse to start when the required values are missing in a non-test environment.
+Generate `PASSPORT_ENCRYPTION_KEY` with `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"` and keep it outside MongoDB, source control, and backups. The application will refuse to start when required values are missing in a non-test environment. Configure the approved DPO contact and publish the versioned holiday calendars before processing privacy requests.
+
+### MCO2 Privacy Data Operations
+
+The privacy migration and C-18 retention job are dry-run by default. Review their counts before any write operation:
+
+```bash
+npm run migrate:privacy-data
+npm run retention:c18
+```
+
+Applying either operation requires the script-specific confirmation flag (`--apply --confirm=APPLY-PRIVACY-MIGRATION` or `--apply --confirm=RUN-MCO2-C18`). Do not use those flags against existing data without explicit approval and a verified backup. Retention uses `Flight.completedAt` as the last-flight completion signal; the application does not currently define a workflow that sets that field, so passenger retention actions are skipped until an authoritative completion source is configured.
 
 ### Provisioning the First Administrator
 

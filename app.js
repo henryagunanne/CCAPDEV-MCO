@@ -7,6 +7,9 @@ const session = require('express-session'); // Session management
 const MongoStore = require('connect-mongo'); // MongoDB session store
 const path = require('path');
 const { mongoUri, sessionSecret, isTestEnvironment } = require('./config/env');
+const helmet = require('helmet');
+const { csrfProtection } = require('./middleware/csrfProtection');
+const crypto = require('crypto');
 
 const SESSION_IDLE_TIMEOUT_MS = 30 * 60 * 1000;
 const SESSION_ABSOLUTE_TIMEOUT_MS = 8 * 60 * 60 * 1000;
@@ -31,7 +34,7 @@ if (!isTestEnvironment) {
         await seedUsers(); // seed users if empty
         await seedReservations(); // seed reservations if empty
     })
-    .catch(err => logger.error('MongoDB connection error:', err));
+    .catch(err => logger.error('MongoDB connection failed.', { code: err.code || 'DATABASE_CONNECTION_ERROR' }));
 }
 
 // Configure Handlebars and handlebars helpers
@@ -118,6 +121,49 @@ app.set('views', './views'); // Set views directory
 
 
 // Middleware
+const trustedProxyCidrs = String(process.env.TRUSTED_PROXY_CIDRS || '')
+  .split(',')
+  .map(value => value.trim())
+  .filter(Boolean);
+if (trustedProxyCidrs.length) app.set('trust proxy', trustedProxyCidrs);
+
+// Middleware to generate a unique nonce for each request, used in CSP headers
+app.use((req, res, next) => {
+    res.locals.cspNonce = crypto.randomBytes(18).toString('base64');
+    next();
+});
+
+// Security headers using Helmet
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            baseUri: ["'self'"],
+            objectSrc: ["'none'"],
+            frameAncestors: ["'none'"],
+            formAction: ["'self'"],
+            scriptSrc: ["'self'", (req, res) => `'nonce-${res.locals.cspNonce}'`, 'https://code.jquery.com', 'https://cdn.jsdelivr.net'],
+            styleSrc: ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net'],
+            imgSrc: ["'self'", 'data:'],
+            fontSrc: ["'self'", 'data:', 'https://cdn.jsdelivr.net'],
+            connectSrc: ["'self'"],
+        }
+    },
+    crossOriginEmbedderPolicy: false,
+    hsts: false
+}));
+
+// Enforce HTTPS in production and set HSTS header
+app.use((req, res, next) => {
+    if (process.env.NODE_ENV === 'production' && req.secure) {
+        res.setHeader('Strict-Transport-Security', 'max-age=31536000');
+    }
+    if (process.env.NODE_ENV === 'production' && !req.secure) {
+        return res.status(403).json({ success: false, message: 'HTTPS is required.' });
+    }
+    next();
+});
+
 app.use(express.urlencoded({ extended: true }));    // Parse URL-encoded bodies
 app.use(express.json());    // Parse JSON bodies
 app.use(express.static(path.join(__dirname, 'public')));  // Serve static files
@@ -139,6 +185,8 @@ app.use(session({
     }
 }));
 
+app.use(csrfProtection);  // CSRF protection middleware
+
 app.use((req, res, next) => {
   const sessionUser = req.session && req.session.user ? req.session.user : null;
 
@@ -150,7 +198,7 @@ app.use((req, res, next) => {
 
     if (isExpired) {
       req.session.destroy((err) => {
-        if (err) logger.error('Session cleanup failed:', err);
+        if (err) logger.error('Session cleanup failed.', { code: err.code || 'SESSION_CLEANUP_ERROR' });
       });
 
       if (req.accepts('html')) {
@@ -181,6 +229,7 @@ app.use((req, res, next) => {
 
 
 // Routes
+app.use('/', require('./routes/privacy'));
 app.use('/', require('./routes/index'));
 app.use('/users', require('./routes/users'));
 app.use('/flights', require('./routes/flights'));
@@ -190,14 +239,19 @@ app.use('/admin', require('./routes/admin'));
 
 // 404 handler - for unmatched routes
 app.use((err, req, res, next) => {
-    logger.error(`ERROR: ${err.message}`, { stack: err.stack });
-    res.status(404).render('error/404', {
+    logger.error('Request processing failed.', { code: err.code || 'UNHANDLED_ERROR' });
+    const statusCode = Number.isInteger(err.status) && err.status >= 400 && err.status < 600
+      ? err.status
+      : 500;
+    if (statusCode === 404) {
+      return res.status(404).render('error/404', {
         title: '404 Not Found',
-        url: req.originalUrl,
         code: 404,
         message: 'Page Not Found',
-        description: `The requested URL "${req.originalUrl}" was not found on this server.`
-    });
+        description: 'The requested page was not found.'
+      });
+    }
+    return res.status(statusCode).json({ success: false, message: 'Unable to process the request.' });
 });
 
 
@@ -205,4 +259,3 @@ app.use((err, req, res, next) => {
 
 // Export app for testing
 module.exports = app;
-

@@ -22,13 +22,37 @@
                    data-seat-outbound="{{this.seatNumber}}"
                    data-seat-return="{{this.returnSeatNumber}}"
                    data-full-name="{{this.fullName}}"
-                   data-age="{{this.age}}"
+                   data-age-category="{{this.ageCategory}}"
                    data-gender="{{this.gender}}"
-                   data-passport="{{this.passport}}">
+                   data-checked-in="{{this.checkedIn}}">
             <div class="card-header bg-light"><strong>Passenger {{inc @index}}</strong></div>
             <div class="card-body">
-              <p class="mb-1">{{this.fullName}} · {{this.gender}} · Age {{this.age}}</p>
-              <p class="text-muted small">Passport: {{this.passport}}</p>
+              {{#if this.checkedIn}}
+              <p class="mb-1">{{this.fullName}} · {{this.gender}} · {{this.ageCategory}}</p>
+              {{else}}
+              <label class="form-label">Full name
+                <input class="form-control passenger-name" value="{{this.fullName}}" minlength="2" maxlength="100" required>
+              </label>
+              <div class="row">
+                <label class="col-md-6">Age category
+                  <select class="form-select passenger-age-category" required>
+                    <option value="Adult 12+" {{#if (eq this.ageCategory "Adult 12+")}}selected{{/if}}>Adult 12+</option>
+                    <option value="Child 2–11" {{#if (eq this.ageCategory "Child 2–11")}}selected{{/if}}>Child 2–11</option>
+                    <option value="Infant under 2" {{#if (eq this.ageCategory "Infant under 2")}}selected{{/if}}>Infant under 2</option>
+                  </select>
+                </label>
+                <label class="col-md-6">Gender
+                  <select class="form-select passenger-gender" required>
+                    <option value="Male" {{#if (eq this.gender "Male")}}selected{{/if}}>Male</option>
+                    <option value="Female" {{#if (eq this.gender "Female")}}selected{{/if}}>Female</option>
+                    <option value="Other" {{#if (eq this.gender "Other")}}selected{{/if}}>Other</option>
+                  </select>
+                </label>
+                <label class="col-md-6">Passport number
+                  <input class="form-control passenger-passport" value="{{this.passportForOwner}}" minlength="6" maxlength="9" pattern="[A-Za-z0-9]{6,9}" required>
+                </label>
+              </div>
+              {{/if}}
               <div class="row">
                 <label class="col-md-6">Meal
                   <select class="form-select meal-option">
@@ -38,6 +62,10 @@
                     <option value="Vegan" {{#if (eq this.meal "Vegan")}}selected{{/if}}>Vegan</option>
                     <option value="Gluten-Free" {{#if (eq this.meal "Gluten-Free")}}selected{{/if}}>Gluten-Free</option>
                   </select>
+                  <div class="form-check meal-consent-wrap {{#unless this.requiresMealConsent}}d-none{{/unless}}">
+                    <input class="form-check-input meal-consent-input" type="checkbox" {{#if this.mealConsent.granted}}checked{{/if}} {{#if this.requiresMealConsent}}required{{/if}}>
+                    <label class="form-check-label">I consent to this special-meal preference; it may indicate a health condition.</label>
+                  </div>
                 </label>
                 <label class="col-md-6">Baggage (kg)
                   <input class="form-control baggage-input" type="number" min="0" max="40" step="1" value="{{this.baggageAllowance}}">

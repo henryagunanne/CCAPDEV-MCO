@@ -1,4 +1,15 @@
 #!/usr/bin/env node
+
+/**
+ * This script imports aircraft configurations from a JSON file and assigns them to flights in the database.
+ * It can be run in dry-run mode or apply mode.
+ * Usage:
+ *   node import-aircraft-configurations.js [--apply]
+ *
+ * Options:
+ *   --apply: Apply the import changes to the database.
+ */
+
 'use strict';
 
 const crypto = require('crypto');

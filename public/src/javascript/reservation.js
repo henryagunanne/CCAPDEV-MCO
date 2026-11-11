@@ -39,10 +39,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const count = Number(passengerCount?.value || 1);
     passengerData = Array.from({ length: count }, () => ({
       fullName: '',
-      age: '',
+      ageCategory: '',
       gender: '',
       passport: '',
       meal: 'None',
+      mealConsent: false,
       baggageAllowance: 0
     }));
     selections.outbound = Array(count).fill('');
@@ -52,40 +53,93 @@ document.addEventListener('DOMContentLoaded', () => {
     passengerData.forEach((passenger, index) => {
       const card = document.createElement('section');
       card.className = 'card my-3 shadow-sm';
-      card.innerHTML = `
-        <div class="card-header bg-light"><strong>Passenger ${index + 1}</strong></div>
-        <div class="card-body">
-          <div class="row mb-2">
-            <label class="col-md-6">Full name
-              <input class="form-control passenger-name" required minlength="2" maxlength="100">
-            </label>
-            <label class="col-md-6">Gender
-              <select class="form-select passenger-gender" required>
-                <option value="">Select</option><option>Male</option><option>Female</option><option>Other</option>
-              </select>
-            </label>
-          </div>
-          <div class="row mb-2">
-            <label class="col-md-6">Age
-              <input class="form-control passenger-age" type="number" min="0" max="120" step="1" required>
-            </label>
-            <label class="col-md-6">Passport number
-              <input class="form-control passenger-passport" required minlength="6" maxlength="9" pattern="[A-Za-z0-9]{6,9}">
-            </label>
-          </div>
-          <div class="row">
-            <label class="col-md-6">Meal
-              <select class="form-select passenger-meal">
-                <option>None</option><option>Vegetarian</option><option>Non-Vegetarian</option><option>Vegan</option><option>Gluten-Free</option>
-              </select>
-            </label>
-            <label class="col-md-6">Baggage (kg)
-              <input class="form-control passenger-baggage" type="number" min="0" max="40" step="1" value="0" required>
-            </label>
-          </div>
-          <div class="small text-muted mt-2">Outbound seat: <span class="seat-label-outbound">Not selected</span></div>
-          <div class="small text-muted return-seat-label d-none">Return seat: <span class="seat-label-returning">Not selected</span></div>
-        </div>`;
+      const cardHeader = document.createElement('div');
+      cardHeader.className = 'card-header bg-light';
+      cardHeader.textContent = `Passenger ${index + 1}`;
+      const cardBody = document.createElement('div');
+      cardBody.className = 'card-body';
+      const firstRow = document.createElement('div');
+      firstRow.className = 'row mb-2';
+      const secondRow = document.createElement('div');
+      secondRow.className = 'row mb-2';
+      const thirdRow = document.createElement('div');
+      thirdRow.className = 'row';
+      const makeField = (labelText, className, element) => {
+        const label = document.createElement('label');
+        label.className = `col-md-6 ${className}`;
+        label.append(document.createTextNode(labelText));
+        label.append(element);
+        return label;
+      };
+      const makeSelect = (className, values, placeholder) => {
+        const select = document.createElement('select');
+        select.className = `form-select ${className}`;
+        if (placeholder) select.add(new Option(placeholder, ''));
+        values.forEach(value => select.add(new Option(value, value)));
+        return select;
+      };
+      const nameInput = document.createElement('input');
+      nameInput.className = 'form-control passenger-name';
+      nameInput.required = true;
+      nameInput.minLength = 2;
+      nameInput.maxLength = 100;
+      const genderSelect = makeSelect('passenger-gender', ['Male', 'Female', 'Other'], 'Select');
+      genderSelect.required = true;
+      const ageSelect = makeSelect('passenger-age-category', ['Adult 12+', 'Child 2–11', 'Infant under 2'], 'Select age category');
+      ageSelect.required = true;
+      const passportInput = document.createElement('input');
+      passportInput.className = 'form-control passenger-passport';
+      passportInput.required = true;
+      passportInput.minLength = 6;
+      passportInput.maxLength = 9;
+      passportInput.pattern = '[A-Za-z0-9]{6,9}';
+      const mealSelect = makeSelect('passenger-meal', ['None', 'Vegetarian', 'Non-Vegetarian', 'Vegan', 'Gluten-Free']);
+      const mealConsentWrap = document.createElement('div');
+      mealConsentWrap.className = 'form-check passenger-meal-consent d-none mt-2';
+      const mealConsent = document.createElement('input');
+      mealConsent.type = 'checkbox';
+      mealConsent.className = 'form-check-input passenger-meal-consent-input';
+      const mealConsentLabel = document.createElement('label');
+      mealConsentLabel.className = 'form-check-label';
+      mealConsentLabel.textContent = 'I consent to using this special-meal preference; it may indicate a health condition.';
+      mealConsentWrap.append(mealConsent, mealConsentLabel);
+      mealConsentLabel.htmlFor = `meal-consent-${index}`;
+      mealConsent.id = `meal-consent-${index}`;
+      mealSelect.addEventListener('change', () => {
+        const required = mealSelect.value !== 'None';
+        mealConsentWrap.classList.toggle('d-none', !required);
+        mealConsent.required = required;
+        if (!required) mealConsent.checked = false;
+      });
+      const baggageInput = document.createElement('input');
+      baggageInput.className = 'form-control passenger-baggage';
+      baggageInput.type = 'number';
+      baggageInput.min = 0;
+      baggageInput.max = 40;
+      baggageInput.step = 1;
+      baggageInput.value = 0;
+      baggageInput.required = true;
+      firstRow.append(makeField('Full name', '', nameInput), makeField('Gender', '', genderSelect));
+      secondRow.append(makeField('Age category', '', ageSelect), makeField('Passport number', '', passportInput));
+      const mealField = makeField('Meal', '', mealSelect);
+      mealField.append(mealConsentWrap);
+      thirdRow.append(mealField, makeField('Baggage (kg)', '', baggageInput));
+      const outboundLabel = document.createElement('div');
+      outboundLabel.className = 'small text-muted mt-2';
+      outboundLabel.append('Outbound seat: ');
+      const outboundSeat = document.createElement('span');
+      outboundSeat.className = 'seat-label-outbound';
+      outboundSeat.textContent = 'Not selected';
+      outboundLabel.append(outboundSeat);
+      const returnLabel = document.createElement('div');
+      returnLabel.className = 'small text-muted return-seat-label d-none';
+      returnLabel.append('Return seat: ');
+      const returnSeat = document.createElement('span');
+      returnSeat.className = 'seat-label-returning';
+      returnSeat.textContent = 'Not selected';
+      returnLabel.append(returnSeat);
+      cardBody.append(firstRow, secondRow, thirdRow, outboundLabel, returnLabel);
+      card.append(cardHeader, cardBody);
       passengerFields.append(card);
     });
 
@@ -315,10 +369,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Prepare the payload for submission
     const passengers = cards.map((card, index) => ({
       fullName: card.querySelector('.passenger-name').value.trim(),
-      age: Number(card.querySelector('.passenger-age').value),
+      ageCategory: card.querySelector('.passenger-age-category').value,
       gender: card.querySelector('.passenger-gender').value,
       passport: card.querySelector('.passenger-passport').value.trim(),
       meal: card.querySelector('.passenger-meal').value,
+      mealConsent: card.querySelector('.passenger-meal-consent-input').checked,
       baggageAllowance: Number(card.querySelector('.passenger-baggage').value),
       seatNumber: selections.outbound[index],
       ...(tripType.value === 'Round-Trip' ? { returnSeatNumber: selections.returning[index] } : {})
@@ -328,6 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ...(tripType.value === 'Round-Trip' ? { returnFlight: selectedFlightId('returning') } : {}),
       tripType: tripType.value,
       travelClass: travelClass.value,
+      privacyNoticeAccepted: document.querySelector('#passengerNoticeAccepted').checked,
       passengers,
       totalAmount: Number(document.querySelector('#totalPrice').textContent)
     };

@@ -9,7 +9,9 @@
     "dev": "nodemon server.js",
     "provision:admin": "node scripts/provision-admin.js",
     "import:aircraft-configurations": "node scripts/import-aircraft-configurations.js",
-    "migrate:booking-integrity": "node scripts/migrate-booking-integrity.js"
+    "migrate:booking-integrity": "node scripts/migrate-booking-integrity.js",
+    "migrate:privacy-data": "node scripts/migrate-privacy-data.js",
+    "retention:c18": "node scripts/run-retention.js"
   },
   "repository": {
     "type": "git",
@@ -27,12 +29,15 @@
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
     "connect-mongo": "^5.1.0",
+    "csurf": "^1.11.0",
     "dotenv": "^18.0.10",
     "express": "^5.1.0",
     "express-handlebars": "^8.0.3",
+    "express-rate-limit": "^8.7.4",
     "express-session": "^1.18.2",
     "express-winston": "^4.2.0",
     "handlebars-helpers": "^0.5.8",
+    "helmet": "^8.3.0",
     "mongoose": "^8.19.2",
     "morgan": "^1.10.1",
     "qrcode": "^1.5.4",

@@ -1,0 +1,115 @@
+<main class="container my-5">
+  <h1>My privacy</h1>
+  <p>Download your profile and bookings after password verification. Other passengers’ passport numbers remain masked.</p>
+  <form id="privacyExportForm" class="mb-4">
+    <label for="privacyPassword" class="form-label">Confirm your password</label>
+    <input id="privacyPassword" type="password" class="form-control mb-2" required>
+    <button class="btn btn-danger" type="submit">Download my data</button>
+  </form>
+
+  <h2>Submit a privacy request</h2>
+  <form id="privacyRequestForm" class="mb-4">
+    <label for="privacyRequestType" class="form-label">Request type</label>
+    <select id="privacyRequestType" class="form-select mb-2">
+      <option value="correction">Correction</option>
+      <option value="deletion">Deletion</option>
+    </select>
+    <button class="btn btn-outline-danger" type="submit">Submit request</button>
+  </form>
+  <p id="privacyMessage" role="status"></p>
+
+  <h2>Withdraw special-meal consent</h2>
+  <p>Withdrawal immediately resets the meal preference to None.</p>
+  {{#each reservations}}
+    {{#each this.passengers}}
+      {{#if this.mealConsent.granted}}
+        <div class="border rounded p-3 mb-2">
+          <span>{{this.fullName}} · booking {{../bookingReference}}</span>
+          <button type="button" class="btn btn-sm btn-outline-danger withdraw-meal-consent"
+                  data-reservation-id="{{../_id}}" data-passenger-id="{{this._id}}">
+            Withdraw meal consent
+          </button>
+        </div>
+      {{/if}}
+    {{/each}}
+  {{/each}}
+
+  <h2>Request status</h2>
+  {{#if requests.length}}
+  <div class="table-responsive">
+    <table class="table">
+      <thead><tr><th>Type</th><th>Status</th><th>Received</th><th>Acknowledgment due</th><th>Completion due</th></tr></thead>
+      <tbody>
+      {{#each requests}}
+        <tr>
+          <td>{{this.type}}</td><td>{{this.status}}</td>
+          <td>{{this.receivedAt}}</td><td>{{this.acknowledgementDueAt}}</td><td>{{this.completionDueAt}}</td>
+        </tr>
+      {{/each}}
+      </tbody>
+    </table>
+  </div>
+  {{else}}
+  <p>No privacy requests yet.</p>
+  {{/if}}
+</main>
+<script nonce="{{cspNonce}}">
+  const message = document.getElementById('privacyMessage');
+  document.getElementById('privacyRequestForm').addEventListener('submit', async event => {
+    event.preventDefault();
+    const response = await fetch('/privacy/requests', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: document.getElementById('privacyRequestType').value })
+    });
+    const result = await response.json();
+    message.textContent = response.ok
+      ? `Request received. Acknowledgment due ${result.request.acknowledgementDueAt}; completion due ${result.request.completionDueAt}.`
+      : result.message || 'Unable to submit the request.';
+  });
+  document.getElementById('privacyExportForm').addEventListener('submit', async event => {
+    event.preventDefault();
+    const response = await fetch('/privacy/export', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ currentPassword: document.getElementById('privacyPassword').value })
+    });
+    if (!response.ok) {
+      const result = await response.json();
+      message.textContent = result.message || 'Unable to download your data.';
+      return;
+    }
+    const data = await response.json();
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+    link.download = 'my-privacy-data.json';
+    link.click();
+    URL.revokeObjectURL(link.href);
+    message.textContent = 'Your data download is ready.';
+  });
+  document.addEventListener('click', async event => {
+    const button = event.target.closest('.withdraw-meal-consent');
+    if (!button) return;
+    button.disabled = true;
+    try {
+      const response = await fetch('/privacy/withdraw-meal-consent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          reservationId: button.dataset.reservationId,
+          passengerId: button.dataset.passengerId
+        })
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        message.textContent = result.message || 'Unable to withdraw consent.';
+        button.disabled = false;
+        return;
+      }
+      window.location.reload();
+    } catch {
+      message.textContent = 'Unable to withdraw consent.';
+      button.disabled = false;
+    }
+  });
+</script>

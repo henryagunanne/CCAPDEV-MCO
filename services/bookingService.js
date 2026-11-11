@@ -7,6 +7,49 @@ const SeatAllocation = require('../models/SeatAllocation');
 const BookingIntegrityState = require('../models/BookingIntegrityState');
 const { BookingInputError } = require('./bookingValidation');
 const { calculateReservationPrice } = require('./bookingPricing');
+const { encryptPassport, fingerprintPassport } = require('./passportEncryption');
+
+const PRIVACY_NOTICE_VERSION = 'mco2-v1';
+
+function protectPassengerData(passengers, existingPassengers = []) {
+  return passengers.map((passenger, index) => {
+    const suppliedFingerprint = passenger.passport
+      ? fingerprintPassport(passenger.passport)
+      : null;
+    const existing = (suppliedFingerprint && existingPassengers.find(entry =>
+      entry.passportFingerprint === suppliedFingerprint
+    )) || existingPassengers[index];
+    const mealConsentGranted = passenger.meal !== 'None' && passenger.mealConsent;
+    const consentWithdrawn = passenger.meal === 'None' && existing?.mealConsent?.granted;
+    const storedPassport = passenger.passport
+      ? {
+          encrypted: encryptPassport(passenger.passport),
+          fingerprint: fingerprintPassport(passenger.passport),
+          last3: passenger.passport.slice(-3)
+        }
+      : {
+          encrypted: existing?.passportEncrypted,
+          fingerprint: existing?.passportFingerprint,
+          last3: existing?.passportLast3
+        };
+    if (!storedPassport.encrypted || !storedPassport.fingerprint) {
+      throw new BookingConflictError('Passport migration is required before editing this reservation.');
+    }
+    return {
+      ...passenger,
+      passportEncrypted: storedPassport.encrypted,
+      passportFingerprint: storedPassport.fingerprint,
+      passportLast3: storedPassport.last3,
+      passport: undefined,
+      mealConsent: {
+        granted: Boolean(mealConsentGranted),
+        version: mealConsentGranted ? PRIVACY_NOTICE_VERSION : existing?.mealConsent?.version || '',
+        consentedAt: mealConsentGranted ? new Date() : existing?.mealConsent?.consentedAt || null,
+        withdrawnAt: consentWithdrawn ? new Date() : existing?.mealConsent?.withdrawnAt || null
+      }
+    };
+  });
+}
 
 
 /**
@@ -337,8 +380,11 @@ async function createReservation({ userId, booking }) {
     flight: flightContext.map(entry => entry.flight._id),
     tripType: booking.tripType,
     travelClass: booking.travelClass,
-    passengers: booking.passengers,
+    passengers: protectPassengerData(booking.passengers),
     price,
+    privacyNoticeVersion: PRIVACY_NOTICE_VERSION,
+    privacyNoticeAcceptedAt: new Date(),
+    privacyNoticeAcceptedBy: userId,
     status: 'Confirmed'
   });
   const claims = claimsForPassengers(flightContext.map(entry => entry.flight), booking.passengers, booking.tripType);
@@ -380,9 +426,10 @@ function sameClaim(left, right) {
  * @param {Object} params - The parameters for updating the reservation.
  * @param {Reservation} params.reservation - The reservation to update.
  * @param {Array<Object>} params.passengers - The new passenger information.
+ * @param {boolean} [params.preservePrice=false] - Whether to preserve the original price or recalculate it.
  * @returns {Promise<Reservation>} - A promise resolving to the updated reservation.
  */
-async function updateReservation({ reservation, passengers }) {
+async function updateReservation({ reservation, passengers, preservePrice = false }) {
   if (reservation.status === 'Cancelled') {
     throw new BookingConflictError('Cancelled reservations cannot be edited.');
   }
@@ -414,8 +461,13 @@ async function updateReservation({ reservation, passengers }) {
   const oldPrice = reservation.price;
   const oldVersion = reservation.__v;
   let addedAllocations = [];
-  const updatedPassengers = passengers.map((passenger, index) => {
-    const existing = reservation.passengers[index];
+  const existingByFingerprint = new Map(reservation.passengers.map(passenger => [
+    passenger.passportFingerprint,
+    passenger
+  ]));
+  const protectedPassengers = protectPassengerData(passengers, reservation.passengers);
+  const updatedPassengers = protectedPassengers.map((passenger, index) => {
+    const existing = existingByFingerprint.get(passenger.passportFingerprint) || reservation.passengers[index];
     return {
       ...passenger,
       checkedIn: existing?.checkedIn || false,
@@ -428,7 +480,7 @@ async function updateReservation({ reservation, passengers }) {
       addedAllocations = await claimSeats(reservation._id, additions, session);
     }
     reservation.passengers = updatedPassengers;
-    reservation.price = price;
+    reservation.price = preservePrice ? oldPrice : price;
     await reservation.save(sessionOptions(session));
     if (removals.length) await releaseSeatAllocations(removals, session);
     return reservation;
@@ -485,7 +537,14 @@ async function cancelReservation(reservation) {
       }
       const update = await Reservation.updateOne(
         { _id: current._id, __v: current.__v, status: { $ne: 'Cancelled' } },
-        { $set: { status: 'Cancelled' }, $inc: { __v: 1 } },
+        {
+          $set: {
+            status: 'Cancelled',
+            'passengers.$[].checkedIn': false,
+            'passengers.$[].boardingPass': null
+          },
+          $inc: { __v: 1 }
+        },
         { session }
       );
       if (update.modifiedCount !== 1) {
@@ -503,9 +562,24 @@ async function cancelReservation(reservation) {
   }
   const priorStatus = reservation.status;
   const priorVersion = reservation.__v;
+  const priorPassengerState = {};
+  for (const [index, passenger] of reservation.passengers.entries()) {
+    priorPassengerState[`passengers.${index}.checkedIn`] = Boolean(passenger.checkedIn);
+    priorPassengerState[`passengers.${index}.boardingPass`] = passenger.boardingPass || {
+      outbound: null,
+      return: null
+    };
+  }
   const update = await Reservation.updateOne(
     { _id: reservation._id, __v: priorVersion, status: { $ne: 'Cancelled' } },
-    { $set: { status: 'Cancelled' }, $inc: { __v: 1 } }
+    {
+      $set: {
+        status: 'Cancelled',
+        'passengers.$[].checkedIn': false,
+        'passengers.$[].boardingPass': null
+      },
+      $inc: { __v: 1 }
+    }
   );
   if (update.modifiedCount !== 1) {
     const current = await Reservation.findById(reservation._id);
@@ -517,7 +591,7 @@ async function cancelReservation(reservation) {
   } catch (error) {
     await Reservation.updateOne(
       { _id: reservation._id, status: 'Cancelled', __v: priorVersion + 1 },
-      { $set: { status: priorStatus }, $inc: { __v: 1 } }
+      { $set: { status: priorStatus, ...priorPassengerState }, $inc: { __v: 1 } }
     );
     throw error;
   }
@@ -525,21 +599,11 @@ async function cancelReservation(reservation) {
 }
 
 
-/** * Delete a reservation, cancelling it first if necessary.
- * @param {Reservation} reservation - The reservation to delete.
- * @returns {Promise<void>}
- * */
-async function deleteReservation(reservation) {
-  if (reservation.status !== 'Cancelled') await cancelReservation(reservation);
-  await Reservation.deleteOne({ _id: reservation._id, status: 'Cancelled' });
-}
-
 module.exports = {
   BookingConflictError,
   createReservation,
   updateReservation,
   cancelReservation,
-  deleteReservation,
   resolveBookingContext,
   claimsForPassengers,
   changeBookedSeats,

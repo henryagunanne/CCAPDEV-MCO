@@ -1,0 +1,37 @@
+<section class="container-fluid p-4">
+  <h1>Privacy Requests</h1>
+  <p>Requests must be acknowledged within five working days and completed within 30 working days. Resolve correction and deletion requests only after the applicable data change has been performed.</p>
+  <p id="privacyRequestMessage" role="status"></p>
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead>
+        <tr><th>Type</th><th>Subject</th><th>Received</th><th>Acknowledgment due</th><th>Completion due</th><th>Status</th><th>Actions</th></tr>
+      </thead>
+      <tbody id="privacyRequestRows">
+        {{#each requests}}
+        <tr data-request-id="{{this._id}}">
+          <td>{{this.type}}</td>
+          <td>{{this.subjectType}}</td>
+          <td>{{this.receivedAt}}</td>
+          <td>{{this.acknowledgementDueAt}}</td>
+          <td>{{this.completionDueAt}}</td>
+          <td class="request-status">{{this.status}}</td>
+          <td>
+            {{#unless this.acknowledgedAt}}
+            <button type="button" class="btn btn-sm btn-outline-primary acknowledge-request">Acknowledge</button>
+            {{/unless}}
+            <label class="small">Decision code
+              <input class="form-control form-control-sm decision-code" maxlength="40" pattern="[A-Z0-9_-]{1,40}">
+            </label>
+            <button type="button" class="btn btn-sm btn-success complete-request" data-outcome="completed">Complete</button>
+            <button type="button" class="btn btn-sm btn-outline-danger complete-request" data-outcome="refused">Refuse</button>
+          </td>
+        </tr>
+        {{else}}
+        <tr><td colspan="7">No open requests.</td></tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+</section>
+<script src="/src/javascript/privacy-requests.js"></script>

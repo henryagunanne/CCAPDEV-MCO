@@ -56,6 +56,10 @@ const flightSchema = new mongoose.Schema({
         type: String,
         enum: ['Scheduled', 'On Time', 'Delayed', 'Cancelled'],
         default: 'Scheduled'
+    },
+    completedAt: {
+        type: Date,
+        default: null
     }
 });
 

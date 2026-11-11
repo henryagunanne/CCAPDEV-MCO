@@ -1,5 +1,13 @@
 const mongoose = require('mongoose');
 
+const encryptedPassportSchema = new mongoose.Schema({
+  algorithm: { type: String, enum: ['aes-256-gcm'] },
+  version: { type: Number, enum: [1] },
+  iv: { type: String },
+  authTag: { type: String },
+  ciphertext: { type: String }
+}, { _id: false });
+
 const passengerSchema = new mongoose.Schema({
   checkedIn: {
     type: Boolean,
@@ -13,28 +21,39 @@ const passengerSchema = new mongoose.Schema({
       type: String,
       required: true
   },
+  ageCategory: {
+    type: String,
+    enum: ['Adult 12+', 'Child 2–11', 'Infant under 2'],
+    default: undefined
+  },
   age: {
-      type: Number,
-      required: true,
-      min: 0,
-      max: 120,
-      validate: Number.isInteger
+    type: Number,
+    min: 0,
+    max: 120,
+    validate: Number.isInteger,
+    select: false
   },
   gender: {
       type: String,
       enum: ['Male', 'Female', 'Other'],
-      required: true
   },
   passport: {
     type: String,
-    required: true,
     trim: true,
-    unique: true,
+    select: false,
     match: /^[A-Za-z0-9]{6,9}$/
+  },
+  passportEncrypted: { type: encryptedPassportSchema, select: false },
+  passportFingerprint: {
+    type: String,
+    select: false
+  },
+  passportLast3: {
+    type: String,
+    default: ''
   },
   seatNumber: {
       type: String,
-      required: true,
       match: /^(?:[1-9]|[12][0-9]|30)[A-J]$/
   },
   returnSeatNumber: {
@@ -46,6 +65,12 @@ const passengerSchema = new mongoose.Schema({
       type: String,
       enum: ['None', 'Vegetarian', 'Non-Vegetarian', 'Vegan', 'Gluten-Free'],
       default: 'None'
+  },
+  mealConsent: {
+    granted: { type: Boolean, default: false },
+    version: { type: String, default: '' },
+    consentedAt: { type: Date, default: null },
+    withdrawnAt: { type: Date, default: null }
   },
   baggageAllowance: {
       type: Number,
@@ -62,8 +87,9 @@ const reservationSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    default: null
   },
+  accountDeletedAt: { type: Date, default: null },
   bookingReference: {
     type: String,
     required: true,
@@ -103,8 +129,13 @@ const reservationSchema = new mongoose.Schema({
     type: String,
     enum: ['Confirmed', 'Cancelled', 'Pending'],
     default: 'Pending'
-  }
+  },
+  privacyNoticeVersion: { type: String, default: '' },
+  privacyNoticeAcceptedAt: { type: Date, default: null },
+  privacyNoticeAcceptedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null }
 }, { optimisticConcurrency: true });
+
+passengerSchema.index({ passportFingerprint: 1 }, { unique: true, sparse: true });
 
 // Export the model for use in other files
 module.exports = mongoose.model('Reservation', reservationSchema);

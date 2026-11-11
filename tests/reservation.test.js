@@ -11,6 +11,14 @@ describe('Booking integrity', () => {
   let agent;
   let userId;
   let flight;
+  let csrfToken;
+
+  async function refreshCsrfToken() {
+    const response = await agent.get('/');
+    const match = response.text.match(/<meta name="csrf-token" content="([^"]+)"/);
+    if (!match) throw new Error('CSRF token was not rendered.');
+    csrfToken = match[1];
+  }
 
   async function createFlight({ price = 148, capacity = 180, date = '2030-12-20' } = {}) {
     const layoutSuffix = `${capacity}-${Math.random().toString(36).slice(2, 10)}`;
@@ -55,7 +63,7 @@ describe('Booking integrity', () => {
   function passenger(overrides = {}) {
     return {
       fullName: 'Anna Rivera',
-      age: 29,
+      ageCategory: 'Adult 12+',
       gender: 'Female',
       passport: 'P100002',
       seatNumber: '7C',
@@ -66,11 +74,12 @@ describe('Booking integrity', () => {
   }
 
   async function book(overrides = {}) {
-    return agent.post('/reservations/create').send({
+    return agent.post('/reservations/create').set('x-csrf-token', csrfToken).send({
       flight: String(flight._id),
       tripType: 'One-Way',
       travelClass: 'Economy',
       passengers: [passenger()],
+      privacyNoticeAccepted: true,
       totalAmount: 1,
       ...overrides
     });
@@ -86,10 +95,12 @@ describe('Booking integrity', () => {
       dateOfBirth: new Date('1990-01-01')
     });
     userId = String(user._id);
-    await agent.post('/users/login').send({
+    await refreshCsrfToken();
+    await agent.post('/users/login').set('x-csrf-token', csrfToken).send({
       email: 'booking-test@example.com',
       password: 'password123'
     });
+    await refreshCsrfToken();
     await BookingIntegrityState.create({
       _id: 'booking-integrity-v1',
       version: 1,
@@ -104,14 +115,15 @@ describe('Booking integrity', () => {
   it('calculates and persists price from stored fares and approved tariffs', async () => {
     const response = await book({
       passengers: [
-        passenger({ meal: 'Vegan', baggageAllowance: 25 }),
+        passenger({ meal: 'Vegan', mealConsent: true, baggageAllowance: 25 }),
         passenger({
           fullName: 'Luis Rivera',
-          age: 30,
+          ageCategory: 'Adult 12+',
           gender: 'Male',
           passport: 'P100003',
           seatNumber: '7D',
           meal: 'Vegetarian',
+          mealConsent: true,
           baggageAllowance: 25
         })
       ],
@@ -124,7 +136,7 @@ describe('Booking integrity', () => {
   });
 
   it('rejects malformed, injected, unexpected, and invalid passenger inputs', async () => {
-    const malformedId = await agent.post('/reservations/create').send({
+    const malformedId = await agent.post('/reservations/create').set('x-csrf-token', csrfToken).send({
       flight: 'not-an-object-id',
       tripType: 'One-Way',
       travelClass: 'Economy',
@@ -180,7 +192,7 @@ describe('Booking integrity', () => {
         passenger(),
         passenger({
           fullName: 'Luis Rivera',
-          age: 30,
+          ageCategory: 'Adult 12+',
           gender: 'Male',
           passport: 'P100003',
           seatNumber: '7D'
@@ -207,12 +219,14 @@ describe('Booking integrity', () => {
     reservation.passengers[0].checkedIn = true;
     reservation.passengers[0].boardingPass = { outbound: 'BP-123456', return: null };
     await reservation.save();
-    const response = await agent.post(`/reservations/${reservation._id}/edit`).send({
+    const response = await agent.post(`/reservations/${reservation._id}/edit`).set('x-csrf-token', csrfToken).send({
       passengersJSON: JSON.stringify([
         passenger({
           meal: 'Vegan',
+          mealConsent: true,
           baggageAllowance: 2,
-          seatNumber: '8A'
+          seatNumber: '8A',
+          passport: undefined
         })
       ]),
       totalPrice: 0
@@ -237,8 +251,8 @@ describe('Booking integrity', () => {
   it('cancels idempotently and releases claims and capacity once', async () => {
     const created = await book();
     const reservation = await Reservation.findOne({ userId });
-    const first = await agent.post(`/reservations/cancel/${reservation._id}`);
-    const second = await agent.post(`/reservations/cancel/${reservation._id}`);
+    const first = await agent.post(`/reservations/cancel/${reservation._id}`).set('x-csrf-token', csrfToken);
+    const second = await agent.post(`/reservations/cancel/${reservation._id}`).set('x-csrf-token', csrfToken);
 
     expect(created.statusCode).toBe(200);
     expect(first.statusCode).toBe(200);
@@ -269,8 +283,8 @@ describe('Booking integrity', () => {
   it('routes reservation update requests through server-side pricing', async () => {
     const created = await book();
     const reservation = await Reservation.findOne({ userId });
-    const response = await agent.post(`/reservations/update/${reservation._id}`).send({
-      passengers: [passenger({ meal: 'Vegan', seatNumber: '8A' })],
+    const response = await agent.post(`/reservations/update/${reservation._id}`).set('x-csrf-token', csrfToken).send({
+      passengers: [passenger({ meal: 'Vegan', mealConsent: true, seatNumber: '8A' })],
       totalPrice: 0
     });
     expect(created.statusCode).toBe(200);

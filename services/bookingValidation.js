@@ -3,9 +3,10 @@ const mongoose = require('mongoose');
 const TRIP_TYPES = ['One-Way', 'Round-Trip'];
 const TRAVEL_CLASSES = ['Economy', 'Premium Economy', 'Business', 'First'];
 const MEALS = ['None', 'Vegetarian', 'Non-Vegetarian', 'Vegan', 'Gluten-Free'];
+const AGE_CATEGORIES = ['Adult 12+', 'Child 2–11', 'Infant under 2'];
 const PASSENGER_FIELDS = new Set([
-  'fullName', 'age', 'gender', 'passport', 'seatNumber',
-  'returnSeatNumber', 'meal', 'baggageAllowance'
+  'fullName', 'ageCategory', 'gender', 'passport', 'seatNumber',
+  'returnSeatNumber', 'meal', 'mealConsent', 'baggageAllowance'
 ]);
 
 // Custom error class for booking input validation errors
@@ -96,7 +97,7 @@ function validateSeatNumber(seatNumber, required = true) {
  * @param {string} tripType - The trip type ('One-Way' or 'Round-Trip') to determine seat validation rules.
  * @returns {Array} - The validated and normalized array of passengers.
  */
-function validatePassengers(raw, tripType) {
+function validatePassengers(raw, tripType, { requirePassport = true } = {}) {
   const passengers = parsePassengerList(raw);
   const normalizedPassengers = passengers.map(passenger => {
     assertAllowedKeys(passenger, PASSENGER_FIELDS, 'Passenger');
@@ -104,18 +105,23 @@ function validatePassengers(raw, tripType) {
         !/^[\p{L}][\p{L}\p{M}' -]{1,98}$/u.test(passenger.fullName.trim())) {
       throw new BookingInputError('Passenger name is invalid.');
     }
-    if (!Number.isInteger(passenger.age) || passenger.age < 0 || passenger.age > 120) {
-      throw new BookingInputError('Passenger age must be a whole number from 0 to 120.');
+    if (!AGE_CATEGORIES.includes(passenger.ageCategory)) {
+      throw new BookingInputError('Select a valid passenger age category.');
     }
     if (!['Male', 'Female', 'Other'].includes(passenger.gender)) {
       throw new BookingInputError('Passenger gender is invalid.');
     }
-    if (typeof passenger.passport !== 'string' ||
-        !/^[A-Za-z0-9]{6,9}$/.test(passenger.passport.trim())) {
-      throw new BookingInputError('Passport number must contain 6 to 9 alphanumeric characters.');
+    if (requirePassport || passenger.passport !== undefined) {
+      if (typeof passenger.passport !== 'string' ||
+          !/^[A-Za-z0-9]{6,9}$/.test(passenger.passport.trim())) {
+        throw new BookingInputError('Passport number must contain 6 to 9 alphanumeric characters.');
+      }
     }
     if (passenger.meal !== undefined && !MEALS.includes(passenger.meal)) {
       throw new BookingInputError('Meal selection is invalid.');
+    }
+    if (passenger.meal !== 'None' && passenger.mealConsent !== true) {
+      throw new BookingInputError('Separate consent is required for a special-meal preference.');
     }
     const baggage = passenger.baggageAllowance === undefined ? 0 : passenger.baggageAllowance;
     if (!Number.isInteger(baggage) || baggage < 0 || baggage > 40) {
@@ -130,16 +136,17 @@ function validatePassengers(raw, tripType) {
     }
     return {
       fullName: passenger.fullName.trim(),
-      age: passenger.age,
+      ageCategory: passenger.ageCategory,
       gender: passenger.gender,
-      passport: passenger.passport.trim().toUpperCase(),
+      passport: passenger.passport === undefined ? undefined : passenger.passport.trim().toUpperCase(),
       seatNumber,
       returnSeatNumber,
       meal: passenger.meal || 'None',
+      mealConsent: passenger.mealConsent === true,
       baggageAllowance: baggage
     };
   });
-  const passports = normalizedPassengers.map(passenger => passenger.passport);
+  const passports = normalizedPassengers.map(passenger => passenger.passport).filter(Boolean);
   if (new Set(passports).size !== passports.length) {
     throw new BookingInputError('Each passenger must have a different passport number.');
   }
@@ -199,13 +206,14 @@ function validateFlightSelection({ flight, returnFlight, tripType, travelClass, 
     flightIds: returnId ? [outboundId, returnId] : [outboundId],
     tripType,
     travelClass,
+    privacyNoticeAccepted: true,
     passengers: normalizedPassengers
   };
 }
 
 const CREATE_FIELDS = new Set([
   'flight', 'returnFlight', 'tripType', 'travelClass', 'passengers',
-  'totalAmount', 'totalPrice', 'price'
+  'totalAmount', 'totalPrice', 'price', 'privacyNoticeAccepted'
 ]);
 const EDIT_FIELDS = new Set([
   'passengers', 'passengersJSON', 'totalAmount', 'totalPrice', 'price',
@@ -221,6 +229,9 @@ const EDIT_FIELDS = new Set([
 function validateCreateBody(body) {
   assertSafeKeys(body);
   assertAllowedKeys(body, CREATE_FIELDS, 'Request');
+  if (body.privacyNoticeAccepted !== true) {
+    throw new BookingInputError('Accept the passenger privacy notice before booking.');
+  }
   return validateFlightSelection(body);
 }
 
@@ -239,7 +250,8 @@ function validateEditBody(body, tripType) {
   }
   return validatePassengers(
     body.passengers === undefined ? body.passengersJSON : body.passengers,
-    tripType
+    tripType,
+    { requirePassport: false }
   );
 }
 
@@ -253,5 +265,6 @@ module.exports = {
   validatePassengers,
   TRIP_TYPES,
   TRAVEL_CLASSES,
-  MEALS
+  MEALS,
+  AGE_CATEGORIES
 };

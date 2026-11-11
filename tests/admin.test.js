@@ -3,11 +3,23 @@ const app = require('../server'); // Import the Express app
 const User = require('../models/User');
 
 let agent; 
+let csrfToken;
+
+async function refreshCsrfToken() {
+    const response = await agent.get('/');
+    const match = response.text.match(/<meta name="csrf-token" content="([^"]+)"/);
+    if (!match) throw new Error('CSRF token was not rendered.');
+    csrfToken = match[1];
+}
 
 describe("Admin Tasks and Privileges", () => {
 
     beforeAll(async () => {
         agent = request.agent(app);
+    });
+
+    beforeEach(async () => {
+        await refreshCsrfToken();
     });
 
 
@@ -30,11 +42,14 @@ describe("Admin Tasks and Privileges", () => {
             // Login admin
             await agent
                 .post("/users/login")
+                .set('x-csrf-token', csrfToken)
                 .send({ email: "admin@test.com", password: "adminpass123" });
+            await refreshCsrfToken();
 
 
             const res = await agent
                 .post('/admin/create')
+                .set('x-csrf-token', csrfToken)
                 .send({
                     flightNumber: 'AA1001',
                     origin: 'Manila (MNL)',
@@ -67,11 +82,14 @@ describe("Admin Tasks and Privileges", () => {
             // login user
             await agent
                 .post("/users/login")
+                .set('x-csrf-token', csrfToken)
                 .send({ email: 'test@example.com', password: 'password123' });
+            await refreshCsrfToken();
 
 
             const res = await agent
                 .post('/admin/create')
+                .set('x-csrf-token', csrfToken)
                 .send({
                     flightNumber: 'AA1002',
                     origin: 'Manila (MNL)',
@@ -108,10 +126,13 @@ describe("Admin Tasks and Privileges", () => {
 
             await agent
                 .post('/users/login')
+                .set('x-csrf-token', csrfToken)
                 .send({ email: 'stepup@test.com', password: 'stepupadmin123' });
+            await refreshCsrfToken();
 
             const res = await agent
                 .post('/admin/sensitive-test')
+                .set('x-csrf-token', csrfToken)
                 .send({});
 
             expect(res.statusCode).toEqual(403);

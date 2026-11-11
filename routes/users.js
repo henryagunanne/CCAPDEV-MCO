@@ -1,12 +1,18 @@
 // routes/users.js
 const express = require('express');
+const mongoose = require('mongoose');
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const router = express.Router();
 const logger = require('../logs/logger');
-const AuditLog = require('../models/AuditLog');
+const Reservation = require('../models/Reservation');
+const PrivacyRequest = require('../models/PrivacyRequest');
 const { getEffectivePermissions, isAdminAccount } = require('../config/rbac');
 const { generateSecret, generateQrCodeDataUrl, verifyToken, buildOtpAuthUrl } = require('../services/mfa');
+const { recordAuditEvent } = require('../services/auditService');
+const { isTodayOrFutureInManila } = require('../services/manilaDate');
+const { supportsTransactions } = require('../services/bookingService');
+const { authenticationLimits } = require('../middleware/rateLimits');
 
 const INVALID_LOGIN_MESSAGE = 'Invalid email or password.';
 const SESSION_IDLE_TIMEOUT_MS = 30 * 60 * 1000;
@@ -107,21 +113,16 @@ async function clearFailedLoginState(user) {
  * @param {string} [params.correlationId=''] - Correlation ID for tracing related actions.
  */
 async function recordAuditLog({ actorId, actorRole, action, resourceType = 'system', resourceId = '', result = 'SUCCESS', approvalId = '', reason = '', correlationId = '' }) {
-  try {
-    await AuditLog.create({
-      actorId,
-      actorRole,
-      action,
-      resourceType,
-      resourceId,
-      result,
-      approvalId,
-      reason,
-      correlationId
-    });
-  } catch (error) {
-    logger.error('Audit log creation failed:', error);
-  }
+  return recordAuditEvent({
+    actorId,
+    actorRole,
+    action,
+    resourceType,
+    resourceId,
+    result,
+    reasonCode: reason ? 'AUTH_EVENT' : '',
+    correlationId
+  });
 }
 
 // Middleware to check if user is authenticated
@@ -154,12 +155,13 @@ function isAdmin(req, res, next) {
 }
 
 // POST /users/register - Handle user registration
-router.post('/register', async (req, res) => {
-    const { firstName, lastName, email, password, dateOfBirth } = req.body;
+router.post('/register', ...authenticationLimits, async (req, res) => {
+    const { firstName, lastName, email, password, isAdult, privacyNoticeAccepted } = req.body;
 
     const normalizedEmail = normalizeEmail(email);
 
-    if (!firstName || !lastName || !normalizedEmail || !dateOfBirth || !isStrongPassword(password)) {
+    if (!firstName || !lastName || !normalizedEmail || isAdult !== true ||
+        privacyNoticeAccepted !== true || !isStrongPassword(password)) {
       return res.status(400).json({ success: false, message: 'Please provide valid registration details. Passwords must be at least 8 characters long.' });
     }
 
@@ -175,22 +177,21 @@ router.post('/register', async (req, res) => {
         firstName: String(firstName).trim(),
         lastName: String(lastName).trim(),
         email: normalizedEmail,
-        password,
-        dateOfBirth
+        password
       });
 
       await newUser.save();
       res.status(200).json({ success: true });
-      logger.info(`New registered User - ${newUser._id}`);
+      logger.info('User registered.');
     } catch (err) {
-      logger.error('Registration error:', err);
+      logger.error('Registration failed.', { code: err.code || 'REGISTRATION_ERROR' });
       const message = err && err.message ? err.message : 'Server error during registration';
       res.status(400).json({ success: false, message });
     }
 });
 
 // POST /users/login - Handle user login
-router.post('/login', async (req, res) => {
+router.post('/login', ...authenticationLimits, async (req, res) => {
     const email = normalizeEmail(req.body.email);
     const password = typeof req.body.password === 'string' ? req.body.password : '';
 
@@ -227,9 +228,9 @@ router.post('/login', async (req, res) => {
         user.mfaVerified = false;
       }
 
-      req.session.regenerate((err) => {
+      req.session.regenerate(async (err) => {
         if (err) {
-          logger.error('Session regeneration error:', err);
+          logger.error('Session regeneration failed.', { code: err.code || 'SESSION_REGENERATION_ERROR' });
           return res.status(500).json({ success: false, message: 'Login failed.' });
         }
 
@@ -247,8 +248,13 @@ router.post('/login', async (req, res) => {
         req.session.absoluteExpiresAt = authenticatedAt + SESSION_ABSOLUTE_TIMEOUT_MS;
         req.session.cookie.maxAge = SESSION_IDLE_TIMEOUT_MS;
 
-        logger.info(`${user.firstName} - ${user._id} logged in`);
-        recordAuditLog({ actorId: user._id, actorRole: user.role || 'user', action: 'admin:login', resourceType: 'User', result: 'SUCCESS', reason: 'Successful login' }).catch(() => {});
+        logger.info('User authenticated.');
+        try {
+          await recordAuditLog({ actorId: user._id, actorRole: user.role || 'user', action: 'user:login', resourceType: 'User', result: 'SUCCESS' });
+        } catch (auditError) {
+          logger.error('Login audit event failed.', { code: auditError.code });
+          return res.status(500).json({ success: false, message: 'Login failed.' });
+        }
 
         return res.status(200).json({ 
           success: true, 
@@ -259,7 +265,7 @@ router.post('/login', async (req, res) => {
       });
 
     } catch (err) {
-      logger.error('Login error:', err);
+      logger.error('Login failed.', { code: err.code || 'LOGIN_ERROR' });
       res.status(500).json({ success: false, message: 'Server error during login' });
     }
 });
@@ -288,7 +294,7 @@ router.get('/mfa/setup', isAuthenticated, async (req, res) => {
       qrCode
     });
   } catch (error) {
-    logger.error('MFA enrollment error:', error);
+    logger.error('MFA enrollment failed.', { code: error.code || 'MFA_ENROLLMENT_ERROR' });
     return res.status(500).json({ success: false, message: 'Unable to configure MFA.' });
   }
 });
@@ -322,12 +328,12 @@ router.post('/mfa/verify', isAuthenticated, async (req, res) => {
       verifiedAt: new Date().toISOString(),
       method: 'mfa'
     };
-    logger.info(`Admin MFA verification succeeded for ${user.email}`);
+    logger.info('Admin MFA verification succeeded.');
     await recordAuditLog({ actorId: user._id, actorRole: user.role || 'Admin', action: 'admin:mfa:verify', resourceType: 'User', result: 'SUCCESS', reason: 'MFA verification succeeded' });
 
     return res.status(200).json({ success: true, message: 'MFA verification succeeded.' });
   } catch (error) {
-    logger.error('MFA verification error:', error);
+    logger.error('MFA verification failed.', { code: error.code || 'MFA_VERIFICATION_ERROR' });
     return res.status(500).json({ success: false, message: 'Unable to verify MFA code.' });
   }
 });
@@ -337,7 +343,7 @@ router.post('/logout', isAuthenticated, (req, res) => {
     req.session.stepUp = null;
     req.session.destroy(err => {
       if (err) {
-        logger.error('Logout error:', err);
+        logger.error('Logout failed.', { code: err.code || 'LOGOUT_ERROR' });
         return res.status(500).json({ success: false, message: 'Server error during logout' });
       }
       res.clearCookie('connect.sid', { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production' });
@@ -366,13 +372,12 @@ router.post('/edit/:userId', isAuthenticated, async (req, res) => {
       return res.status(403).json({ success: false, message: 'You can only edit your own profile.' });
     }
 
-    const { firstName, lastName, email, dateOfBirth } = req.body;
+    const { firstName, lastName, email } = req.body;
     const allowedUpdates = {};
 
     if (firstName) allowedUpdates.firstName = String(firstName).trim();
     if (lastName) allowedUpdates.lastName = String(lastName).trim();
     if (email) allowedUpdates.email = String(email).trim().toLowerCase();
-    if (dateOfBirth) allowedUpdates.dateOfBirth = new Date(dateOfBirth);
 
     if (Object.keys(allowedUpdates).length === 0) {
       return res.status(400).json({ success: false, message: 'No valid profile changes supplied.' });
@@ -386,6 +391,13 @@ router.post('/edit/:userId', isAuthenticated, async (req, res) => {
 
       Object.assign(existingUser, allowedUpdates);
       await existingUser.save();
+      await recordAuditEvent({
+        actorId: existingUser._id,
+        actorRole: existingUser.role || 'user',
+        action: 'user:profile:update',
+        resourceType: 'User',
+        resourceId: existingUser._id
+      });
 
       const safeUser = buildSessionUser(existingUser);
       req.session.user = {
@@ -395,14 +407,14 @@ router.post('/edit/:userId', isAuthenticated, async (req, res) => {
         absoluteExpiresAt: req.session.absoluteExpiresAt || Date.now() + SESSION_ABSOLUTE_TIMEOUT_MS
       };
 
-      logger.info(`User ${userId} updated profile`);
+      logger.info('User profile updated.');
       res.json({ 
         success: true, 
         message: 'Profile updated successfully!',
         user: safeUser
       });
     } catch (err) {
-      logger.error('Profile update error:', err);
+      logger.error('Profile update failed.', { code: err.code || 'PROFILE_UPDATE_ERROR' });
       res.status(500).json({ success: false, message: 'Server error during profile update' });
     }
 });
@@ -441,10 +453,17 @@ router.post('/change-password/:userId', isAuthenticated, async (req, res) => {
       user.password = newPassword;
       await user.save();
 
-      logger.info(`User ${user._id} has changed their password`);
+      await recordAuditEvent({
+        actorId: user._id,
+        actorRole: user.role || 'user',
+        action: 'user:password:change',
+        resourceType: 'User',
+        resourceId: user._id
+      });
+      logger.info('User password changed.');
       res.json({ success: true });
     } catch (err) {
-      logger.error('Password change error:', err);
+      logger.error('Password change failed.', { code: err.code || 'PASSWORD_CHANGE_ERROR' });
       res.status(500).json({ success: false, message: 'Server error during password change' });
     }
 });
@@ -471,34 +490,126 @@ router.post('/delete/:userId', isAuthenticated, async (req, res) => {
       return res.status(403).json({ success: false, message: 'Administrators cannot be deleted by ordinary users.' });
     }
 
+    if (isOwnAccount) {
+      const passwordMatches = await bcrypt.compare(String(req.body.currentPassword || ''), targetUser.password);
+      if (!passwordMatches) {
+        return res.status(400).json({ success: false, message: 'Current password is incorrect.' });
+      }
+    }
+
     if (isAdmin && !isOwnAccount && targetUser.role === 'Admin' && sessionUserId !== targetUser._id.toString()) {
       return res.status(403).json({ success: false, message: 'Administrative deletion requires explicit authorization.' });
     }
 
     try {
-      await User.findByIdAndDelete(userId);
+      const bookings = await Reservation.find({ userId: targetUser._id })
+        .populate({ path: 'flight', select: 'departureDate' })
+        .lean();
+      const hasFutureBooking = bookings.some(booking =>
+        booking.status !== 'Cancelled' && booking.flight.some(flight =>
+          isTodayOrFutureInManila(flight.departureDate)
+        )
+      );
+      if (hasFutureBooking) {
+        return res.status(409).json({
+          success: false,
+          message: 'Cancel future bookings before deleting your account.'
+        });
+      }
+      const deleteAccountData = async session => {
+        const options = session ? { session } : {};
+        for (const booking of bookings) {
+          const unset = {
+            userId: '',
+            privacyNoticeAcceptedBy: '',
+            tripType: '',
+            travelClass: ''
+          };
+          const set = { accountDeletedAt: new Date() };
+          for (let index = 0; index < booking.passengers.length; index += 1) {
+            set[`passengers.${index}.fullName`] = `Passenger ${index + 1}`;
+            set[`passengers.${index}.meal`] = 'None';
+            set[`passengers.${index}.checkedIn`] = false;
+            unset[`passengers.${index}.age`] = '';
+            unset[`passengers.${index}.ageCategory`] = '';
+            unset[`passengers.${index}.gender`] = '';
+            unset[`passengers.${index}.passport`] = '';
+            unset[`passengers.${index}.passportEncrypted`] = '';
+            unset[`passengers.${index}.passportFingerprint`] = '';
+            unset[`passengers.${index}.passportLast3`] = '';
+            unset[`passengers.${index}.seatNumber`] = '';
+            unset[`passengers.${index}.returnSeatNumber`] = '';
+            unset[`passengers.${index}.baggageAllowance`] = '';
+            unset[`passengers.${index}.boardingPass`] = '';
+            unset[`passengers.${index}.mealConsent`] = '';
+          }
+          await Reservation.updateOne({ _id: booking._id }, { $set: set, $unset: unset }, options);
+        }
+        let deletionRequestQuery = PrivacyRequest.findOne({
+          requesterId: targetUser._id,
+          type: 'deletion',
+          status: { $nin: ['COMPLETED', 'REFUSED'] }
+        }).sort({ receivedAt: -1 });
+        if (session) deletionRequestQuery = deletionRequestQuery.session(session);
+        const deletionRequest = await deletionRequestQuery;
+        if (deletionRequest) {
+          deletionRequest.status = 'COMPLETED';
+          deletionRequest.decisionCode = 'ACCOUNT_DELETED';
+          deletionRequest.acknowledgedAt = new Date();
+          deletionRequest.completedAt = deletionRequest.acknowledgedAt;
+          await deletionRequest.save(options);
+          await recordAuditEvent({
+            actorId: targetUser._id,
+            actorRole: targetUser.role || 'user',
+            action: 'privacy:request:completed',
+            resourceType: 'PrivacyRequest',
+            resourceId: deletionRequest._id,
+            correlationId: String(deletionRequest._id),
+            session
+          });
+        }
+        await recordAuditEvent({
+          actorId: targetUser._id,
+          actorRole: targetUser.role || 'user',
+          action: 'user:account:delete',
+          resourceType: 'User',
+          resourceId: targetUser._id,
+          session
+        });
+        await User.deleteOne({ _id: userId }, options);
+      };
+      if (supportsTransactions()) {
+        const session = await mongoose.startSession();
+        try {
+          await session.withTransaction(() => deleteAccountData(session));
+        } finally {
+          await session.endSession();
+        }
+      } else {
+        await deleteAccountData(null);
+      }
 
       if (isOwnAccount) {
         req.session.destroy(err => {
           if (err) {
-            logger.error('Session destruction error:', err);
+            logger.error('Session destruction failed.', { code: err.code || 'SESSION_DESTROY_ERROR' });
           }
-          logger.info(`User deleted ${targetUser.firstName} ${targetUser.lastName}`);
+          logger.info('User account deleted.');
           res.json({ success: true });
         });
         return;
       }
 
-      logger.info(`Admin user deleted account ${targetUser._id}`);
+      logger.info('Admin deleted a user account.');
       res.json({ success: true });
     } catch (err) {
-      logger.error('Account deletion error:', err);
+      logger.error('Account deletion failed.', { code: err.code || 'ACCOUNT_DELETE_ERROR' });
       res.status(500).json({ success: false, message: 'Server error during account deletion' });
     }
 });
 
 // POST /users/forgot-password - Handle forgot password
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', ...authenticationLimits, async (req, res) => {
   const email = normalizeEmail(req.body.email);
 
   try {
@@ -507,13 +618,13 @@ router.post('/forgot-password', async (req, res) => {
       return res.status(200).json({ success: true, message: 'If an account exists, a reset link has been sent.' });
     }
 
-    logger.info(`User ${findUser.lastName} - ${findUser._id} has requested to change their password`);
+    logger.info('Password recovery requested.');
     res.json({ 
       success: true, 
       message: 'If an account exists, a reset link has been sent.'
     });
   } catch (err) {
-    logger.error('Forgot password error:', err);
+    logger.error('Password recovery failed.', { code: err.code || 'PASSWORD_RECOVERY_ERROR' });
     res.status(500).json({ success: false, message: 'Server error during password reset' });
   }
 });

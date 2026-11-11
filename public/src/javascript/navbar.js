@@ -116,7 +116,7 @@ jQuery(function() {
         // ensure that the terms are accepted
         if (!$("#termsCheck").is(":checked")) {
             $(".acceptTerms .invalid-feedback").text("You must accept the terms and conditions");
-            $("#termsCheck").setCustomValidity("You must accept the terms and conditions");
+            $("#termsCheck")[0].setCustomValidity("You must accept the privacy notice");
         } else {
             $("#termsCheck")[0].setCustomValidity("");
         }
@@ -133,7 +133,8 @@ jQuery(function() {
             lastName: $("#lastName").val(),
             email: $("#email").val(),
             password: $("#password").val(),
-            dateOfBirth: $("#dateOfBirth").val()
+            isAdult: $("#isAdult").is(":checked"),
+            privacyNoticeAccepted: $("#termsCheck").is(":checked")
         };
 
         // AJAX POST request for registration
@@ -153,7 +154,7 @@ jQuery(function() {
             },
             error: function(xhr) {
                 // Show error message on failure
-                $("#registerError").text(res.message).show();
+                $("#registerError").text(xhr.responseJSON?.message || 'Registration failed.').show();
             }
         });
     });

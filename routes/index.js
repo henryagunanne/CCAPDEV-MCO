@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
       popularFlights
     });
   } catch (error) {
-    logger.error('Error loading flights:', error);
+    logger.error('Homepage flight listing failed.', { code: error.code || 'FLIGHT_LIST_ERROR' });
     res.status(500).send('Server Error');
   }
 });

@@ -77,8 +77,6 @@
               <tr>
                 <th>#</th>
                 <th>Full Name</th>
-                <th>Gender</th>
-                <th>Age</th>
                 <th>Seat</th>
                 {{#if (eq reservation.tripType "Round-Trip")}}<th>Return Seat</th>{{/if}}
                 <th>Meal</th>
@@ -90,8 +88,6 @@
               <tr>
                 <td>{{inc @index}}</td>
                 <td>{{this.fullName}}</td>
-                <td>{{this.gender}}</td>
-                <td>{{this.age}}</td>
                 <td>{{this.seatNumber}}</td>
                 {{#if (eq ../reservation.tripType "Round-Trip")}}<td>{{this.returnSeatNumber}}</td>{{/if}}
                 <td>{{this.meal}}</td>

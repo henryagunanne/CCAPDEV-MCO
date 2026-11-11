@@ -41,6 +41,21 @@
               <i class="bi bi-journal-bookmark me-2"></i> Reservations
             </a>
           </li>
+          <li class="nav-item mb-2">
+            <a href="/admin/approvals" class="nav-link text-white {{#if (eq title 'Approval Queue')}}active{{/if}}">
+              <i class="bi bi-check2-square me-2"></i> Approvals
+            </a>
+          </li>
+          <li class="nav-item mb-2">
+            <a href="/admin/emergency-access" class="nav-link text-white {{#if (eq title 'Emergency Access')}}active{{/if}}">
+              <i class="bi bi-shield-exclamation me-2"></i> Emergency Access
+            </a>
+          </li>
+          <li class="nav-item mb-2">
+            <a href="/admin/security" class="nav-link text-white {{#if (eq title 'Security Center')}}active{{/if}}">
+              <i class="bi bi-shield-lock me-2"></i> Security Center
+            </a>
+          </li>
         </ul>
       </div>
       <div>

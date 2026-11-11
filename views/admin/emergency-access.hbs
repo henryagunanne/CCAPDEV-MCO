@@ -1,0 +1,42 @@
+<div class="container-fluid px-4 py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="fw-bold text-danger mb-1">Emergency Access</h1>
+      <p class="text-muted mb-0">Track and review emergency privilege requests and expirations.</p>
+    </div>
+    <a href="/admin/security" class="btn btn-outline-danger">Back to Security Center</a>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-body">
+      {{#if grants.length}}
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-danger">
+              <tr>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Permissions</th>
+                <th>Approvals</th>
+                <th>Expires</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each grants}}
+                <tr>
+                  <td>{{this.reason}}</td>
+                  <td><span class="badge bg-danger">{{this.status}}</span></td>
+                  <td>{{this.permissions.length}}</td>
+                  <td>{{this.approvals.length}} / {{this.requiredApprovals}}</td>
+                  <td>{{formatDate this.expiresAt}}</td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      {{else}}
+        <div class="alert alert-secondary mb-0">No emergency access records were found.</div>
+      {{/if}}
+    </div>
+  </div>
+</div>

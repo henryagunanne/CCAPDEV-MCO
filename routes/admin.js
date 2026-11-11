@@ -1,22 +1,20 @@
 // routes/admin.js
 const express = require('express');
+const crypto = require('crypto');
 const router = express.Router();
 const Flight = require('../models/Flight');
 const User = require('../models/User');
 const Reservation = require('../models/Reservation');
-const logger = require('../logs/logger'); 
+const AdminApprovalRequest = require('../models/AdminApprovalRequest');
+const EmergencyAccessGrant = require('../models/EmergencyAccessGrant');
+const logger = require('../logs/logger');
+const { permissions } = require('../config/rbac');
+const { requireAdminAccess, requirePermission, requireStepUpAuthentication } = require('../middleware/adminAuth');
 
 /* ======================================================
    Admin Access Middleware
 ====================================================== */
-router.use((req, res, next) => {
-  if (req.session.user && req.session.user.role === 'Admin') {
-    return next();
-  }
-  return res.status(403).render('error/access-denied', {
-    title: "Access Denied"
-  });
-});
+router.use(requireAdminAccess);
 
 /* ======================================================
   DEBUG LOGGER (optional)
@@ -29,7 +27,7 @@ router.use((req, res, next) => {
 /* ======================================================
   Dashboard Route 
 ====================================================== */
-router.get('/', async (req, res) => {
+router.get('/', requirePermission(permissions.FLIGHT_READ), async (req, res) => {
   try {
     const flights = await Flight.find().lean();
     const users = await User.find().lean();
@@ -90,7 +88,7 @@ router.get('/create', (req, res) => {
 /* ======================================================
   Get All Flights
 ====================================================== */
-router.get('/flights', async (req, res) => {
+router.get('/flights', requirePermission(permissions.FLIGHT_READ), async (req, res) => {
   try {
     const flights = await Flight.find().lean();
 
@@ -138,7 +136,7 @@ router.get('/flights/:flightNumber', async (req, res) => {
 /* ======================================================
   Create Flight API
 ====================================================== */
-router.post('/create', async (req, res) => {
+router.post('/create', requirePermission(permissions.FLIGHT_CREATE), async (req, res) => {
   try {
     let flight = new Flight(req.body);
     const saved = await flight.save();
@@ -158,7 +156,7 @@ router.post('/create', async (req, res) => {
 /* ======================================================
    Update Flight
 ====================================================== */
-router.put('/update/:id', async (req, res) => {
+router.put('/update/:id', requirePermission(permissions.FLIGHT_UPDATE), async (req, res) => {
   try {
     const updatedFlight = await Flight.findByIdAndUpdate(
       req.params.id,
@@ -182,7 +180,7 @@ router.put('/update/:id', async (req, res) => {
 /* ======================================================
    Delete Flight
 ====================================================== */
-router.delete('/delete/:id', async (req, res) => {
+router.delete('/delete/:id', requirePermission(permissions.FLIGHT_DELETE), async (req, res) => {
   try {
     const deletedFlight = await Flight.findByIdAndDelete(req.params.id).lean();
 
@@ -202,7 +200,7 @@ router.delete('/delete/:id', async (req, res) => {
 /* ======================================================
    Reservations
 ====================================================== */
-router.get('/reservations', async (req, res) => {
+router.get('/reservations', requirePermission(permissions.RESERVATION_READ), async (req, res) => {
   try {
     const reservations = await Reservation.find()
       .populate('flight')
@@ -221,7 +219,7 @@ router.get('/reservations', async (req, res) => {
 });
 
 // POST /admin/edit-reservation/:id 
-router.post('/edit-reservation/:reservationId', async (req, res) => {
+router.post('/edit-reservation/:reservationId', requirePermission(permissions.RESERVATION_UPDATE), async (req, res) => {
   const { status } = req.body;
   const { reservationId } = req.params;
   try{
@@ -248,7 +246,7 @@ router.post('/edit-reservation/:reservationId', async (req, res) => {
 });
 
 // POST /admin/delete-reservation/:reservationId
-router.post('/delete-reservation/:reservationId', async (req, res) => {
+router.post('/delete-reservation/:reservationId', requirePermission(permissions.RESERVATION_CANCEL), async (req, res) => {
   const { reservationId } = req.params;
   try {
     const deletedReservation = await Reservation.findByIdAndDelete(reservationId);
@@ -259,8 +257,256 @@ router.post('/delete-reservation/:reservationId', async (req, res) => {
 
     res.json({ success: true });
   } catch (error) {
-    logger.error('Reservation deletion error:', err);
+    logger.error('Reservation deletion error:', error);
     res.status(500).send('Server error during Reservation deletion');
+  }
+});
+
+// GET /admin/security - Security Center
+router.get('/security', requirePermission(permissions.SECURITY_REVIEW), async (req, res) => {
+  try {
+    const approvals = await AdminApprovalRequest.find({ status: 'PENDING_APPROVAL' }).sort({ createdAt: -1 }).limit(10).lean();
+    const emergency = await EmergencyAccessGrant.find({ status: 'PENDING_APPROVAL' }).sort({ createdAt: -1 }).limit(10).lean();
+
+    res.render('admin/security', {
+      layout: 'admin',
+      title: 'Security Center',
+      approvals,
+      emergency,
+      user: req.session.user
+    });
+  } catch (error) {
+    logger.error('Security center retrieval failed:', error);
+    res.status(500).render('error/server-error', { layout: 'admin', title: 'Security Error' });
+  }
+});
+
+router.get('/approvals', requirePermission(permissions.ADMIN_ROLE_ASSIGN), async (req, res) => {
+  try {
+    const approvals = await AdminApprovalRequest.find().sort({ createdAt: -1 }).lean();
+
+    res.render('admin/approvals', {
+      layout: 'admin',
+      title: 'Approval Queue',
+      approvals,
+      user: req.session.user
+    });
+  } catch (error) {
+    logger.error('Approval page retrieval failed:', error);
+    res.status(500).render('error/server-error', { layout: 'admin', title: 'Approval Queue Error' });
+  }
+});
+
+// GET /admin/emergency-access - Emergency Access Page
+router.get('/emergency-access', requirePermission(permissions.SECURITY_REVIEW), async (req, res) => {
+  try {
+    const grants = await EmergencyAccessGrant.find().sort({ createdAt: -1 }).lean();
+
+    res.render('admin/emergency-access', {
+      layout: 'admin',
+      title: 'Emergency Access',
+      grants,
+      user: req.session.user
+    });
+  } catch (error) {
+    logger.error('Emergency access page retrieval failed:', error);
+    res.status(500).render('error/server-error', { layout: 'admin', title: 'Emergency Access Error' });
+  }
+});
+
+// POST /admin/sensitive-test - Test Step-Up Authentication
+router.post('/sensitive-test', requirePermission(permissions.FLIGHT_UPDATE), requireStepUpAuthentication([permissions.FLIGHT_UPDATE], 5 * 60 * 1000), async (req, res) => {
+  res.status(200).json({ success: true, message: 'Step-up authentication verified.' });
+});
+
+
+// POST /admin/approvals - Create Approval Request
+router.post('/approvals', requirePermission(permissions.ADMIN_ROLE_ASSIGN), async (req, res) => {
+  try {
+    const { action, resourceType = 'system', resourceId = '', payload = {}, reason = '', amount = 0 } = req.body;
+
+    if (!action) {
+      return res.status(400).json({ success: false, message: 'Action is required.' });
+    }
+
+    const requestedBy = req.session.user._id;
+    const requiredApprovals = Number(amount) > 5000 ? 2 : 1;
+    const payloadHash = crypto.createHash('sha256').update(JSON.stringify(payload)).digest('hex');
+    const request = await AdminApprovalRequest.create({
+      requesterId: requestedBy,
+      action,
+      resourceType,
+      resourceId,
+      payload,
+      totalAmount: Number(amount) || 0,
+      payloadHash,
+      requiredApprovals,
+      reason,
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      status: 'PENDING_APPROVAL'
+    });
+
+    res.status(202).json({
+      success: true,
+      approvalId: request._id,
+      status: request.status,
+      requiredApprovals,
+      expiresAt: request.expiresAt
+    });
+  } catch (error) {
+    logger.error('Approval request creation failed:', error);
+    res.status(500).json({ success: false, message: 'Unable to create approval request.' });
+  }
+});
+
+// POST /admin/approvals/:approvalId/approve - Approve an Admin Approval Request
+router.get('/approvals', requirePermission(permissions.ADMIN_ROLE_ASSIGN), async (req, res) => {
+  try {
+    const approvals = await AdminApprovalRequest.find({
+      status: 'PENDING_APPROVAL'
+    }).sort({ createdAt: -1 }).lean();
+
+    res.status(200).json({ success: true, approvals });
+  } catch (error) {
+    logger.error('Approval retrieval failed:', error);
+    res.status(500).json({ success: false, message: 'Unable to retrieve approvals.' });
+  }
+});
+
+// POST /admin/approvals/:approvalId/approve - Approve an Admin Approval Request
+router.post('/approvals/:approvalId/approve', requirePermission(permissions.ADMIN_ROLE_ASSIGN), requireStepUpAuthentication([permissions.ADMIN_ROLE_ASSIGN], 5 * 60 * 1000), async (req, res) => {
+  try {
+    const { approvalId } = req.params;
+    const { comment = '' } = req.body;
+    const approverId = req.session.user._id;
+
+    const request = await AdminApprovalRequest.findById(approvalId);
+    if (!request) {
+      return res.status(404).json({ success: false, message: 'Approval request not found.' });
+    }
+
+    if (request.requesterId.toString() === approverId.toString()) {
+      return res.status(403).json({ success: false, message: 'You cannot approve your own request.' });
+    }
+
+    if (request.status !== 'PENDING_APPROVAL') {
+      return res.status(409).json({ success: false, message: 'This approval request is no longer pending.' });
+    }
+
+    if (new Date(request.expiresAt).getTime() < Date.now()) {
+      request.status = 'EXPIRED';
+      await request.save();
+      return res.status(409).json({ success: false, message: 'This approval request has expired.' });
+    }
+
+    const alreadyApproved = request.approvals.some((entry) => entry.approverId.toString() === approverId.toString());
+    if (alreadyApproved) {
+      return res.status(409).json({ success: false, message: 'This approver has already acted on this request.' });
+    }
+
+    request.approvals.push({
+      approverId,
+      status: 'APPROVED',
+      comment,
+      approvedAt: new Date()
+    });
+
+    if (request.approvals.length >= request.requiredApprovals) {
+      request.status = 'APPROVED';
+      request.updatedAt = new Date();
+    }
+
+    await request.save();
+
+    res.status(200).json({
+      success: true,
+      approvalId: request._id,
+      status: request.status,
+      approvals: request.approvals.length
+    });
+  } catch (error) {
+    logger.error('Approval failed:', error);
+    res.status(500).json({ success: false, message: 'Unable to approve request.' });
+  }
+});
+
+// POST /admin/approvals/:approvalId/reject - Reject an Admin Approval Request
+router.post('/emergency-access', requirePermission(permissions.SECURITY_REVIEW), async (req, res) => {
+  try {
+    const { reason = '', permissions: grantedPermissions = [], durationMinutes = 60 } = req.body;
+
+    if (!reason || grantedPermissions.length === 0) {
+      return res.status(400).json({ success: false, message: 'Emergency access reason and permissions are required.' });
+    }
+
+    const request = await EmergencyAccessGrant.create({
+      requestedBy: req.session.user._id,
+      reason,
+      permissions: grantedPermissions,
+      requiredApprovals: 2,
+      expiresAt: new Date(Date.now() + Number(durationMinutes || 60) * 60 * 1000),
+      status: 'PENDING_APPROVAL'
+    });
+
+    res.status(202).json({ success: true, grantId: request._id, status: request.status });
+  } catch (error) {
+    logger.error('Emergency access request failed:', error);
+    res.status(500).json({ success: false, message: 'Unable to create emergency access request.' });
+  }
+});
+
+// POST /admin/emergency-access/:grantId/approve - Approve an Emergency Access Request
+router.post('/emergency-access/:grantId/approve', requirePermission(permissions.SECURITY_REVIEW), requireStepUpAuthentication([permissions.SECURITY_REVIEW], 5 * 60 * 1000), async (req, res) => {
+  try {
+    const { grantId } = req.params;
+    const approverId = req.session.user._id;
+
+    const grant = await EmergencyAccessGrant.findById(grantId);
+    if (!grant) {
+      return res.status(404).json({ success: false, message: 'Emergency access grant not found.' });
+    }
+
+    if (grant.requestedBy.toString() === approverId.toString()) {
+      return res.status(403).json({ success: false, message: 'The requester cannot approve their own emergency access.' });
+    }
+
+    const alreadyApproved = grant.approvals.some((entry) => entry.approverId.toString() === approverId.toString());
+    if (alreadyApproved) {
+      return res.status(409).json({ success: false, message: 'This approver has already approved this grant.' });
+    }
+
+    grant.approvals.push({ approverId, role: req.session.user.role || 'custodian', approvedAt: new Date() });
+    if (grant.approvals.length >= grant.requiredApprovals) {
+      grant.status = 'APPROVED';
+      grant.startedAt = new Date();
+    }
+    await grant.save();
+
+    res.status(200).json({ success: true, grantId: grant._id, status: grant.status, approvals: grant.approvals.length });
+  } catch (error) {
+    logger.error('Emergency approval failed:', error);
+    res.status(500).json({ success: false, message: 'Unable to approve emergency access.' });
+  }
+});
+
+
+// POST /admin/emergency-access/:grantId/revoke - Revoke an Emergency Access Request
+router.post('/emergency-access/:grantId/revoke', requirePermission(permissions.SECURITY_REVIEW), async (req, res) => {
+  try {
+    const { grantId } = req.params;
+    const grant = await EmergencyAccessGrant.findById(grantId);
+    if (!grant) {
+      return res.status(404).json({ success: false, message: 'Emergency access grant not found.' });
+    }
+
+    grant.status = 'REVOKED';
+    grant.expiresAt = new Date();
+    await grant.save();
+
+    res.status(200).json({ success: true, grantId: grant._id, status: grant.status });
+  } catch (error) {
+    logger.error('Emergency revoke failed:', error);
+    res.status(500).json({ success: false, message: 'Unable to revoke emergency access.' });
   }
 });
 

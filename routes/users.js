@@ -3,11 +3,75 @@ const express = require('express');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs'); // for password hashing and comparison
 const router = express.Router();
-const logger = require('../logs/logger'); 
+const logger = require('../logs/logger');
+const AuditLog = require('../models/AuditLog');
+const { getEffectivePermissions, isAdminAccount } = require('../config/rbac');
+const { generateSecret, generateQrCodeDataUrl, verifyToken, buildOtpAuthUrl } = require('../services/mfa');
+
+
+/** * Build a safe user object for session storage, excluding sensitive information.
+ * @param {Object} user - The user object from the database.
+ * @returns {Object} - A safe user object for session storage.
+ */
+function buildSessionUser(user) {
+  const permissions = getEffectivePermissions(user);
+  const status = user.status || 'active';
+  const isAdmin = isAdminAccount(user);
+
+  return {
+    _id: user._id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    role: user.role,
+    roles: Array.isArray(user.roles) ? user.roles : [],
+    permissions,
+    status,
+    mfaEnabled: Boolean(user.mfaEnabled),
+    mfaVerified: Boolean(user.mfaVerified),
+    isAdmin
+  };
+}
+
+/** * Record an audit log entry for administrative actions.
+ * @param {Object} params - Parameters for the audit log entry.
+ * @param {string} params.actorId - ID of the user performing the action.
+ * @param {string} params.actorRole - Role of the user performing the action.
+ * @param {string} params.action - Action performed (e.g., 'admin:login').
+ * @param {string} [params.resourceType='system'] - Type of resource affected (e.g., 'User', 'Flight').
+ * @param {string} [params.resourceId=''] - ID of the resource affected.
+ * @param {string} [params.result='SUCCESS'] - Result of the action ('SUCCESS' or 'FAILURE').
+ * @param {string} [params.approvalId=''] - ID of any approval associated with the action.
+ * @param {string} [params.reason=''] - Reason for failure, if applicable.
+ * @param {string} [params.correlationId=''] - Correlation ID for tracing related actions.
+ */
+async function recordAuditLog({ actorId, actorRole, action, resourceType = 'system', resourceId = '', result = 'SUCCESS', approvalId = '', reason = '', correlationId = '' }) {
+  try {
+    await AuditLog.create({
+      actorId,
+      actorRole,
+      action,
+      resourceType,
+      resourceId,
+      result,
+      approvalId,
+      reason,
+      correlationId
+    });
+  } catch (error) {
+    logger.error('Audit log creation failed:', error);
+  }
+}
 
 // Middleware to check if user is authenticated
 function isAuthenticated(req, res, next) {
     if (req.session.user) {
+      if (req.session.user.status === 'disabled' || req.session.user.status === 'suspended') {
+        return res.status(403).render('error/access-denied', {
+          title: 'Access Denied',
+          message: 'This account is disabled.'
+        });
+      }
       return next();
     }else {
       res.status(403).render('error/access-denied', { 
@@ -66,25 +130,54 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
   
     try {
-      const user = await User.findOne({ email: email }).lean();
-  
+      const user = await User.findOne({ email: email });
+      
+      // Check if user exists
       if (!user) {
+        // Record audit log for failed login attempt
+        await recordAuditLog({ actorRole: 'anonymous', action: 'admin:login', resourceType: 'User', result: 'FAILURE', reason: 'User not found' });
         return res.status(400).json({ message: 'User not found' });
       }
-  
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(400).json({ message:'Invalid password' });
+
+      // Check if user is disabled or suspended
+      if (user.status === 'disabled' || user.status === 'suspended') {
+        await recordAuditLog({ actorId: user._id, actorRole: user.role || 'user', action: 'admin:login', resourceType: 'User', result: 'FAILURE', reason: 'Account disabled' });
+        return res.status(403).json({ message: 'This user account is disabled.' });
       }
   
-      // Password matched
-      req.session.user = user; // store user in session
-      req.session.user.role = user.role; // store user role in session
-      logger.info(`${user.firstName} - ${user._id} logged in`);
-      return res.status(200).json({ 
-        success: true, 
-        isAdmin: req.session.user.role === 'Admin',
-        message: `Welcome, ${user.firstName}!` 
+      // Compare the provided password with the stored hashed password
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        await recordAuditLog({ actorId: user._id, actorRole: user.role || 'user', action: 'admin:login', resourceType: 'User', result: 'FAILURE', reason: 'Invalid password' });
+        return res.status(400).json({ message:'Invalid password' });
+      }
+
+      // Update last login timestamp and handle MFA verification status
+      user.lastLoginAt = new Date();
+      if (user.role === 'Admin' && user.mfaEnabled && !user.mfaVerified) {
+        user.mfaVerified = false;
+      }
+      
+      req.session.regenerate((err) => {
+        if (err) {
+          logger.error('Session regeneration error:', err);
+          return res.status(500).json({ message: 'Login failed.' });
+        }
+
+        const safeSessionUser = buildSessionUser(user);
+        req.session.user = safeSessionUser;
+        req.session.user.role = user.role;
+        req.session.stepUp = null;
+
+        logger.info(`${user.firstName} - ${user._id} logged in`);
+        recordAuditLog({ actorId: user._id, actorRole: user.role || 'user', action: 'admin:login', resourceType: 'User', result: 'SUCCESS', reason: 'Successful login' }).catch(() => {});
+
+        return res.status(200).json({ 
+          success: true, 
+          isAdmin: req.session.user.role === 'Admin',
+          mfaRequired: Boolean(user.mfaEnabled && !user.mfaVerified),
+          message: `Welcome, ${user.firstName}!` 
+        });
       });
 
     } catch (err) {
@@ -93,8 +186,77 @@ router.post('/login', async (req, res) => {
     }
 });
 
+// GET /users/mfa/setup - Initialize admin MFA enrollment
+router.get('/mfa/setup', isAuthenticated, async (req, res) => {
+  try {
+    const user = await User.findById(req.session.user._id);
+    if (!user || user.role !== 'Admin') {
+      return res.status(403).json({ success: false, message: 'Administrative access required.' });
+    }
+
+    if (!user.mfaSecret) {
+      user.mfaSecret = generateSecret();
+      user.mfaEnabled = true;
+      user.mfaVerified = false;
+      await user.save();
+    }
+
+    const qrCode = await generateQrCodeDataUrl(user.email, user.mfaSecret);
+    
+    return res.status(200).json({
+      success: true,
+      secret: user.mfaSecret,
+      otpAuthUrl: buildOtpAuthUrl(user.email, user.mfaSecret),
+      qrCode
+    });
+  } catch (error) {
+    logger.error('MFA enrollment error:', error);
+    return res.status(500).json({ success: false, message: 'Unable to configure MFA.' });
+  }
+});
+
+// POST /users/mfa/verify - Verify MFA token to complete admin login
+router.post('/mfa/verify', isAuthenticated, async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    const user = await User.findById(req.session.user._id);
+    if (!user || user.role !== 'Admin') {
+      return res.status(403).json({ success: false, message: 'Administrative access required.' });
+    }
+
+    if (!user.mfaSecret) {
+      return res.status(400).json({ success: false, message: 'MFA is not configured.' });
+    }
+
+    const isValid = verifyToken(user.mfaSecret, String(token || '').trim());
+    if (!isValid) {
+      return res.status(400).json({ success: false, message: 'Invalid MFA code.' });
+    }
+
+    user.mfaVerified = true;
+    user.lastMfaVerifiedAt = new Date();
+    await user.save();
+
+    req.session.user.mfaVerified = true;
+    req.session.user.mfaEnabled = true;
+    req.session.stepUp = {
+      verifiedAt: new Date().toISOString(),
+      method: 'mfa'
+    };
+    logger.info(`Admin MFA verification succeeded for ${user.email}`);
+    await recordAuditLog({ actorId: user._id, actorRole: user.role || 'Admin', action: 'admin:mfa:verify', resourceType: 'User', result: 'SUCCESS', reason: 'MFA verification succeeded' });
+
+    return res.status(200).json({ success: true, message: 'MFA verification succeeded.' });
+  } catch (error) {
+    logger.error('MFA verification error:', error);
+    return res.status(500).json({ success: false, message: 'Unable to verify MFA code.' });
+  }
+});
+
 // POST /users/logout - Handle user logout
 router.post('/logout', isAuthenticated, (req, res) => {
+    req.session.stepUp = null;
     req.session.destroy(err => {
       if (err) {
         logger.error('Logout error:', err);

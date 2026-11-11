@@ -22,6 +22,8 @@ describe("Admin Tasks and Privileges", () => {
                 email: "admin@test.com",
                 dateOfBirth: new Date(),
                 role: "Admin",
+                roles: ['flight_operations_admin'],
+                permissions: ['flight:read', 'flight:create', 'flight:update', 'flight:delete']
             });
             await admin.save(); // save admin user
 
@@ -87,6 +89,34 @@ describe("Admin Tasks and Privileges", () => {
         });
     });
 
-    
+    describe('Sensitive admin actions and approvals', () => {
+        it('Sensitive admin routes require step-up authentication', async () => {
+            const admin = new User({
+                firstName: 'Step',
+                lastName: 'Up',
+                password: 'stepupadmin123',
+                email: 'stepup@test.com',
+                dateOfBirth: new Date(),
+                role: 'Admin',
+                roles: ['flight_operations_admin'],
+                permissions: ['flight:read', 'flight:update'],
+                mfaEnabled: true,
+                mfaVerified: true,
+                status: 'active'
+            });
+            await admin.save();
+
+            await agent
+                .post('/users/login')
+                .send({ email: 'stepup@test.com', password: 'stepupadmin123' });
+
+            const res = await agent
+                .post('/admin/sensitive-test')
+                .send({});
+
+            expect(res.statusCode).toEqual(403);
+            expect(res.body.code).toBe('STEP_UP_REQUIRED');
+        });
+    });
 
 });

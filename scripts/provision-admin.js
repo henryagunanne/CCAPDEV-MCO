@@ -4,6 +4,11 @@ const mongoose = require('mongoose');
 const User = require('../models/User');
 const { mongoUri } = require('../config/env');
 
+/**
+ * Prompt the user for input in the command line.
+ * @param {string} question - The question to ask the user.
+ * @returns {Promise<string>} - A promise that resolves with the user's input.
+ */
 function askQuestion(question) {
   return new Promise((resolve) => {
     const rl = require('readline').createInterface({
@@ -18,6 +23,12 @@ function askQuestion(question) {
   });
 }
 
+
+/**
+ * Prompt the user for hidden input (e.g., password) in the command line.
+ * @param {string} promptText - The prompt text to display to the user.
+ * @returns {Promise<string>} - A promise that resolves with the user's input.
+ */
 function askHidden(promptText) {
   return new Promise((resolve, reject) => {
     if (!process.stdin.isTTY) {
@@ -72,10 +83,17 @@ function askHidden(promptText) {
   });
 }
 
+
+/** * Validate the email format.
+ * @param {string} email - The email address to validate.
+ * @returns {boolean} - True if the email is valid, false otherwise.
+ */
 function validateEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+
+/** * Main function to provision the administrator account. */
 async function main() {
   const cliEmail = process.argv[2];
   const emailInput = cliEmail || (await askQuestion('Administrator email: '));
@@ -107,7 +125,19 @@ async function main() {
     email,
     password,
     dateOfBirth: new Date('2000-01-01'),
-    role: 'Admin'
+    role: 'Admin',
+    roles: ['flight_operations_admin', 'reservation_support_admin', 'finance_admin', 'user_access_admin', 'security_audit_admin'],
+    permissions: [
+      'flight:read', 'flight:create', 'flight:update', 'flight:delete',
+      'reservation:read', 'reservation:update', 'reservation:cancel',
+      'finance:read', 'refund:create', 'refund:approve',
+      'user:create', 'user:update', 'user:disable', 'user:reactivate',
+      'admin:role:assign', 'admin:access:revoke', 'audit:read', 'security:review',
+      'passenger:edit', 'operational:flight:update', 'aircraft:assign'
+    ],
+    mfaEnabled: true,
+    mfaVerified: true,
+    status: 'active'
   });
 
   await adminUser.save();

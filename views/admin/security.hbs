@@ -1,0 +1,84 @@
+<div class="container-fluid px-4 py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="fw-bold text-danger mb-1">Security Center</h1>
+      <p class="text-muted mb-0">Admin security monitoring, approvals, and emergency access oversight.</p>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <div class="col-md-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body">
+          <h5 class="card-title text-danger">Pending Approvals</h5>
+          <div class="list-group list-group-flush mt-3">
+            {{#if approvals.length}}
+              {{#each approvals}}
+                <div class="list-group-item">
+                  <div class="d-flex justify-content-between">
+                    <strong>{{this.action}}</strong>
+                    <span class="badge bg-warning text-dark">{{this.status}}</span>
+                  </div>
+                  <small class="text-muted">Request ID: {{this._id}}</small>
+                  <div class="small mt-2">Required approvals: {{this.requiredApprovals}} · Total amount: ₱{{this.totalAmount}}</div>
+                </div>
+              {{/each}}
+            {{else}}
+              <div class="text-muted py-2">No pending approval requests.</div>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body">
+          <h5 class="card-title text-danger">Emergency Access Requests</h5>
+          <div class="list-group list-group-flush mt-3">
+            {{#if emergency.length}}
+              {{#each emergency}}
+                <div class="list-group-item">
+                  <div class="d-flex justify-content-between">
+                    <strong>{{this.reason}}</strong>
+                    <span class="badge bg-danger">{{this.status}}</span>
+                  </div>
+                  <small class="text-muted">Expires: {{formatDate this.expiresAt}}</small>
+                  <div class="small mt-2">Permissions: {{#if this.permissions}}{{this.permissions.length}}{{else}}0{{/if}}</div>
+                </div>
+              {{/each}}
+            {{else}}
+              <div class="text-muted py-2">No pending emergency access requests.</div>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-body">
+      <h5 class="card-title text-danger">Security Controls</h5>
+      <div class="row mt-3 g-3">
+        <div class="col-md-4">
+          <div class="border rounded p-3 h-100">
+            <div class="fw-semibold mb-2">MFA Status</div>
+            <div class="text-muted">{{#if user.mfaVerified}}Verified{{else}}Pending{{/if}}</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="border rounded p-3 h-100">
+            <div class="fw-semibold mb-2">Step-up Window</div>
+            <div class="text-muted">5 minutes</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="border rounded p-3 h-100">
+            <div class="fw-semibold mb-2">Approval Window</div>
+            <div class="text-muted">24 hours</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

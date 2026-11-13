@@ -2,6 +2,9 @@ const request = require('supertest');
 const app = require('../server'); // Import the Express app
 const User = require('../models/User');
 const AuditLog = require('../models/AuditLog');
+const Flight = require('../models/Flight');
+const AircraftLayout = require('../models/AircraftLayout');
+const Reservation = require('../models/Reservation');
 const speakeasy = require('speakeasy');
 const {
     decryptSecret,
@@ -99,6 +102,44 @@ describe("Admin Tasks and Privileges", () => {
     
             expect(res.statusCode).toEqual(201);
             expect(res.body).toHaveProperty('message', 'Flight created successfully.');
+            expect(res.body.flight.aircraftLayoutId).toBeTruthy();
+            const savedLayout = await AircraftLayout.findById(res.body.flight.aircraftLayoutId).lean();
+            expect(savedLayout.seatCapacity).toBe(180);
+            expect(savedLayout.seats.slice(0, 10).map(seat => seat.seatNumber)).toEqual(
+                ['1A', '1B', '1C', '1D', '1E', '1F', '1G', '1H', '1I', '1J']
+            );
+        });
+
+        it('rejects aircraft or capacity changes when reservations already reference the flight', async () => {
+            const admin = new User({
+                firstName: 'Update', lastName: 'Admin', password: 'adminpass123',
+                email: 'flight-update-admin@test.com', role: 'Admin',
+                roles: ['flight_operations_admin'],
+                permissions: ['flight:read', 'flight:create', 'flight:update']
+            });
+            await admin.save();
+            await signInAdmin('flight-update-admin@test.com', 'adminpass123');
+            const created = await agent.post('/admin/create').set('x-csrf-token', csrfToken).send({
+                flightNumber: 'AA1991', origin: 'Manila (MNL)', destination: 'Cebu (CEB)',
+                departureDate: '2027-01-15', departureTime: '08:00', arrivalTime: '09:30',
+                aircraft: 'Airbus A320', seatCapacity: 100, price: 2000, status: 'Scheduled'
+            }).expect(201);
+            await Reservation.create({
+                bookingReference: 'TEST-LOCKED-FLIGHT',
+                flight: [created.body.flight._id],
+                tripType: 'One-Way', travelClass: 'Economy',
+                passengers: [{ fullName: 'Booked Passenger', seatNumber: '1A' }],
+                price: 2000
+            });
+            await agent.put(`/admin/update/${created.body.flight._id}`)
+                .set('x-csrf-token', csrfToken)
+                .send({
+                    flightNumber: 'AA1991', origin: 'Manila (MNL)', destination: 'Cebu (CEB)',
+                    departureDate: '2027-01-15', departureTime: '08:00', arrivalTime: '09:30',
+                    aircraft: 'Airbus A320', seatCapacity: 110, price: 2000, status: 'Scheduled'
+                }).expect(409);
+            const unchanged = await Flight.findById(created.body.flight._id).lean();
+            expect(unchanged.seatCapacity).toBe(100);
         });
 
         // test normal user creating flight

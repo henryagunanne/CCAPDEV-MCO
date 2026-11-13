@@ -5,6 +5,8 @@ const router = express.Router();
 const Flight = require('../models/Flight');
 const User = require('../models/User');
 const Reservation = require('../models/Reservation');
+const SeatAllocation = require('../models/SeatAllocation');
+const { ensureAircraftLayout, MAX_CAPACITY } = require('../services/seatAllocationService');
 const AuditLog = require('../models/AuditLog');
 const AdminApprovalRequest = require('../models/AdminApprovalRequest');
 const EmergencyAccessGrant = require('../models/EmergencyAccessGrant');
@@ -35,6 +37,13 @@ const {
 } = require('../services/mfa');
 
 const MFA_REENROLLMENT_TTL_MS = 5 * 60 * 1000;
+
+function isValidFlightDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const parsed = new Date(`${value}T00:00:00.000Z`);
+  return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+}
+
 
 /** * Hashes the provided recovery code using SHA-256.
  * @param {string} challengeId - The challenge ID to hash.
@@ -310,20 +319,59 @@ router.get('/flights/:flightNumber', requirePermission(permissions.FLIGHT_READ),
 /* ======================================================
   Create Flight API
 ====================================================== */
+
 router.post('/create', requirePermission(permissions.FLIGHT_CREATE), async (req, res) => {
   try {
-    let flight = new Flight(req.body);
+    const allowed = new Set([
+      'flightNumber', 'origin', 'destination', 'departureDate',
+      'departureTime', 'arrivalTime', 'aircraft', 'seatCapacity', 'price', 'status'
+    ]);
+    if (Object.keys(req.body).some(key => !allowed.has(key))) {
+      return res.status(400).json({ success: false, message: 'Unsupported flight field supplied.' });
+    }
+    const values = {
+      flightNumber: String(req.body.flightNumber || '').trim(),
+      origin: String(req.body.origin || '').trim(),
+      destination: String(req.body.destination || '').trim(),
+      departureDate: String(req.body.departureDate || '').trim(),
+      departureTime: String(req.body.departureTime || '').trim(),
+      arrivalTime: String(req.body.arrivalTime || '').trim(),
+      aircraft: String(req.body.aircraft || '').trim(),
+      seatCapacity: Number(req.body.seatCapacity),
+      price: Number(req.body.price),
+      status: req.body.status || 'Scheduled'
+    };
+    if (!values.flightNumber || !values.origin || !values.destination ||
+        values.origin === values.destination ||
+        !isValidFlightDate(values.departureDate) ||
+        !/^([01]\d|2[0-3]):[0-5]\d$/.test(values.departureTime) ||
+        !/^([01]\d|2[0-3]):[0-5]\d$/.test(values.arrivalTime) ||
+        !values.aircraft || !Number.isInteger(values.seatCapacity) ||
+        values.seatCapacity < 1 || values.seatCapacity > MAX_CAPACITY ||
+        !Number.isFinite(values.price) || values.price < 0 ||
+        !['Scheduled', 'On Time', 'Delayed', 'Cancelled'].includes(values.status)) {
+      return res.status(400).json({ success: false, message: 'Check the required flight fields, schedule, capacity (1–300), price, and status.' });
+    }
+
+    const layout = await ensureAircraftLayout(values.aircraft, values.seatCapacity);
+    const flight = new Flight({ ...values, bookedSeats: 0, aircraftLayoutId: layout._id });
     const saved = await flight.save();
-
-    res.status(201).json({
-      message: 'Flight created successfully.',
-      flight: saved
+    await recordAuditEvent({
+      actorId: req.session.user._id,
+      actorRole: req.session.user.role || 'Admin',
+      action: 'flight:create',
+      resourceType: 'Flight',
+      resourceId: saved._id
     });
-
-    logger.info('Flight created successfully.');
+    return res.status(201).json({ success: true, message: 'Flight created successfully.', flight: saved });
   } catch (err) {
+    if (err instanceof BookingInputError) return res.status(err.statusCode).json({ success: false, message: err.message });
+    if (err.code === 11000) return res.status(409).json({ success: false, message: 'A flight with that flight number already exists.' });
+    if (err.name === 'ValidationError' || err instanceof RangeError) {
+      return res.status(400).json({ success: false, message: err.message });
+    }
     logger.error('Flight creation failed.', { code: err.code || 'FLIGHT_CREATE_ERROR' });
-    res.status(500).json({ message: 'Error creating flight.' });
+    return res.status(500).json({ success: false, message: 'Error creating flight.' });
   }
 });
 
@@ -332,22 +380,75 @@ router.post('/create', requirePermission(permissions.FLIGHT_CREATE), async (req,
 ====================================================== */
 router.put('/update/:id', requirePermission(permissions.FLIGHT_UPDATE), async (req, res) => {
   try {
-    const updatedFlight = await Flight.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    ).lean();
+    const allowed = new Set([
+      'flightNumber', 'origin', 'destination', 'departureDate',
+      'departureTime', 'arrivalTime', 'aircraft', 'seatCapacity', 'price', 'status'
+    ]);
+    if (Object.keys(req.body).some(key => !allowed.has(key))) {
+      return res.status(400).json({ success: false, message: 'Unsupported flight field supplied.' });
+    }
+    const flightId = validateObjectId(req.params.id, 'Flight ID');
+    const flight = await Flight.findById(flightId);
+    if (!flight) return res.status(404).json({ success: false, message: 'Flight not found.' });
 
-    if (!updatedFlight) {
-      return res.status(404).json({ message: 'Flight not found.' });
+    const values = {
+      flightNumber: String(req.body.flightNumber || '').trim(),
+      origin: String(req.body.origin || '').trim(),
+      destination: String(req.body.destination || '').trim(),
+      departureDate: String(req.body.departureDate || '').trim(),
+      departureTime: String(req.body.departureTime || '').trim(),
+      arrivalTime: String(req.body.arrivalTime || '').trim(),
+      aircraft: String(req.body.aircraft || '').trim(),
+      seatCapacity: Number(req.body.seatCapacity),
+      price: Number(req.body.price),
+      status: req.body.status || 'Scheduled'
+    };
+    if (!values.flightNumber || !values.origin || !values.destination ||
+        values.origin === values.destination ||
+        !isValidFlightDate(values.departureDate) ||
+        !/^([01]\d|2[0-3]):[0-5]\d$/.test(values.departureTime) ||
+        !/^([01]\d|2[0-3]):[0-5]\d$/.test(values.arrivalTime) ||
+        !values.aircraft || !Number.isInteger(values.seatCapacity) ||
+        values.seatCapacity < 1 || values.seatCapacity > MAX_CAPACITY ||
+        !Number.isFinite(values.price) || values.price < 0 ||
+        !['Scheduled', 'On Time', 'Delayed', 'Cancelled'].includes(values.status)) {
+      return res.status(400).json({ success: false, message: 'Check the required flight fields, schedule, capacity (1–300), price, and status.' });
     }
 
-    res.json({ message: 'Flight updated successfully.', flight: updatedFlight });
-    logger.info('Flight updated successfully.');
+    const layoutChanged = values.aircraft !== flight.aircraft || values.seatCapacity !== flight.seatCapacity;
+    if (layoutChanged) {
+      const [allocationCount, reservationCount] = await Promise.all([
+        SeatAllocation.countDocuments({ flightId: flight._id }),
+        Reservation.countDocuments({ flight: flight._id })
+      ]);
+      if (allocationCount > 0 || reservationCount > 0 || Number(flight.bookedSeats || 0) > 0) {
+        return res.status(409).json({
+          success: false,
+          message: 'Aircraft or seat capacity cannot be changed after reservations or seat allocations exist. Use a controlled migration that preserves assigned seats.'
+        });
+      }
+      const layout = await ensureAircraftLayout(values.aircraft, values.seatCapacity);
+      flight.aircraftLayoutId = layout._id;
+    }
 
+    Object.assign(flight, values);
+    const updatedFlight = await flight.save();
+    await recordAuditEvent({
+      actorId: req.session.user._id,
+      actorRole: req.session.user.role || 'Admin',
+      action: 'flight:update',
+      resourceType: 'Flight',
+      resourceId: updatedFlight._id
+    });
+    return res.json({ success: true, message: 'Flight updated successfully.', flight: updatedFlight });
   } catch (err) {
+    if (err instanceof BookingInputError) return res.status(err.statusCode).json({ success: false, message: err.message });
+    if (err.code === 11000) return res.status(409).json({ success: false, message: 'A flight with that flight number already exists.' });
+    if (err.name === 'ValidationError' || err instanceof RangeError) {
+      return res.status(400).json({ success: false, message: err.message });
+    }
     logger.error('Flight update failed.', { code: err.code || 'FLIGHT_UPDATE_ERROR' });
-    res.status(500).json({ message: 'Error updating flight.' });
+    return res.status(500).json({ success: false, message: 'Error updating flight.' });
   }
 });
 

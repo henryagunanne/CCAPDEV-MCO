@@ -172,3 +172,90 @@ footer {
 .seat-row .seat {
   margin: 0 6px; /* adds horizontal space between seats */
 }
+
+/* Ten-column A–J aircraft seat map */
+.seat-grid-wrap {
+  width: 100%;
+  overflow-x: auto;
+  padding: 0.75rem 0.25rem;
+}
+.seat-grid {
+  display: grid;
+  grid-template-columns: 2rem repeat(10, minmax(2.7rem, 1fr));
+  gap: 0.4rem;
+  min-width: 540px;
+  max-width: 850px;
+  margin: 0 auto;
+  align-items: center;
+}
+.seat-grid-corner,
+.seat-column-heading,
+.seat-row-heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.75rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #495057;
+}
+.seat-row-heading {
+  color: #6c757d;
+}
+.seat-grid .seat {
+  width: 100%;
+  min-width: 0;
+  height: 2.45rem;
+  margin: 0;
+  padding: 0.15rem;
+  border: 1px solid #adb5bd;
+  border-radius: 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.seat-grid .seat.available {
+  background: #fff;
+  color: #198754;
+  border-color: #198754;
+}
+.seat-grid .seat.available:hover {
+  background: #d1e7dd;
+}
+.seat-grid .seat.class-unavailable {
+  background: #e9ecef;
+  color: #adb5bd;
+  border-color: #dee2e6;
+  cursor: not-allowed;
+}
+.seat-grid .seat.occupied {
+  background: #6c757d !important;
+  color: #fff !important;
+  border-color: #6c757d;
+  cursor: not-allowed;
+}
+.seat-grid .seat.selected {
+  background: #ffc107 !important;
+  color: #212529 !important;
+  border: 2px solid #b58100 !important;
+}
+.seat-grid-empty {
+  min-height: 2.45rem;
+}
+@media (max-width: 576px) {
+  .seat-grid {
+    min-width: 540px;
+    gap: 0.3rem;
+  }
+}
+
+.seat-grid .seat-first { background: #dc3545; color: #fff; border-color: #b02a37; }
+.seat-grid .seat-business { background: #f8f9fa; color: #6f42c1; border: 2px solid #6f42c1; }
+.seat-grid .seat-premium { background: #0dcaf0; color: #212529; border-color: #0aa2c0; }
+.seat-grid .seat-economy { background: #0d6efd; color: #fff; border-color: #0a58ca; }
+.seat-grid .seat.class-unavailable { background: #e9ecef; color: #adb5bd; border-color: #dee2e6; }
+.seat-grid .seat.occupied { background: #6c757d !important; color: #fff !important; border-color: #6c757d; }
+.seat-grid .seat.selected { background: #ffc107 !important; color: #212529 !important; border: 2px solid #b58100 !important; }
+
+/* Preserve the configured 3-4-3 aisle breaks without changing seat IDs. */
+.seat-grid .aisle-start { margin-left: 0.22rem; }

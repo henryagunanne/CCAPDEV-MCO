@@ -6897,3 +6897,360 @@
 {"level":"info","message":"POST /privacy/withdraw-meal-consent 200 16 - 28.443 ms","timestamp":"2026-11-13 13:17:25"}
 {"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-13 13:17:26"}
 {"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-13 13:17:26"}
+{"level":"info","message":"POST /users/login 403 63 - 30.922 ms","timestamp":"2026-11-13 13:34:47"}
+{"level":"info","message":"GET / 200 55771 - 1592.607 ms","timestamp":"2026-11-13 13:35:35"}
+{"level":"info","message":"User authenticated.","timestamp":"2026-11-13 13:35:51"}
+{"level":"info","message":"POST /users/login 200 95 - 203.233 ms","timestamp":"2026-11-13 13:35:51"}
+{"level":"info","message":"GET / 200 55816 - 51.436 ms","timestamp":"2026-11-13 13:35:53"}
+{"level":"info","message":"GET / 304 - - 354.100 ms","timestamp":"2026-11-13 13:35:57"}
+{"level":"info","message":"GET /reservations/my-bookings 200 27819 - 888.982 ms","timestamp":"2026-11-13 13:36:03"}
+{"level":"info","message":"GET /reservations/6af5f1995724e3c8223fda6a/edit 200 20777 - 66.911 ms","timestamp":"2026-11-13 13:36:04"}
+{"level":"info","message":"GET /reservations/seats/6af5f16d5a0537d8ce26116b?excludeReservation=6af5f1995724e3c8223fda6a 409 70 - 21.794 ms","timestamp":"2026-11-13 13:36:04"}
+{"level":"info","message":"GET / 304 - - 73.849 ms","timestamp":"2026-11-13 13:36:11"}
+{"level":"info","message":"GET /flights/search?tripType=Round-Trip&travelClass=All&passengers=1&origin=Manila+%28MNL%29&destination=Cebu+%28CEB%29&departureDate=2027-09-09&returnDate=2026-11-13 200 15623 - 194.882 ms","timestamp":"2026-11-13 13:36:42"}
+{"level":"info","message":"GET / 304 - - 49.440 ms","timestamp":"2026-11-13 13:36:45"}
+{"level":"info","message":"GET /reservations/book/6af5f16d5a0537d8ce26116b?tripType=One-Way&depart=Nov%2020,%202027&return=Dec%2020,%202027 409 70 - 14.708 ms","timestamp":"2026-11-13 13:36:50"}
+{"level":"info","message":"GET /reservations/book/6af5f16d5a0537d8ce26116e?tripType=One-Way&depart=Jun%2025,%202027&return=Jul%2025,%202027 409 70 - 12.571 ms","timestamp":"2026-11-13 13:36:55"}
+{"level":"info","message":"GET /reservations/book/6af5f16d5a0537d8ce261157?tripType=One-Way&depart=Sep%2026,%202027&return=Oct%2026,%202027 409 70 - 907.030 ms","timestamp":"2026-11-13 13:37:21"}
+{"level":"info","message":"GET /reservations/book-flight 200 23376 - 42.946 ms","timestamp":"2026-11-13 13:37:29"}
+{"level":"info","message":"Flight availability search completed.","resultCount":0,"timestamp":"2026-11-13 13:37:35"}
+{"level":"info","message":"GET /reservations/search?origin=Bangkok+%28BKK%29&destination=Beijing+%28PEK%29 304 - - 17.324 ms","timestamp":"2026-11-13 13:37:35"}
+{"level":"info","message":"Flight availability search completed.","resultCount":0,"timestamp":"2026-11-13 13:37:37"}
+{"level":"info","message":"GET /reservations/search?origin=Bangkok+%28BKK%29&destination=Beijing+%28PEK%29 304 - - 18.231 ms","timestamp":"2026-11-13 13:37:37"}
+{"level":"info","message":"Flight availability search completed.","resultCount":0,"timestamp":"2026-11-13 13:37:37"}
+{"level":"info","message":"GET /reservations/search?origin=Beijing+%28PEK%29&destination=Bangkok+%28BKK%29 304 - - 11.483 ms","timestamp":"2026-11-13 13:37:37"}
+{"level":"info","message":"Flight availability search completed.","resultCount":0,"timestamp":"2026-11-13 13:37:47"}
+{"level":"info","message":"GET /reservations/search?origin=Busan+%28PUS%29&destination=Beijing+%28PEK%29 200 14 - 11.224 ms","timestamp":"2026-11-13 13:37:47"}
+{"level":"info","message":"Flight availability search completed.","resultCount":0,"timestamp":"2026-11-13 13:37:47"}
+{"level":"info","message":"GET /reservations/search?origin=Beijing+%28PEK%29&destination=Busan+%28PUS%29 200 14 - 8.951 ms","timestamp":"2026-11-13 13:37:47"}
+{"level":"info","message":"Flight availability search completed.","resultCount":0,"timestamp":"2026-11-13 13:37:49"}
+{"level":"info","message":"GET /reservations/search?origin=Busan+%28PUS%29&destination=Cebu+%28CEB%29 200 14 - 10.357 ms","timestamp":"2026-11-13 13:37:49"}
+{"level":"info","message":"Flight availability search completed.","resultCount":0,"timestamp":"2026-11-13 13:37:49"}
+{"level":"info","message":"GET /reservations/search?origin=Cebu+%28CEB%29&destination=Busan+%28PUS%29 200 14 - 9.251 ms","timestamp":"2026-11-13 13:37:49"}
+{"level":"info","message":"GET /reservations/check-in 200 20144 - 18.911 ms","timestamp":"2026-11-13 13:37:52"}
+{"level":"info","message":"GET / 304 - - 57.779 ms","timestamp":"2026-11-13 13:37:55"}
+{"level":"info","message":"Server running at http://localhost:3000","timestamp":"2026-11-13 13:40:19"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-13 13:40:19"}
+{"level":"info","message":"Server running at http://localhost:3000","timestamp":"2026-11-13 13:57:38"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-13 13:57:38"}
+{"level":"info","message":"GET / 200 55816 - 354.053 ms","timestamp":"2026-11-13 13:57:48"}
+{"level":"info","message":"GET /reservations/my-bookings 200 27817 - 40.956 ms","timestamp":"2026-11-13 13:57:49"}
+{"level":"info","message":"GET / 304 - - 37.582 ms","timestamp":"2026-11-13 13:57:52"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 13:57:55"}
+{"level":"info","message":"GET /reservations/book/6af6a2c6165621fb525dd77d?tripType=One-Way&depart=May%2010,%202027&return=Jun%2009,%202027 500 15740 - 591.083 ms","timestamp":"2026-11-13 13:57:55"}
+{"level":"info","message":"GET / 304 - - 153.310 ms","timestamp":"2026-11-13 13:57:59"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 13:58:01"}
+{"level":"info","message":"GET /reservations/book/6af6a2c6165621fb525dd780?tripType=One-Way&depart=Nov%2002,%202026&return=Dec%2002,%202026 500 15740 - 195.465 ms","timestamp":"2026-11-13 13:58:01"}
+{"level":"info","message":"GET / 304 - - 138.082 ms","timestamp":"2026-11-13 13:58:18"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 13:58:25"}
+{"level":"info","message":"GET /reservations/book/6af6a2c6165621fb525dd761?tripType=Round-Trip&depart=Feb%2004,%202027&return=Mar%2006,%202027 500 15740 - 207.325 ms","timestamp":"2026-11-13 13:58:26"}
+{"level":"info","message":"GET / 304 - - 140.540 ms","timestamp":"2026-11-13 13:58:48"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 14:00:15"}
+{"level":"info","message":"GET /reservations/book/6af6a2c6165621fb525dd779?tripType=One-Way&depart=Nov%2012,%202027&return=Dec%2012,%202027 500 15740 - 150.035 ms","timestamp":"2026-11-13 14:00:15"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 14:02:23"}
+{"level":"info","message":"GET /reservations/book/6af6a2c6165621fb525dd769?tripType=One-Way&depart=Dec%2017,%202026&return=Jan%2016,%202027 500 15740 - 683.175 ms","timestamp":"2026-11-13 14:02:23"}
+{"level":"info","message":"GET /reservations/book-flight 304 - - 231.433 ms","timestamp":"2026-11-13 14:02:49"}
+{"level":"info","message":"Flight availability search completed.","resultCount":4,"timestamp":"2026-11-13 14:02:53"}
+{"level":"info","message":"GET /reservations/search?origin=Beijing+%28PEK%29&destination=Bangkok+%28BKK%29 200 1434 - 92.931 ms","timestamp":"2026-11-13 14:02:53"}
+{"level":"info","message":"Flight availability search completed.","resultCount":4,"timestamp":"2026-11-13 14:02:55"}
+{"level":"info","message":"GET /reservations/search?origin=Beijing+%28PEK%29&destination=Bangkok+%28BKK%29 304 - - 22.116 ms","timestamp":"2026-11-13 14:02:55"}
+{"level":"info","message":"Flight availability search completed.","resultCount":4,"timestamp":"2026-11-13 14:02:55"}
+{"level":"info","message":"GET /reservations/search?origin=Bangkok+%28BKK%29&destination=Beijing+%28PEK%29 200 1436 - 10.622 ms","timestamp":"2026-11-13 14:02:55"}
+{"level":"info","message":"GET /reservations/seats/6af6a2c6165621fb525ddd84 200 21078 - 273.510 ms","timestamp":"2026-11-13 14:02:56"}
+{"level":"info","message":"GET /reservations/seats/6af6a2c6165621fb525ddd8b 200 15578 - 30.102 ms","timestamp":"2026-11-13 14:02:58"}
+{"level":"info","message":"GET /reservations/my-bookings 200 27817 - 227.022 ms","timestamp":"2026-11-13 14:04:14"}
+{"level":"info","message":"GET /users/profile 200 22752 - 72.802 ms","timestamp":"2026-11-13 14:04:17"}
+{"level":"info","message":"GET / 304 - - 34.751 ms","timestamp":"2026-11-13 14:04:21"}
+{"level":"info","message":"Server running at http://localhost:3000","timestamp":"2026-11-13 22:26:00"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-13 22:26:02"}
+{"level":"info","message":"GET / 200 55771 - 3453.514 ms","timestamp":"2026-11-13 22:26:54"}
+{"level":"info","message":"Server running at http://localhost:3000","timestamp":"2026-11-13 22:46:51"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-13 22:46:52"}
+{"level":"info","message":"GET / 200 59975 - 1688.254 ms","timestamp":"2026-11-13 22:50:44"}
+{"level":"info","message":"GET /reservations/book/6af6a2c6165621fb525dd7b5?tripType=Round-Trip&depart=Jul%2004,%202027&return=Aug%2003,%202027 403 15682 - 175.677 ms","timestamp":"2026-11-13 22:50:58"}
+{"level":"info","message":"User authenticated.","timestamp":"2026-11-13 22:51:16"}
+{"level":"info","message":"POST /users/login 200 95 - 173.463 ms","timestamp":"2026-11-13 22:51:16"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 22:51:17"}
+{"level":"info","message":"GET /reservations/book/6af6a2c6165621fb525dd7b5?tripType=Round-Trip&depart=Jul%2004,%202027&return=Aug%2003,%202027 500 15740 - 237.666 ms","timestamp":"2026-11-13 22:51:17"}
+{"level":"info","message":"GET / 200 60020 - 39.166 ms","timestamp":"2026-11-13 22:51:21"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 22:51:28"}
+{"level":"info","message":"GET /reservations/book/6af721c5a090f9d6f91eb8fa?tripType=One-Way&depart=Feb%2010,%202027&return=Mar%2012,%202027 500 15740 - 105.793 ms","timestamp":"2026-11-13 22:51:28"}
+{"level":"info","message":"GET / 304 - - 84.996 ms","timestamp":"2026-11-13 22:51:32"}
+{"level":"info","message":"GET /users/profile 200 22752 - 196.332 ms","timestamp":"2026-11-13 22:54:32"}
+{"level":"info","message":"GET / 304 - - 194.689 ms","timestamp":"2026-11-13 22:55:22"}
+{"level":"info","message":"GET /reservations/book-flight 200 23376 - 57.633 ms","timestamp":"2026-11-13 22:55:23"}
+{"level":"info","message":"Flight availability search completed.","resultCount":4,"timestamp":"2026-11-13 22:55:27"}
+{"level":"info","message":"GET /reservations/search?origin=Bangkok+%28BKK%29&destination=Beijing+%28PEK%29 304 - - 27.945 ms","timestamp":"2026-11-13 22:55:27"}
+{"level":"info","message":"Flight availability search completed.","resultCount":4,"timestamp":"2026-11-13 22:55:29"}
+{"level":"info","message":"GET /reservations/search?origin=Bangkok+%28BKK%29&destination=Beijing+%28PEK%29 304 - - 31.938 ms","timestamp":"2026-11-13 22:55:29"}
+{"level":"info","message":"Flight availability search completed.","resultCount":4,"timestamp":"2026-11-13 22:55:29"}
+{"level":"info","message":"GET /reservations/search?origin=Beijing+%28PEK%29&destination=Bangkok+%28BKK%29 304 - - 13.686 ms","timestamp":"2026-11-13 22:55:29"}
+{"level":"info","message":"GET /reservations/seats/6af6a2c6165621fb525ddd85 200 17959 - 71.237 ms","timestamp":"2026-11-13 22:55:34"}
+{"level":"info","message":"GET /reservations/seats/6af6a2c6165621fb525ddd85 304 - - 20.399 ms","timestamp":"2026-11-13 22:55:40"}
+{"level":"info","message":"GET /reservations/seats/6af6a2c6165621fb525ddd88 200 19933 - 24.887 ms","timestamp":"2026-11-13 22:55:59"}
+{"level":"info","message":"POST /reservations/create 400 93 - 174.860 ms","timestamp":"2026-11-13 23:04:33"}
+{"level":"info","message":"GET /reservations/seats/6af6a2c6165621fb525ddd8b 304 - - 23.655 ms","timestamp":"2026-11-13 23:04:52"}
+{"level":"info","message":"GET /reservations/seats/6af6a2c6165621fb525ddd84 304 - - 23.407 ms","timestamp":"2026-11-13 23:04:55"}
+{"level":"info","message":"Reservation created.","timestamp":"2026-11-13 23:05:33"}
+{"level":"info","message":"POST /reservations/create 200 122 - 111.756 ms","timestamp":"2026-11-13 23:05:33"}
+{"level":"info","message":"GET /reservations/6af7273d51eb08132338f150/confirmation 200 19849 - 236.605 ms","timestamp":"2026-11-13 23:05:33"}
+{"level":"info","message":"GET /reservations/my-bookings 200 32571 - 116.926 ms","timestamp":"2026-11-13 23:05:47"}
+{"level":"info","message":"GET / 304 - - 218.595 ms","timestamp":"2026-11-13 23:07:33"}
+{"level":"info","message":"GET /reservations/my-bookings 200 32571 - 299.898 ms","timestamp":"2026-11-13 23:07:45"}
+{"level":"info","message":"GET /reservations/6af7273d51eb08132338f150/edit 200 21139 - 77.563 ms","timestamp":"2026-11-13 23:07:53"}
+{"level":"info","message":"GET /reservations/seats/6af6a2c6165621fb525ddd8b?excludeReservation=6af7273d51eb08132338f150 200 15578 - 10.384 ms","timestamp":"2026-11-13 23:07:53"}
+{"level":"info","message":"GET /reservations/seats/6af6a2c6165621fb525ddd84?excludeReservation=6af7273d51eb08132338f150 200 21078 - 5.986 ms","timestamp":"2026-11-13 23:07:53"}
+{"level":"info","message":"GET /reservations/my-bookings 200 32571 - 182.498 ms","timestamp":"2026-11-13 23:09:18"}
+{"level":"info","message":"Reservation cancelled.","timestamp":"2026-11-13 23:09:28"}
+{"level":"info","message":"POST /reservations/cancel/6af6a2cc165621fb525de50b 200 93 - 79.847 ms","timestamp":"2026-11-13 23:09:28"}
+{"level":"info","message":"GET /reservations/my-bookings 200 32164 - 10.821 ms","timestamp":"2026-11-13 23:09:28"}
+{"level":"info","message":"GET /reservations/check-in 200 20144 - 207.826 ms","timestamp":"2026-11-13 23:09:59"}
+{"level":"info","message":"POST /reservations/check-in 200 400 - 146.105 ms","timestamp":"2026-11-13 23:10:08"}
+{"level":"info","message":"POST /users/logout 200 16 - 12.502 ms","timestamp":"2026-11-13 23:10:28"}
+{"level":"info","message":"GET / 200 59975 - 103.991 ms","timestamp":"2026-11-13 23:10:30"}
+{"level":"info","message":"User registered.","timestamp":"2026-11-13 23:13:52"}
+{"level":"info","message":"POST /users/register 200 16 - 446.441 ms","timestamp":"2026-11-13 23:13:52"}
+{"level":"info","message":"GET / 200 59975 - 284.454 ms","timestamp":"2026-11-13 23:13:56"}
+{"level":"info","message":"User authenticated.","timestamp":"2026-11-13 23:14:14"}
+{"level":"info","message":"POST /users/login 200 97 - 417.254 ms","timestamp":"2026-11-13 23:14:14"}
+{"level":"info","message":"GET / 200 60022 - 114.697 ms","timestamp":"2026-11-13 23:14:16"}
+{"level":"info","message":"GET /users/profile 200 22746 - 25.510 ms","timestamp":"2026-11-13 23:14:19"}
+{"level":"info","message":"GET /reservations/my-bookings 200 18761 - 544.446 ms","timestamp":"2026-11-13 23:14:22"}
+{"level":"info","message":"GET / 304 - - 151.621 ms","timestamp":"2026-11-13 23:14:28"}
+{"level":"info","message":"GET /users/profile 304 - - 2587.206 ms","timestamp":"2026-11-13 23:14:46"}
+{"level":"info","message":"GET /users/profile 200 22746 - 1333.630 ms","timestamp":"2026-11-13 23:15:23"}
+{"level":"info","message":"GET /users/profile 200 22746 - 39.562 ms","timestamp":"2026-11-13 23:15:26"}
+{"level":"info","message":"User profile updated.","timestamp":"2026-11-13 23:15:59"}
+{"level":"info","message":"POST /users/edit/6af7293051eb08132338f18b 200 312 - 1486.723 ms","timestamp":"2026-11-13 23:15:59"}
+{"level":"info","message":"User profile updated.","timestamp":"2026-11-13 23:15:59"}
+{"level":"info","message":"POST /users/edit/6af7293051eb08132338f18b 200 312 - 6327.745 ms","timestamp":"2026-11-13 23:15:59"}
+{"level":"info","message":"User profile updated.","timestamp":"2026-11-13 23:15:59"}
+{"level":"info","message":"POST /users/edit/6af7293051eb08132338f18b 200 312 - 3658.008 ms","timestamp":"2026-11-13 23:15:59"}
+{"level":"info","message":"GET /users/profile 200 22758 - 18.680 ms","timestamp":"2026-11-13 23:16:05"}
+{"level":"info","message":"User password changed.","timestamp":"2026-11-13 23:16:32"}
+{"level":"info","message":"POST /users/change-password/6af7293051eb08132338f18b 200 16 - 670.689 ms","timestamp":"2026-11-13 23:16:32"}
+{"level":"info","message":"GET /users/profile 200 22758 - 20.807 ms","timestamp":"2026-11-13 23:16:33"}
+{"level":"info","message":"GET /privacy/my-privacy 200 18925 - 85.632 ms","timestamp":"2026-11-13 23:16:36"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 23:16:45"}
+{"level":"info","message":"POST /privacy/export 500 84 - 446.386 ms","timestamp":"2026-11-13 23:16:46"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 23:16:49"}
+{"level":"info","message":"POST /privacy/export 500 84 - 352.394 ms","timestamp":"2026-11-13 23:16:49"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 23:16:58"}
+{"level":"info","message":"POST /privacy/export 500 84 - 574.645 ms","timestamp":"2026-11-13 23:17:00"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 23:17:05"}
+{"level":"info","message":"POST /privacy/requests 500 84 - 96.323 ms","timestamp":"2026-11-13 23:17:05"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 23:17:09"}
+{"level":"info","message":"POST /privacy/requests 500 84 - 22.340 ms","timestamp":"2026-11-13 23:17:09"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 23:17:12"}
+{"level":"info","message":"POST /privacy/requests 500 84 - 76.795 ms","timestamp":"2026-11-13 23:17:12"}
+{"level":"info","message":"GET /privacy/my-privacy 200 18925 - 159.107 ms","timestamp":"2026-11-13 23:17:19"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 23:17:23"}
+{"level":"info","message":"POST /privacy/requests 500 84 - 52.516 ms","timestamp":"2026-11-13 23:17:24"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 23:17:41"}
+{"level":"info","message":"POST /privacy/requests 500 84 - 132.955 ms","timestamp":"2026-11-13 23:17:41"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 23:17:42"}
+{"level":"info","message":"POST /privacy/requests 500 84 - 12.919 ms","timestamp":"2026-11-13 23:17:42"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 23:17:52"}
+{"level":"info","message":"POST /privacy/export 500 84 - 284.616 ms","timestamp":"2026-11-13 23:17:52"}
+{"level":"info","message":"GET /users/profile 304 - - 147.648 ms","timestamp":"2026-11-13 23:20:33"}
+{"level":"info","message":"User account deleted.","timestamp":"2026-11-13 23:20:42"}
+{"level":"info","message":"POST /users/delete/6af7293051eb08132338f18b 200 16 - 423.585 ms","timestamp":"2026-11-13 23:20:42"}
+{"level":"info","message":"GET / 200 59975 - 49.172 ms","timestamp":"2026-11-13 23:20:44"}
+{"level":"info","message":"Administrator password authentication completed; MFA is pending.","timestamp":"2026-11-13 23:21:35"}
+{"level":"info","message":"POST /users/login 200 158 - 429.252 ms","timestamp":"2026-11-13 23:21:35"}
+{"level":"info","message":"GET /users/mfa/verify 200 19526 - 46.656 ms","timestamp":"2026-11-13 23:21:35"}
+{"level":"info","message":"POST /users/mfa/verify 200 91 - 178.870 ms","timestamp":"2026-11-13 23:22:18"}
+{"level":"info","message":"GET /admin 200 21045 - 233.004 ms","timestamp":"2026-11-13 23:22:19"}
+{"level":"info","message":"GET /admin/profile 200 19662 - 120.376 ms","timestamp":"2026-11-13 23:22:38"}
+{"level":"info","message":"GET /admin/management 200 21757 - 315.693 ms","timestamp":"2026-11-13 23:23:07"}
+{"level":"info","message":"GET /admin/management/new 200 22290 - 193.439 ms","timestamp":"2026-11-13 23:23:15"}
+{"level":"info","message":"POST /admin/management 201 18058 - 421.719 ms","timestamp":"2026-11-13 23:23:51"}
+{"level":"info","message":"GET /admin/management 200 22536 - 362.123 ms","timestamp":"2026-11-13 23:24:25"}
+{"level":"info","message":"GET /admin/management/6af697337f3624d6e831060e/edit 200 26318 - 53.284 ms","timestamp":"2026-11-13 23:24:35"}
+{"code":"HTTP_404","level":"info","message":"Request rejected.","timestamp":"2026-11-13 23:24:35"}
+{"level":"info","message":"GET /admin/assets/Logo/Logo-red.png 404 64 - 22.384 ms","timestamp":"2026-11-13 23:24:35"}
+{"level":"info","message":"GET /admin/management/6af697337f3624d6e831060e 200 20493 - 175.623 ms","timestamp":"2026-11-13 23:25:34"}
+{"level":"info","message":"GET /admin/management 304 - - 170.647 ms","timestamp":"2026-11-13 23:25:58"}
+{"level":"info","message":"GET /admin/management/6af72b8751eb08132338f1d6 200 20301 - 48.761 ms","timestamp":"2026-11-13 23:26:02"}
+{"level":"info","message":"GET /admin/management/6af72b8751eb08132338f1d6/edit 200 26252 - 48.803 ms","timestamp":"2026-11-13 23:26:07"}
+{"code":"HTTP_404","level":"info","message":"Request rejected.","timestamp":"2026-11-13 23:26:07"}
+{"level":"info","message":"GET /admin/assets/Logo/Logo-red.png 404 64 - 26.520 ms","timestamp":"2026-11-13 23:26:07"}
+{"level":"info","message":"GET /admin/management/6af72b8751eb08132338f1d6 304 - - 34.326 ms","timestamp":"2026-11-13 23:26:14"}
+{"level":"info","message":"GET /privacy/dpo/manage 200 17638 - 30.824 ms","timestamp":"2026-11-13 23:26:24"}
+{"level":"info","message":"GET /admin/security 200 26882 - 20.793 ms","timestamp":"2026-11-13 23:26:25"}
+{"level":"info","message":"GET /admin/management 304 - - 61.502 ms","timestamp":"2026-11-13 23:26:40"}
+{"level":"info","message":"GET /admin/management/6af72b8751eb08132338f1d6 304 - - 30.577 ms","timestamp":"2026-11-13 23:26:44"}
+{"level":"info","message":"GET /admin/management 304 - - 61.116 ms","timestamp":"2026-11-13 23:26:47"}
+{"level":"info","message":"GET /admin/profile 304 - - 42.459 ms","timestamp":"2026-11-13 23:26:49"}
+{"level":"info","message":"GET /admin/security 200 26882 - 26.178 ms","timestamp":"2026-11-13 23:26:50"}
+{"level":"info","message":"GET /privacy/dpo/manage 304 - - 19.671 ms","timestamp":"2026-11-13 23:26:52"}
+{"level":"info","message":"GET /admin/emergency-access 200 17443 - 74.566 ms","timestamp":"2026-11-13 23:26:53"}
+{"level":"info","message":"GET /admin/approvals 200 17433 - 14.902 ms","timestamp":"2026-11-13 23:26:57"}
+{"level":"info","message":"GET /admin/reservations 200 70266 - 52.944 ms","timestamp":"2026-11-13 23:26:59"}
+{"level":"info","message":"POST /privacy/passports/reveal 200 39 - 159.159 ms","timestamp":"2026-11-13 23:28:06"}
+{"level":"info","message":"POST /privacy/passports/reveal 410 67 - 16.990 ms","timestamp":"2026-11-13 23:28:26"}
+{"level":"info","message":"GET /admin/create 200 27389 - 71.984 ms","timestamp":"2026-11-13 23:28:51"}
+{"level":"info","message":"GET /admin/flights 200 3512705 - 232.312 ms","timestamp":"2026-11-13 23:28:59"}
+{"level":"info","message":"GET /admin/create 200 27389 - 26.348 ms","timestamp":"2026-11-13 23:29:08"}
+{"level":"info","message":"GET /admin/flights 200 3512705 - 124.885 ms","timestamp":"2026-11-13 23:29:09"}
+{"level":"info","message":"GET /admin/edit/6af6a2c6165621fb525dd75c 200 33249 - 38.000 ms","timestamp":"2026-11-13 23:29:15"}
+{"level":"info","message":"GET /admin/flights 200 3512705 - 112.553 ms","timestamp":"2026-11-13 23:29:20"}
+{"level":"info","message":"GET /admin/management 304 - - 71.155 ms","timestamp":"2026-11-13 23:29:34"}
+{"level":"info","message":"GET /admin/profile 304 - - 27.664 ms","timestamp":"2026-11-13 23:29:40"}
+{"level":"info","message":"GET /admin/security 200 26882 - 36.111 ms","timestamp":"2026-11-13 23:29:43"}
+{"level":"info","message":"GET /admin/management 304 - - 31.049 ms","timestamp":"2026-11-13 23:29:46"}
+{"level":"info","message":"GET /admin 200 21242 - 32.335 ms","timestamp":"2026-11-13 23:29:47"}
+{"level":"info","message":"GET /admin/management 304 - - 329.660 ms","timestamp":"2026-11-13 23:32:28"}
+{"level":"info","message":"GET /admin/security 200 26882 - 56.996 ms","timestamp":"2026-11-13 23:32:30"}
+{"level":"info","message":"POST /admin/security/mfa/re-enroll 200 5161 - 197.583 ms","timestamp":"2026-11-13 23:32:57"}
+{"level":"info","message":"POST /admin/security/mfa/re-enroll/confirm 200 307 - 78.760 ms","timestamp":"2026-11-13 23:33:25"}
+{"level":"info","message":"GET /admin/security 200 26882 - 271.392 ms","timestamp":"2026-11-13 23:33:47"}
+{"level":"info","message":"GET /admin 304 - - 193.881 ms","timestamp":"2026-11-13 23:33:56"}
+{"level":"info","message":"GET / 200 60253 - 77.819 ms","timestamp":"2026-11-13 23:33:58"}
+{"level":"info","message":"GET /reservations/book-flight 403 16023 - 52.054 ms","timestamp":"2026-11-13 23:34:00"}
+{"level":"info","message":"GET / 304 - - 48.503 ms","timestamp":"2026-11-13 23:34:07"}
+{"level":"info","message":"GET /users/profile 200 23029 - 18.512 ms","timestamp":"2026-11-13 23:34:10"}
+{"level":"info","message":"POST /users/logout 200 16 - 57.331 ms","timestamp":"2026-11-13 23:34:29"}
+{"level":"info","message":"GET / 200 59975 - 62.236 ms","timestamp":"2026-11-13 23:34:31"}
+{"level":"info","message":"GET / 304 - - 573.595 ms","timestamp":"2026-11-13 23:34:50"}
+{"level":"info","message":"GET /users/admin-setup 200 16922 - 372.810 ms","timestamp":"2026-11-13 23:36:06"}
+{"level":"info","message":"POST /users/admin-setup 200 15809 - 423.845 ms","timestamp":"2026-11-13 23:36:30"}
+{"level":"info","message":"GET / 304 - - 54.404 ms","timestamp":"2026-11-13 23:36:33"}
+{"level":"info","message":"Administrator password authentication completed; MFA is pending.","timestamp":"2026-11-13 23:36:57"}
+{"level":"info","message":"POST /users/login 200 163 - 392.966 ms","timestamp":"2026-11-13 23:36:57"}
+{"level":"info","message":"GET /users/mfa/enroll 200 25358 - 45.610 ms","timestamp":"2026-11-13 23:36:57"}
+{"level":"info","message":"POST /users/mfa/setup/confirm 200 261 - 114.600 ms","timestamp":"2026-11-13 23:37:19"}
+{"level":"info","message":"GET /admin 200 17350 - 170.762 ms","timestamp":"2026-11-13 23:37:31"}
+{"level":"info","message":"GET /admin/reservations 200 68817 - 305.032 ms","timestamp":"2026-11-13 23:37:35"}
+{"level":"info","message":"GET /admin 304 - - 146.181 ms","timestamp":"2026-11-13 23:38:28"}
+{"level":"info","message":"GET /admin/reservations 200 68817 - 116.677 ms","timestamp":"2026-11-13 23:38:36"}
+{"level":"info","message":"GET /admin/profile 200 17429 - 368.325 ms","timestamp":"2026-11-13 23:38:49"}
+{"level":"info","message":"GET /admin 304 - - 105.503 ms","timestamp":"2026-11-13 23:38:55"}
+{"level":"info","message":"GET /admin/reservations 200 68817 - 66.314 ms","timestamp":"2026-11-13 23:38:57"}
+{"level":"info","message":"GET /admin/profile 304 - - 50.803 ms","timestamp":"2026-11-13 23:38:58"}
+{"level":"info","message":"POST /users/logout 200 16 - 130.982 ms","timestamp":"2026-11-13 23:39:09"}
+{"level":"info","message":"GET / 200 59975 - 61.248 ms","timestamp":"2026-11-13 23:39:12"}
+{"level":"info","message":"Administrator password authentication completed; MFA is pending.","timestamp":"2026-11-13 23:39:40"}
+{"level":"info","message":"POST /users/login 200 163 - 353.315 ms","timestamp":"2026-11-13 23:39:40"}
+{"level":"info","message":"GET /users/mfa/verify 200 19526 - 24.003 ms","timestamp":"2026-11-13 23:39:40"}
+{"level":"info","message":"POST /users/mfa/cancel 200 31 - 51.786 ms","timestamp":"2026-11-13 23:40:05"}
+{"level":"info","message":"GET / 200 59975 - 39.815 ms","timestamp":"2026-11-13 23:40:06"}
+{"level":"info","message":"Administrator password authentication completed; MFA is pending.","timestamp":"2026-11-13 23:40:54"}
+{"level":"info","message":"POST /users/login 200 158 - 374.466 ms","timestamp":"2026-11-13 23:40:54"}
+{"level":"info","message":"GET /users/mfa/verify 200 19526 - 23.385 ms","timestamp":"2026-11-13 23:40:54"}
+{"level":"info","message":"POST /users/mfa/verify 200 91 - 174.213 ms","timestamp":"2026-11-13 23:41:10"}
+{"level":"info","message":"GET /admin 200 21241 - 311.081 ms","timestamp":"2026-11-13 23:41:11"}
+{"level":"info","message":"GET /admin/profile 200 19662 - 38.629 ms","timestamp":"2026-11-13 23:41:14"}
+{"level":"info","message":"GET /admin/security 200 26881 - 53.785 ms","timestamp":"2026-11-13 23:41:16"}
+{"level":"info","message":"GET /privacy/dpo/manage 200 17638 - 250.265 ms","timestamp":"2026-11-13 23:42:21"}
+{"level":"info","message":"GET /admin/emergency-access 200 17443 - 55.782 ms","timestamp":"2026-11-13 23:42:24"}
+{"level":"info","message":"GET /privacy/dpo/manage 304 - - 21.934 ms","timestamp":"2026-11-13 23:42:25"}
+{"level":"info","message":"GET /admin 304 - - 59.501 ms","timestamp":"2026-11-13 23:42:27"}
+{"level":"info","message":"GET /admin/flights/AA1000 200 123 - 111.924 ms","timestamp":"2026-11-13 23:42:42"}
+{"level":"info","message":"POST /users/logout 200 16 - 41.476 ms","timestamp":"2026-11-13 23:42:59"}
+{"level":"info","message":"GET / 200 59975 - 134.590 ms","timestamp":"2026-11-13 23:43:03"}
+{"level":"info","message":"Server running at https://localhost:3000","timestamp":"2026-11-13 23:44:19"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-13 23:44:20"}
+{"level":"info","message":"GET / 200 59975 - 238.529 ms","timestamp":"2026-11-13 23:44:38"}
+{"code":"HTTP_404","level":"info","message":"Request rejected.","timestamp":"2026-11-13 23:44:38"}
+{"level":"info","message":"GET /apple-touch-icon-precomposed.png 404 64 - 73.383 ms","timestamp":"2026-11-13 23:44:38"}
+{"code":"HTTP_404","level":"info","message":"Request rejected.","timestamp":"2026-11-13 23:44:38"}
+{"code":"HTTP_404","level":"info","message":"Request rejected.","timestamp":"2026-11-13 23:44:38"}
+{"level":"info","message":"GET /apple-touch-icon.png 404 64 - 86.325 ms","timestamp":"2026-11-13 23:44:38"}
+{"level":"info","message":"GET /favicon.ico 404 64 - 95.708 ms","timestamp":"2026-11-13 23:44:38"}
+{"level":"info","message":"Administrator password authentication completed; MFA is pending.","timestamp":"2026-11-13 23:45:07"}
+{"level":"info","message":"POST /users/login 200 158 - 392.942 ms","timestamp":"2026-11-13 23:45:07"}
+{"level":"info","message":"GET /users/mfa/verify 200 19526 - 23.454 ms","timestamp":"2026-11-13 23:45:07"}
+{"level":"info","message":"POST /users/mfa/verify 400 58 - 208.762 ms","timestamp":"2026-11-13 23:45:29"}
+{"level":"info","message":"POST /users/mfa/verify 200 91 - 37.579 ms","timestamp":"2026-11-13 23:45:38"}
+{"level":"info","message":"GET /admin 200 21241 - 1996.756 ms","timestamp":"2026-11-13 23:45:41"}
+{"code":"HTTP_404","level":"info","message":"Request rejected.","timestamp":"2026-11-13 23:45:41"}
+{"level":"info","message":"GET /favicon.ico 404 64 - 38.797 ms","timestamp":"2026-11-13 23:45:41"}
+{"level":"info","message":"GET /admin/create 200 27389 - 117.637 ms","timestamp":"2026-11-13 23:45:45"}
+{"level":"info","message":"GET /admin/management 200 22511 - 63.461 ms","timestamp":"2026-11-13 23:45:46"}
+{"level":"info","message":"GET /admin/management/6af72b8751eb08132338f1d6 200 20520 - 141.414 ms","timestamp":"2026-11-13 23:46:02"}
+{"level":"info","message":"POST /admin/management/6af72b8751eb08132338f1d6/status 302 86 - 103.295 ms","timestamp":"2026-11-13 23:46:09"}
+{"level":"info","message":"GET /admin/management/6af72b8751eb08132338f1d6?updated=status 200 20956 - 42.981 ms","timestamp":"2026-11-13 23:46:09"}
+{"level":"info","message":"POST /users/logout 200 16 - 164.088 ms","timestamp":"2026-11-13 23:46:17"}
+{"level":"info","message":"GET / 200 59975 - 32.961 ms","timestamp":"2026-11-13 23:46:19"}
+{"level":"info","message":"POST /users/login 403 60 - 43.491 ms","timestamp":"2026-11-13 23:46:30"}
+{"level":"info","message":"User authenticated.","timestamp":"2026-11-13 23:51:17"}
+{"level":"info","message":"POST /users/login 200 95 - 6256.401 ms","timestamp":"2026-11-13 23:51:17"}
+{"level":"info","message":"User authenticated.","timestamp":"2026-11-13 23:51:17"}
+{"level":"info","message":"POST /users/login 200 95 - 465.714 ms","timestamp":"2026-11-13 23:51:17"}
+{"level":"info","message":"User authenticated.","timestamp":"2026-11-13 23:51:17"}
+{"level":"info","message":"POST /users/login 200 95 - 4264.904 ms","timestamp":"2026-11-13 23:51:18"}
+{"level":"info","message":"GET / 200 60020 - 456.423 ms","timestamp":"2026-11-13 23:51:23"}
+{"level":"info","message":"GET /users/profile 200 22752 - 4049.268 ms","timestamp":"2026-11-13 23:51:30"}
+{"level":"info","message":"GET /users/profile 200 22752 - 209.333 ms","timestamp":"2026-11-13 23:51:32"}
+{"level":"info","message":"GET / 304 - - 819.910 ms","timestamp":"2026-11-13 23:51:52"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 23:51:59"}
+{"level":"info","message":"GET /reservations/book/6af6a2c6165621fb525dd780?tripType=One-Way&depart=Nov%2002,%202026&return=Dec%2002,%202026 500 15740 - 4185.513 ms","timestamp":"2026-11-13 23:52:01"}
+{"level":"info","message":"GET / 304 - - 146.480 ms","timestamp":"2026-11-13 23:54:19"}
+{"level":"info","message":"Server running at https://localhost:3000","timestamp":"2026-11-14 00:18:39"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-14 00:18:39"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:18:52"}
+{"level":"info","message":"GET / 500 15740 - 244.949 ms","timestamp":"2026-11-14 00:18:53"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:18:56"}
+{"level":"info","message":"GET / 500 15740 - 17.986 ms","timestamp":"2026-11-14 00:18:56"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:18:58"}
+{"level":"info","message":"GET / 500 15740 - 13.040 ms","timestamp":"2026-11-14 00:18:58"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:19:03"}
+{"level":"info","message":"GET / 500 15740 - 14.315 ms","timestamp":"2026-11-14 00:19:03"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:19:33"}
+{"level":"info","message":"GET / 500 15740 - 153.911 ms","timestamp":"2026-11-14 00:19:33"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:19:41"}
+{"level":"info","message":"GET / 500 15695 - 241.760 ms","timestamp":"2026-11-14 00:19:41"}
+{"level":"info","message":"Server running at http://localhost:3000","timestamp":"2026-11-14 00:20:10"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-14 00:20:10"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:24:00"}
+{"level":"info","message":"GET / 500 15695 - 767.234 ms","timestamp":"2026-11-14 00:24:00"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:24:13"}
+{"level":"info","message":"GET / 500 15695 - 45.006 ms","timestamp":"2026-11-14 00:24:13"}
+{"level":"info","message":"Server running at https://localhost:3000","timestamp":"2026-11-14 00:25:04"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-14 00:25:04"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:25:12"}
+{"level":"info","message":"GET / 500 15695 - 495.182 ms","timestamp":"2026-11-14 00:25:12"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:25:33"}
+{"level":"info","message":"GET / 500 15695 - 49.678 ms","timestamp":"2026-11-14 00:25:33"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:25:40"}
+{"level":"info","message":"GET / 500 15695 - 30.617 ms","timestamp":"2026-11-14 00:25:40"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:26:21"}
+{"level":"info","message":"GET / 500 15695 - 33.390 ms","timestamp":"2026-11-14 00:26:21"}
+{"level":"info","message":"Server running at https://localhost:3000","timestamp":"2026-11-14 00:26:28"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-14 00:26:28"}
+{"level":"info","message":"GET / 200 59975 - 71.521 ms","timestamp":"2026-11-14 00:26:30"}
+{"level":"info","message":"GET /reservations/book/6af6a2c6165621fb525dd790?tripType=Round-Trip&depart=Oct%2026,%202027&return=Nov%2025,%202027 403 15682 - 23.751 ms","timestamp":"2026-11-14 00:26:36"}
+{"code":"EADDRINUSE","level":"error","message":"Server failed to start.","timestamp":"2026-11-14 00:27:43"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-14 00:27:44"}
+{"code":"EADDRINUSE","level":"error","message":"Server failed to start.","timestamp":"2026-11-14 00:27:54"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-14 00:27:54"}
+{"level":"info","message":"Server running at http://localhost:3000","timestamp":"2026-11-14 00:33:14"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-14 00:33:14"}
+{"level":"info","message":"GET / 200 60412 - 622.199 ms","timestamp":"2026-11-14 00:33:25"}
+{"level":"info","message":"GET /reservations/book/6af6a2c6165621fb525dd780?tripType=One-Way&travelClass=Business&departDate=Nov%2002,%202026&returnDate=Dec%2002,%202026 403 15682 - 21.316 ms","timestamp":"2026-11-14 00:33:29"}
+{"level":"info","message":"GET / 304 - - 577.473 ms","timestamp":"2026-11-14 00:35:21"}
+{"level":"info","message":"GET /reservations/book/6af6a2c6165621fb525dd790?tripType=Round-Trip&travelClass=Business&departDate=Oct%2026,%202027&returnDate=Nov%2025,%202027 403 15682 - 35.483 ms","timestamp":"2026-11-14 00:35:27"}
+{"level":"info","message":"POST /users/login 401 56 - 117.291 ms","timestamp":"2026-11-14 00:35:48"}
+{"level":"info","message":"User authenticated.","timestamp":"2026-11-14 00:36:06"}
+{"level":"info","message":"POST /users/login 200 95 - 104.669 ms","timestamp":"2026-11-14 00:36:06"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:36:08"}
+{"level":"info","message":"GET /reservations/book/6af6a2c6165621fb525dd790?tripType=Round-Trip&travelClass=Business&departDate=Oct%2026,%202027&returnDate=Nov%2025,%202027 500 15740 - 91.968 ms","timestamp":"2026-11-14 00:36:08"}
+{"level":"info","message":"Server running at http://localhost:3000","timestamp":"2026-11-14 00:38:50"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-14 00:38:50"}
+{"level":"info","message":"GET / 200 60397 - 93.641 ms","timestamp":"2026-11-14 00:38:56"}
+{"level":"info","message":"GET / 304 - - 32.705 ms","timestamp":"2026-11-14 00:39:01"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:39:07"}
+{"level":"info","message":"GET /reservations/book/6af6a2c6165621fb525dd780?tripType=One-Way&travelClass=Business&departDate=2026-11-01&returnDate=2026-12-01 500 15740 - 64.462 ms","timestamp":"2026-11-14 00:39:07"}
+{"level":"info","message":"GET / 304 - - 21.763 ms","timestamp":"2026-11-14 00:39:10"}
+{"level":"info","message":"Server running at https://localhost:3000","timestamp":"2026-11-14 00:42:10"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-14 00:42:11"}
+{"level":"info","message":"GET / 200 60397 - 2794.828 ms","timestamp":"2026-11-14 00:42:31"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:42:43"}
+{"level":"info","message":"GET /reservations/book/6af6a2c6165621fb525dd790?tripType=Round-Trip&travelClass=Business&departDate=2027-10-25&returnDate=2027-11-24 500 15740 - 323.755 ms","timestamp":"2026-11-14 00:42:43"}
+{"level":"info","message":"GET / 304 - - 65.885 ms","timestamp":"2026-11-14 00:42:57"}
+{"level":"info","message":"Server running at https://localhost:3000","timestamp":"2026-11-14 00:43:54"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-14 00:43:54"}
+{"level":"info","message":"GET / 200 60457 - 2240.325 ms","timestamp":"2026-11-14 00:44:02"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:44:07"}
+{"level":"info","message":"GET /reservations/book/6af6a2c6165621fb525dd780?tripType=One-Way&travelClass=Business&departDate=Nov%2002,%202026&returnDate=Dec%2002,%202026 500 15740 - 437.096 ms","timestamp":"2026-11-14 00:44:07"}

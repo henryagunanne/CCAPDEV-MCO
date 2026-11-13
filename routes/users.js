@@ -114,7 +114,10 @@ function normalizeOtpInput(value) {
 }
 
 
-
+/** * Check if a user is an active administrator, meaning they have admin privileges and are not disabled or suspended.
+ * @param {Object} user - The user object to check.
+ * @returns {boolean} - True if the user is an active administrator, false otherwise.
+ */
 function isActiveAdministrator(user) {
   return Boolean(user && isAdminAccount(user) && user.status !== 'disabled' && user.status !== 'suspended');
 }

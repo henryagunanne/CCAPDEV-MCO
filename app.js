@@ -14,10 +14,10 @@ const crypto = require('crypto');
 const SESSION_IDLE_TIMEOUT_MS = 30 * 60 * 1000;
 const SESSION_ABSOLUTE_TIMEOUT_MS = 8 * 60 * 60 * 1000;
 const isProduction = process.env.NODE_ENV === 'production';
-const seedPopularFlights = require('./seeds/seedPopularFlights'); // Seed popular flights
-const seedFlights = require('./seeds/seedFlights'); // Seed flights
-const seedUsers = require('./seeds/seedUsers'); // Seed Users
-const seedReservations = require('./seeds/seedReservations'); // Seed Reservations
+// const seedPopularFlights = require('./seeds/seedPopularFlights'); // Seed popular flights
+// const seedFlights = require('./seeds/seedFlights'); // Seed flights
+// const seedUsers = require('./seeds/seedUsers'); // Seed Users
+// const seedReservations = require('./seeds/seedReservations'); // Seed Reservations
 
 // System logging
 const httpLogger = require('./logs/httpLogger');
@@ -30,10 +30,10 @@ if (!isTestEnvironment) {
     mongoose.connect(mongoUri)
     .then(async () => {
         logger.info('✅ MongoDB connected.');
-        await seedFlights(); // seeds flights if empty
-        await seedPopularFlights(); // seed popular flights if empty
-        await seedUsers(); // seed users if empty
-        await seedReservations(); // seed reservations if empty
+        // await seedFlights(); // seeds flights if empty
+        // await seedPopularFlights(); // seed popular flights if empty
+        // await seedUsers(); // seed users if empty
+        // await seedReservations(); // seed reservations if empty
     })
     .catch(err => logger.error('MongoDB connection failed.', { code: err.code || 'DATABASE_CONNECTION_ERROR' }));
 }
@@ -55,6 +55,14 @@ app.engine('hbs', exphbs.engine({
         month: 'short',
         year: 'numeric'
       });
+    },
+
+    // Date input formatting helper for HTML date input fields
+    dateInput: (date) => {
+      if (!date) return '';
+      const parsed = date instanceof Date ? date : new Date(date);
+      if (Number.isNaN(parsed.getTime())) return '';
+      return parsed.toISOString().slice(0, 10);
     },
 
     // Chunk helper to group flights (e.g., 4 per slide)
@@ -150,7 +158,7 @@ app.use(helmet({
             imgSrc: ["'self'", 'data:'],
             fontSrc: ["'self'", 'data:', 'https://cdn.jsdelivr.net'],
             connectSrc: ["'self'"],
-            upgradeInsecureRequests: isProduction ? [] : null,
+            upgradeInsecureRequests: isProduction ? [] : null,  // Upgrade HTTP requests to HTTPS in production
         }
     },
     crossOriginEmbedderPolicy: false,

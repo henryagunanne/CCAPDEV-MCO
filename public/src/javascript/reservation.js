@@ -162,33 +162,83 @@ document.addEventListener('DOMContentLoaded', () => {
       container.textContent = selectedFlightId(leg) ? 'Seat configuration is unavailable.' : 'Select the flight first.';
       return;
     }
-    const occupied = new Set(layout.occupiedSeats);
+    const occupied = new Set(layout.occupiedSeats || []);
     const selected = new Set(selections[leg].filter(Boolean));
     const seatGrid = document.createElement('div');
-    seatGrid.className = 'd-flex flex-wrap justify-content-center';
+    seatGrid.className = 'seat-grid-wrap';
+    const seatGridInner = document.createElement('div');
+    seatGridInner.className = 'seat-grid';
+    const columns = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+    const corner = document.createElement('span');
+    corner.className = 'seat-grid-corner';
+    seatGridInner.append(corner);
+    columns.forEach(letter => {
+      const heading = document.createElement('span');
+      heading.className = 'seat-column-heading';
+      if (letter === 'D' || letter === 'H') heading.classList.add('aisle-start');
+      heading.textContent = letter;
+      seatGridInner.append(heading);
+    });
+
+    const seatsByRow = new Map();
     for (const seat of layout.seats) {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'seat m-1 p-2 border rounded';
-      button.textContent = seat.seatNumber;
-      button.title = seat.travelClass;
-      button.setAttribute('aria-label', `${seat.seatNumber}, ${seat.travelClass}`);
-      button.dataset.seat = seat.seatNumber;
-      if (occupied.has(seat.seatNumber)) {
-        button.disabled = true;
-        button.classList.add('occupied', 'bg-secondary', 'text-white');
-      } else if (seat.travelClass !== travelClass.value) {
-        button.disabled = true;
-        button.classList.add('text-muted');
-      } else if (selected.has(seat.seatNumber)) {
-        button.classList.add('selected', 'bg-warning');
-      } else {
-        button.classList.add('available');
-      }
-      button.addEventListener('click', () => selectSeat(leg, seat.seatNumber));
-      seatGrid.append(button);
+      if (!seatsByRow.has(seat.row)) seatsByRow.set(seat.row, new Map());
+      seatsByRow.get(seat.row).set(seat.column, seat);
     }
-    container.append(seatGrid);
+    const rowCount = Math.ceil(Number(layout.seatCapacity || layout.seats.length) / 10);
+    for (let row = 1; row <= rowCount; row += 1) {
+      const rowLabel = document.createElement('span');
+      rowLabel.className = 'seat-row-heading';
+      rowLabel.textContent = String(row);
+      seatGridInner.append(rowLabel);
+      const rowSeats = seatsByRow.get(row) || new Map();
+      columns.forEach(letter => {
+        const seat = rowSeats.get(letter);
+        if (!seat) {
+          const empty = document.createElement('span');
+          empty.className = 'seat-grid-empty';
+          empty.setAttribute('aria-hidden', 'true');
+          seatGridInner.append(empty);
+          return;
+        }
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'seat';
+        button.textContent = seat.seatNumber;
+        button.title = `${seat.seatNumber} · ${seat.travelClass}`;
+        button.setAttribute('aria-label', `${seat.seatNumber}, ${seat.travelClass}`);
+        button.dataset.seat = seat.seatNumber;
+        if (seat.column === 'D' || seat.column === 'H') button.classList.add('aisle-start');
+        const classStyle = {
+          'First': 'seat-first',
+          'Business': 'seat-business',
+          'Premium Economy': 'seat-premium',
+          'Economy': 'seat-economy'
+        }[seat.travelClass];
+        if (classStyle) button.classList.add(classStyle);
+        if (occupied.has(seat.seatNumber)) {
+          button.disabled = true;
+          button.classList.add('occupied');
+        } else if (seat.travelClass !== travelClass.value) {
+          button.disabled = true;
+          button.classList.add('class-unavailable');
+        } else if (selected.has(seat.seatNumber)) {
+          button.classList.add('selected');
+        } else {
+          button.classList.add('available');
+        }
+        button.addEventListener('click', () => selectSeat(leg, seat.seatNumber));
+        seatGridInner.append(button);
+      });
+    }
+    seatGrid.append(seatGridInner);
+    const frontLabel = document.createElement('p');
+    frontLabel.className = 'text-center text-muted small fw-semibold mb-2';
+    frontLabel.textContent = 'FRONT OF AIRCRAFT · COCKPIT';
+    const rearLabel = document.createElement('p');
+    rearLabel.className = 'text-center text-muted small fw-semibold mt-2';
+    rearLabel.textContent = 'REAR OF AIRCRAFT';
+    container.append(frontLabel, seatGrid, rearLabel);
   }
 
   /** * Handle seat selection for a given flight leg.

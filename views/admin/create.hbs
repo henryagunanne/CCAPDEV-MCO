@@ -27,10 +27,11 @@
 
           <!-- Seat Capacity -->
           <div class="col-md-4">
-            <label for="seatCapacity" class="form-label fw-semibold">Seat Capacity</label>
-            <input type="number" class="form-control" id="seatCapacity" name="seatCapacity" min="1" required>
+            <label for="seatCapacity" class="form-label fw-semibold">Seat Capacity (1–300)</label>
+            <input type="number" class="form-control" id="seatCapacity" name="seatCapacity" min="1" max="300" required>
             <div class="invalid-feedback">Please enter a valid seat capacity.</div>
           </div>
+          <div class="col-12"><small class="text-muted">The seat map is generated from this capacity using the shared A–J layout. Capacity and aircraft cannot be changed after bookings exist.</small></div>
 
           <!-- Origin -->
           <div class="col-md-6">
@@ -69,7 +70,7 @@
 
           <!-- Price -->
           <div class="col-md-6">
-            <label for="price" class="form-label fw-semibold">Price ($)</label>
+            <label for="price" class="form-label fw-semibold">Base Fare (₱)</label>
             <input type="number" class="form-control" id="price" name="price" min="0" required>
             <div class="invalid-feedback">Please enter a valid price.</div>
           </div>

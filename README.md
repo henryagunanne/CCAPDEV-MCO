@@ -213,6 +213,12 @@ npm run migrate:booking-integrity -- --apply
 
 The migration intentionally stops when existing reservations need reconciliation, including round trips without a return seat. Resolve those conflicts before applying. Do not run either `--apply` command against a production database without an approved backup and deployment window. Booking and seat-availability endpoints remain unavailable until the migration verifies the unique seat index and marks booking integrity ready.
 
+
+## Database seeding
+
+See [`scripts/seeds/README.md`](scripts/seeds/README.md) for the non-destructive `npm run seed` workflow, model coverage, execution order, and legacy booking-integrity migration guidance. Application startup no longer inserts demo records automatically. Provision administrators separately with `npm run provision:admin`.
+
+
 ### Running the Application
 
 ```bash

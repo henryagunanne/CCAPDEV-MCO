@@ -21,21 +21,14 @@ const fs = require("fs");
 const path = require("path");
 
 const CONFIG_VERSION = "1.0.0";
-const MAX_ROWS = 30;
-const COLUMNS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
-// ASSUMPTION: 3-4-3 abreast. Change here if you want a different aisle pattern.
-const COLUMN_POSITIONS = {
-  A: "WINDOW", B: "MIDDLE", C: "AISLE",
-  D: "AISLE", E: "MIDDLE", F: "MIDDLE", G: "AISLE",
-  H: "AISLE", I: "MIDDLE", J: "WINDOW"
-};
-const MAX_SEATS = MAX_ROWS * COLUMNS.length; // 300
+const {
+  COLUMNS, COLUMN_POSITIONS, CLASS_ORDER, CLASS_PERCENTAGES, CLASS_CODES,
+  MAX_CAPACITY, allocateClassCounts, generateSeats
+} = require("../services/seatAllocationService");
+const MAX_ROWS = MAX_CAPACITY / COLUMNS.length;
+const MAX_SEATS = MAX_CAPACITY;
 
-const CLASS_ORDER = ["First", "Business", "Premium Economy", "Economy"];
-const CLASS_PERCENTAGES = { First: 5, Business: 10, "Premium Economy": 15, Economy: 70 };
-const CLASS_CODES = { First: "F", Business: "J", "Premium Economy": "W", Economy: "Y" };
-
-// Same list as seedFlights.js
+// Same list as the application's aircraft selector.
 const KNOWN_AIRCRAFT = [
   "Airbus A320", "Airbus A320neo", "Airbus A321", "Airbus A321neo",
   "Airbus A330", "Airbus A350",
@@ -44,54 +37,18 @@ const KNOWN_AIRCRAFT = [
   "Embraer E190", "Bombardier CRJ900"
 ];
 
-function allocateClassCounts(capacity) {
-  const counts = {};
-  const remainders = [];
-  let allocated = 0;
-  for (const name of CLASS_ORDER) {
-    const exact = (capacity * CLASS_PERCENTAGES[name]) / 100;
-    const whole = Math.floor(exact);
-    counts[name] = whole;
-    allocated += whole;
-    remainders.push({ name, remainder: exact - whole });
-  }
-  remainders.sort(
-    (a, b) => b.remainder - a.remainder || CLASS_ORDER.indexOf(a.name) - CLASS_ORDER.indexOf(b.name)
-  );
-  const remaining = capacity - allocated;
-  for (let i = 0; i < remaining; i += 1) counts[remainders[i].name] += 1;
-  return counts;
-}
-
 function buildSeats(flightId, capacity) {
-  if (!Number.isInteger(capacity) || capacity <= 0) {
-    throw new Error(`Flight ${flightId} has invalid seatCapacity: ${capacity}`);
+  try {
+    const classCounts = allocateClassCounts(capacity);
+    const seats = generateSeats(capacity).map(seat => ({
+      seatId: `${flightId}:${seat.seatNumber}`,
+      ...seat,
+      status: "AVAILABLE"
+    }));
+    return { seats, classCounts };
+  } catch (error) {
+    throw new Error(`Flight ${flightId}: ${error.message}`);
   }
-  if (capacity > MAX_SEATS) {
-    throw new Error(
-      `Flight ${flightId} seatCapacity ${capacity} exceeds the ${MAX_SEATS}-seat grid (rows 1-${MAX_ROWS} x columns A-J).`
-    );
-  }
-  const classCounts = allocateClassCounts(capacity);
-  const seats = [];
-  let index = 0;
-  for (const className of CLASS_ORDER) {
-    for (let n = 0; n < classCounts[className]; n += 1, index += 1) {
-      const row = Math.floor(index / COLUMNS.length) + 1;
-      const column = COLUMNS[index % COLUMNS.length];
-      seats.push({
-        seatId: `${flightId}:${row}${column}`,
-        seatNumber: `${row}${column}`,
-        row,
-        column,
-        position: COLUMN_POSITIONS[column],
-        travelClass: className,
-        classCode: CLASS_CODES[className],
-        status: "AVAILABLE"
-      });
-    }
-  }
-  return { seats, classCounts };
 }
 
 function configurationForAircraft(aircraft) {

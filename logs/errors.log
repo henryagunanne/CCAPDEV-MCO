@@ -13,3 +13,39 @@
 {"code":"EADDRINUSE","level":"error","message":"Server failed to start.","timestamp":"2026-11-13 07:53:20"}
 {"code":"EADDRINUSE","level":"error","message":"Server failed to start.","timestamp":"2026-11-13 08:00:51"}
 {"code":"EADDRINUSE","level":"error","message":"Server failed to start.","timestamp":"2026-11-13 08:04:12"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 13:57:55"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 13:58:01"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 13:58:25"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 14:00:15"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 14:02:23"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 22:51:17"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 22:51:28"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 23:16:45"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 23:16:49"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 23:16:58"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 23:17:05"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 23:17:09"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 23:17:12"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 23:17:23"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 23:17:41"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 23:17:42"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 23:17:52"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-13 23:51:59"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:18:52"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:18:56"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:18:58"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:19:03"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:19:33"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:19:41"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:24:00"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:24:13"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:25:12"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:25:33"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:25:40"}
+{"code":"UNHANDLED_ERROR","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:26:21"}
+{"code":"EADDRINUSE","level":"error","message":"Server failed to start.","timestamp":"2026-11-14 00:27:43"}
+{"code":"EADDRINUSE","level":"error","message":"Server failed to start.","timestamp":"2026-11-14 00:27:54"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:36:08"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:39:07"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:42:43"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:44:07"}

@@ -23,6 +23,8 @@ function createLimit(max, keyGenerator) {
   });
 }
 
+
+// Rate limiters for different scenarios
 const byIp = createLimit;
 const byAccount = (max) => createLimit(max, (req) => {
   const accountId = req.session?.user?._id;
@@ -32,11 +34,19 @@ const byEmail = (max) => createLimit(max, (req) => {
   const email = String(req.body?.email || '').trim().toLowerCase();
   return email ? `email:${crypto.createHash('sha256').update(email).digest('hex')}` : `ip:${ipKeyGenerator(req.ip)}`;
 });
+const byMfaAccount = (max) => createLimit(max, (req) => {
+  const accountId = req.session?.user?._id
+    || req.session?.mfaPending?.userId
+    || req.session?.mfaReenrollment?.userId;
+  return accountId ? `mfa:${accountId}` : `ip:${ipKeyGenerator(req.ip)}`;
+});
 
 module.exports = {
   flightSearchLimits: [byIp(60), byAccount(60)],
   bookingLimits: [byIp(10), byAccount(10)],
   cancellationLimits: [byIp(10), byAccount(10)],
   checkInLimits: [byIp(10)],
-  authenticationLimits: [byIp(10), byEmail(10)]
+  authenticationLimits: [byIp(10), byEmail(10)],
+  mfaVerificationLimits: [byIp(10), byMfaAccount(10)],
+  recoveryCodeLimits: [byIp(5), byMfaAccount(5)]
 };

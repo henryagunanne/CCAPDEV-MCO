@@ -104,6 +104,26 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
+    mfaReplacementPendingSecret: {
+        type: String,
+        default: ''
+    },
+    mfaReplacementExpiresAt: {
+        type: Date,
+        default: null
+    },
+    mfaReplacementChallengeHash: {
+        type: String,
+        default: ''
+    },
+    mfaLastUsedCounter: {
+        type: Number,
+        default: -1
+    },
+    mfaLastUsedSecretHash: {
+        type: String,
+        default: ''
+    },
     recoveryCodes: {
         type: [String],
         default: []
@@ -136,6 +156,9 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 });
 
+
+/** * Pre-save hook to hash the password if it has been modified.
+ */
 userSchema.pre('save', async function (next) {
     if (!this.isModified('password')) return next();
     if (typeof this.password !== 'string' || this.password.trim() === '') {
@@ -172,7 +195,6 @@ userSchema.methods.toSafeSession = function () {
         permissions: this.permissions || [],
         status: this.status || 'active',
         mfaEnabled: Boolean(this.mfaEnabled),
-        mfaVerified: Boolean(this.mfaVerified),
         isAdmin: this.role === 'Admin'
     };
 };

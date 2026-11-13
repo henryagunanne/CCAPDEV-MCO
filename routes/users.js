@@ -13,15 +13,15 @@ const { isProvisionedAdminAccount } = require('../services/adminIdentity');
 const {
   generateSecret,
   generateQrCodeDataUrl,
-  verifyToken,
+  verifyTokenCounter,
   buildOtpAuthUrl,
   encryptSecret,
   decryptSecret,
   generateRecoveryCodes,
   hashRecoveryCode,
-  verifyRecoveryCode,
   isMfaEnrollmentComplete
 } = require('../services/mfa');
+const { mfaVerificationLimits, recoveryCodeLimits } = require('../middleware/rateLimits');
 const { recordAuditEvent } = require('../services/auditService');
 const { isTodayOrFutureInManila } = require('../services/manilaDate');
 const { supportsTransactions } = require('../services/bookingService');
@@ -54,7 +54,6 @@ function buildSessionUser(user) {
     isProvisionedAdmin: isProvisionedAdminAccount(user),
     sessionVersion: Number(user.sessionVersion || 0),
     mfaEnabled: Boolean(user.mfaEnabled),
-    mfaVerified: Boolean(user.mfaVerified),
     isAdmin
   };
 }
@@ -96,11 +95,12 @@ function isStrongAdminSetupPassword(password) {
  * @returns {Object} - The MFA pending state object.
  */
 function buildMfaPendingState(userId, stage = 'enroll') {
+  const createdAt = Date.now();
   return {
     userId: String(userId),
     stage,
-    createdAt: Date.now(),
-    expiresAt: Date.now() + 5 * 60 * 1000
+    createdAt,
+    expiresAt: createdAt + 5 * 60 * 1000
   };
 }
 
@@ -111,6 +111,144 @@ function buildMfaPendingState(userId, stage = 'enroll') {
  */
 function normalizeOtpInput(value) {
   return String(value || '').replace(/\s+/g, '').trim();
+}
+
+
+
+function isActiveAdministrator(user) {
+  return Boolean(user && isAdminAccount(user) && user.status !== 'disabled' && user.status !== 'suspended');
+}
+
+
+/** * Check if the current session is pending MFA verification.
+ * @param {Object} pending - The pending MFA state.
+ * @param {string} stage - The stage of the MFA process.
+ * @returns {boolean} - True if the session is pending MFA verification, false otherwise.
+ */
+function isLiveMfaPending(pending, stage) {
+  return Boolean(pending && pending.stage === stage && Number(pending.expiresAt) > Date.now());
+}
+
+
+/** * Consume a recovery code for a user, removing it from the list of valid codes.   
+ * @param {Object} user - The user object from the database.
+ * @param {string} recoveryCode - The recovery code to consume.
+ * @returns {Promise<boolean>} - True if the recovery code was consumed, false otherwise.
+ */
+async function consumeRecoveryCode(user, recoveryCode) {
+  const hashedCode = hashRecoveryCode(recoveryCode);
+  if (!Array.isArray(user.recoveryCodes) || !user.recoveryCodes.includes(hashedCode)) return false;
+
+  const updatedUser = await User.findOneAndUpdate(
+    { _id: user._id, recoveryCodes: hashedCode },
+    { $pull: { recoveryCodes: hashedCode } },
+    { new: true }
+  ).select('recoveryCodes');
+  if (!updatedUser) return false;
+
+  user.recoveryCodes = updatedUser.recoveryCodes;
+  return true;
+}
+
+
+/** * Consume a fresh TOTP token for a user, ensuring it hasn't been used before.
+ * @param {Object} user - The user object from the database.
+ * @param {string} encryptedSecret - The encrypted MFA secret.
+ * @param {string} token - The TOTP token to consume.
+ * @returns {Promise<boolean>} - True if the token was consumed, false otherwise.
+ */
+async function consumeFreshTotp(user, encryptedSecret, token) {
+  const secret = decryptSecret(encryptedSecret);
+  const counter = verifyTokenCounter(secret, token, { window: 1 });
+  if (counter === null) return false;
+  const secretHash = crypto.createHash('sha256').update(encryptedSecret).digest('hex');
+
+  const result = await User.updateOne(
+    {
+      _id: user._id,
+      $or: [
+        { mfaLastUsedSecretHash: secretHash, mfaLastUsedCounter: { $lt: counter } },
+        { mfaLastUsedSecretHash: { $ne: secretHash } }
+      ]
+    },
+    { $set: { mfaLastUsedCounter: counter, mfaLastUsedSecretHash: secretHash } }
+  );
+  return result.modifiedCount === 1;
+}
+
+
+/** * Regenerate the session for a request, creating a new session ID and clearing old data.
+ * @param {Object} req - The Express request object.
+ * @returns {Promise} - A promise that resolves when the session is regenerated.
+ */
+function regenerateSession(req) {
+  return new Promise((resolve, reject) => {
+    req.session.regenerate((error) => error ? reject(error) : resolve());
+  });
+}
+
+
+/** * Set the authenticated session for a user, including MFA state and expiration times. 
+ * @param {Object} req - The Express request object.
+ * @param {Object} user - The user object from the database.
+ * @param {Object} options - Options for setting the session.
+ * @param {boolean} options.mfaAuthenticated - Whether the user has completed MFA authentication.
+ */
+function setAuthenticatedSession(req, user, { mfaAuthenticated = false } = {}) {
+  const authenticatedAt = Date.now();
+  req.session.user = {
+    ...buildSessionUser(user),
+    authenticatedAt,
+    lastActivityAt: authenticatedAt,
+    absoluteExpiresAt: authenticatedAt + SESSION_ABSOLUTE_TIMEOUT_MS
+  };
+  req.session.authenticatedAt = authenticatedAt;
+  req.session.lastActivityAt = authenticatedAt;
+  req.session.absoluteExpiresAt = authenticatedAt + SESSION_ABSOLUTE_TIMEOUT_MS;
+  req.session.cookie.maxAge = SESSION_IDLE_TIMEOUT_MS;
+  req.session.stepUp = mfaAuthenticated
+    ? { verifiedAt: new Date(authenticatedAt).toISOString(), method: 'mfa' }
+    : null;
+  if (mfaAuthenticated) {
+    req.session.mfaAuthenticated = true;
+    req.session.mfaAuthenticatedAt = authenticatedAt;
+  }
+}
+
+
+/** * Create an authenticated session for an administrator after successful MFA verification.
+ * @param {Object} req - The Express request object.
+ * @param {Object} user - The user object from the database.
+ * @returns {Promise} - A promise that resolves when the session is created.
+ */
+async function createAuthenticatedAdminSession(req, user) {
+  await regenerateSession(req);
+  setAuthenticatedSession(req, user, { mfaAuthenticated: true });
+  await new Promise((resolve, reject) => {
+    req.session.save((error) => error ? reject(error) : resolve());
+  });
+}
+
+
+/** * Clear expired MFA secrets for a user, removing any pending or replacement secrets that have expired.
+ * @param {Object} user - The user object from the database.
+ * @returns {Promise<void>}
+ */
+async function clearExpiredMfaSecrets(user) {
+  const now = new Date();
+  let changed = false;
+  if (user.mfaPendingExpiresAt && user.mfaPendingExpiresAt <= now) {
+    user.mfaPendingSecret = '';
+    user.mfaPendingExpiresAt = null;
+    changed = true;
+  }
+  if (user.mfaReplacementExpiresAt && user.mfaReplacementExpiresAt <= now) {
+    user.mfaReplacementPendingSecret = '';
+    user.mfaReplacementExpiresAt = null;
+    user.mfaReplacementChallengeHash = '';
+    changed = true;
+  }
+  if (changed) await user.save();
 }
 
 /** * Handle failed login attempts, incrementing the count and locking the account if necessary.
@@ -345,59 +483,53 @@ router.post('/login', ...authenticationLimits, async (req, res) => {
       }
 
       await clearFailedLoginState(user);
+      await clearExpiredMfaSecrets(user);
       user.lastLoginAt = new Date();
       await user.save();
 
-      const wantsHtml = req.accepts('html') && !req.xhr;
-      const isAdmin = user.role === 'Admin';
+      const wantsHtml = req.accepts('html')
+        && !req.xhr
+        && String(req.get('accept') || '').includes('text/html');
+      const isAdmin = isAdminAccount(user);
       const hasMfaEnrollment = isMfaEnrollmentComplete(user);
-      const requiresMfaChallenge = isAdmin && !user.mfaVerified;
       const pendingStage = hasMfaEnrollment ? 'verify' : 'enroll';
 
-      req.session.regenerate((err) => {
-        if (err) {
-          logger.error('Session regeneration failed.', { code: err.code || 'SESSION_REGENERATION_ERROR' });
-          return res.status(500).json({ success: false, message: 'Login failed.' });
-        }
+      await regenerateSession(req);
 
-        const authenticatedAt = Date.now();
-        const safeSessionUser = buildSessionUser(user);
-        req.session.user = {
-          ...safeSessionUser,
-          authenticatedAt,
-          lastActivityAt: authenticatedAt,
-          absoluteExpiresAt: authenticatedAt + SESSION_ABSOLUTE_TIMEOUT_MS,
-          mfaRequired: Boolean(isAdmin && requiresMfaChallenge)
-        };
-        req.session.stepUp = null;
-        req.session.mfaPending = isAdmin && requiresMfaChallenge ? buildMfaPendingState(user._id, pendingStage) : null;
-        req.session.authenticatedAt = authenticatedAt;
-        req.session.lastActivityAt = authenticatedAt;
-        req.session.absoluteExpiresAt = authenticatedAt + SESSION_ABSOLUTE_TIMEOUT_MS;
-        req.session.cookie.maxAge = SESSION_IDLE_TIMEOUT_MS;
-
-        logger.info('User authenticated.');
-
-        const response = {
+      // If the user is an admin and MFA is required, set up the pending MFA state
+      if (isAdmin) {
+        const pending = buildMfaPendingState(user._id, pendingStage);
+        req.session.mfaPending = pending;
+        req.session.cookie.maxAge = Math.max(1, pending.expiresAt - Date.now());
+        await new Promise((resolve, reject) => {
+          req.session.save((error) => error ? reject(error) : resolve());
+        });
+        const redirect = `/users/mfa/${pendingStage}`;
+        logger.info('Administrator password authentication completed; MFA is pending.');
+        if (wantsHtml) return res.redirect(redirect);
+        return res.status(200).json({
           success: true,
-          isAdmin,
-          mfaRequired: Boolean(isAdmin && requiresMfaChallenge),
-          nextAction: isAdmin && requiresMfaChallenge ? pendingStage : null,
-          redirect: isAdmin && requiresMfaChallenge ? `/users/mfa/${pendingStage}` : null,
-          message: `Welcome, ${user.firstName}!`
-        };
+          isAdmin: true,
+          mfaRequired: true,
+          nextAction: pendingStage,
+          redirect,
+          message: `Welcome, ${user.firstName}! Complete MFA to continue.`
+        });
+      }
 
-        if (wantsHtml) {
-          if (isAdmin && requiresMfaChallenge) {
-            return res.redirect(`/users/mfa/${pendingStage}`);
-          }
-          if (isAdmin) {
-            return res.redirect('/admin');
-          }
-          return res.redirect('/');
-        }
+      setAuthenticatedSession(req, user);
+      await new Promise((resolve, reject) => {
+        req.session.save((error) => error ? reject(error) : resolve());
+      });
+      logger.info('User authenticated.');
 
-        return res.status(200).json(response);
+      if (wantsHtml) return res.redirect('/');
+      return res.status(200).json({
+        success: true,
+        isAdmin: false,
+        mfaRequired: false,
+        redirect: null,
+        message: `Welcome, ${user.firstName}!`
       });
 
     } catch (err) {
@@ -412,23 +544,32 @@ router.get('/mfa/enroll', async (req, res) => {
     return res.redirect('/');
   }
 
+  if (!isLiveMfaPending(pending, 'enroll')) {
+    req.session.destroy((error) => {
+      if (error) logger.error('Expired MFA session cleanup failed.', { code: error.code || 'MFA_SESSION_CLEANUP_ERROR' });
+      return res.redirect('/?mfaExpired=true');
+    });
+    return;
+  }
+
   const user = await User.findById(pending.userId);
-  if (!user || user.role !== 'Admin') {
+  if (!isActiveAdministrator(user)) {
     return res.status(403).render('error/access-denied', { title: 'Access Denied', message: 'Administrative access required.' });
   }
 
-  if (pending.expiresAt && Date.now() > pending.expiresAt) {
-    req.session.mfaPending = null;
-    return res.redirect('/?mfaExpired=true');
+  if (isMfaEnrollmentComplete(user)) {
+    pending.stage = 'verify';
+    return res.redirect('/users/mfa/verify');
   }
 
-  const pendingSecret = user.mfaPendingSecret ? decryptSecret(user.mfaPendingSecret) : '';
-  const secret = pendingSecret || generateSecret();
-  if (!user.mfaPendingSecret) {
+  await clearExpiredMfaSecrets(user);
+  let secret = user.mfaPendingSecret ? decryptSecret(user.mfaPendingSecret) : '';
+  if (!secret) {
+    secret = generateSecret();
     user.mfaPendingSecret = encryptSecret(secret);
-    user.mfaEnabled = false;
-    await user.save();
   }
+  user.mfaPendingExpiresAt = new Date(pending.expiresAt);
+  await user.save();
 
   const qrCode = await generateQrCodeDataUrl(user.email, secret);
   return res.render('users/mfa-enroll', {
@@ -448,18 +589,22 @@ router.get('/mfa/verify', async (req, res) => {
     return res.redirect('/');
   }
 
+  if (!isLiveMfaPending(pending, 'verify')) {
+    req.session.destroy((error) => {
+      if (error) logger.error('Expired MFA session cleanup failed.', { code: error.code || 'MFA_SESSION_CLEANUP_ERROR' });
+      return res.redirect('/?mfaExpired=true');
+    });
+    return;
+  }
+
   const user = await User.findById(pending.userId);
-  if (!user || user.role !== 'Admin') {
+  if (!isActiveAdministrator(user)) {
     return res.status(403).render('error/access-denied', { title: 'Access Denied', message: 'Administrative access required.' });
   }
 
-  if (!user.mfaEnabled || !user.mfaSecret) {
+  if (!isMfaEnrollmentComplete(user)) {
+    pending.stage = 'enroll';
     return res.redirect('/users/mfa/enroll');
-  }
-
-  if (pending.expiresAt && Date.now() > pending.expiresAt) {
-    req.session.mfaPending = null;
-    return res.redirect('/?mfaExpired=true');
   }
 
   return res.render('users/mfa-verify', {
@@ -473,21 +618,23 @@ router.get('/mfa/verify', async (req, res) => {
 
 router.get('/mfa/setup', async (req, res) => {
   const pending = req.session && req.session.mfaPending;
-  if (!pending || pending.stage !== 'enroll') {
+  if (!isLiveMfaPending(pending, 'enroll')) {
     return res.status(403).json({ success: false, message: 'MFA enrollment is required.' });
   }
 
   const user = await User.findById(pending.userId);
-  if (!user || user.role !== 'Admin') {
+  if (!isActiveAdministrator(user) || isMfaEnrollmentComplete(user)) {
     return res.status(403).json({ success: false, message: 'Administrative access required.' });
   }
 
-  const pendingSecret = user.mfaPendingSecret ? decryptSecret(user.mfaPendingSecret) : '';
-  const secret = pendingSecret || generateSecret();
-  if (!user.mfaPendingSecret) {
+  await clearExpiredMfaSecrets(user);
+  let secret = user.mfaPendingSecret ? decryptSecret(user.mfaPendingSecret) : '';
+  if (!secret) {
+    secret = generateSecret();
     user.mfaPendingSecret = encryptSecret(secret);
-    await user.save();
   }
+  user.mfaPendingExpiresAt = new Date(pending.expiresAt);
+  await user.save();
 
   const qrCode = await generateQrCodeDataUrl(user.email, secret);
   return res.status(200).json({
@@ -501,16 +648,21 @@ router.get('/mfa/setup', async (req, res) => {
 
 
 
-router.post('/mfa/setup/confirm', async (req, res) => {
+router.post('/mfa/setup/confirm', ...mfaVerificationLimits, async (req, res) => {
   const pending = req.session && req.session.mfaPending;
-  if (!pending || pending.stage !== 'enroll') {
-    return res.status(403).json({ success: false, code: 'MFA_REQUIRED', message: 'MFA enrollment is required.' });
+  if (!isLiveMfaPending(pending, 'enroll')) {
+    return res.status(401).json({ success: false, code: 'MFA_PENDING_EXPIRED', message: 'Your MFA setup session expired. Sign in again.' });
   }
 
   const token = normalizeOtpInput(req.body.token);
   const user = await User.findById(pending.userId);
-  if (!user || user.role !== 'Admin') {
+  if (!isActiveAdministrator(user) || isMfaEnrollmentComplete(user)) {
     return res.status(403).json({ success: false, message: 'Administrative access required.' });
+  }
+
+  await clearExpiredMfaSecrets(user);
+  if (!user.mfaPendingExpiresAt || user.mfaPendingExpiresAt <= new Date()) {
+    return res.status(401).json({ success: false, code: 'MFA_PENDING_EXPIRED', message: 'Your MFA setup session expired. Sign in again.' });
   }
 
   const pendingSecret = decryptSecret(user.mfaPendingSecret);
@@ -518,30 +670,24 @@ router.post('/mfa/setup/confirm', async (req, res) => {
     return res.status(400).json({ success: false, message: 'MFA enrollment secret is unavailable.' });
   }
 
-  if (!verifyToken(pendingSecret, token, { window: 1 })) {
+  if (!await consumeFreshTotp(user, user.mfaPendingSecret, token)) {
+    await recordAuditLog({ actorId: user._id, actorRole: 'Admin', action: 'admin:mfa:enroll', resourceType: 'User', result: 'FAILURE', reason: 'Invalid or reused enrollment code' });
     return res.status(400).json({ success: false, message: 'The verification code was invalid.' });
   }
 
   const recoveryCodes = generateRecoveryCodes(10);
+  const encryptedPendingSecret = user.mfaPendingSecret;
   user.mfaEnabled = true;
-  user.mfaVerified = true;
   user.mfaPendingSecret = '';
-  user.mfaSecret = encryptSecret(pendingSecret);
+  user.mfaPendingExpiresAt = null;
+  user.mfaSecret = encryptedPendingSecret;
   user.mfaEnrolledAt = new Date();
   user.lastMfaVerifiedAt = new Date();
   user.recoveryCodes = recoveryCodes.map((code) => hashRecoveryCode(code));
   await user.save();
 
-  req.session.user = {
-    ...req.session.user,
-    mfaEnabled: true,
-    mfaVerified: true,
-    isAdmin: true
-  };
-  req.session.mfaPending = null;
-  req.session.stepUp = { verifiedAt: new Date().toISOString(), method: 'mfa' };
-
   await recordAuditLog({ actorId: user._id, actorRole: user.role || 'Admin', action: 'admin:mfa:enroll', resourceType: 'User', result: 'SUCCESS', reason: 'MFA enrollment complete' });
+  await createAuthenticatedAdminSession(req, user);
 
   return res.status(200).json({
     success: true,
@@ -553,21 +699,21 @@ router.post('/mfa/setup/confirm', async (req, res) => {
 
 
 
-router.post('/mfa/verify', async (req, res) => {
+router.post('/mfa/verify', ...mfaVerificationLimits, ...recoveryCodeLimits, async (req, res) => {
   const pending = req.session && req.session.mfaPending;
-  if (!pending || pending.stage !== 'verify') {
-    return res.status(403).json({ success: false, code: 'MFA_REQUIRED', message: 'MFA verification is required.' });
+  if (!isLiveMfaPending(pending, 'verify')) {
+    return res.status(401).json({ success: false, code: 'MFA_PENDING_EXPIRED', message: 'Your MFA verification session expired. Sign in again.' });
   }
 
   const token = normalizeOtpInput(req.body.token);
   const recoveryCode = typeof req.body.recoveryCode === 'string' ? req.body.recoveryCode.trim() : '';
 
   const user = await User.findById(pending.userId);
-  if (!user || user.role !== 'Admin') {
+  if (!isActiveAdministrator(user)) {
     return res.status(403).json({ success: false, message: 'Administrative access required.' });
   }
 
-  if (!user.mfaEnabled || !user.mfaSecret) {
+  if (!isMfaEnrollmentComplete(user)) {
     return res.status(400).json({ success: false, code: 'MFA_REQUIRED', message: 'MFA is not configured for this account.' });
   }
 
@@ -575,60 +721,51 @@ router.post('/mfa/verify', async (req, res) => {
   let usedRecovery = false;
 
   if (token) {
-    const secret = decryptSecret(user.mfaSecret);
-    isValid = Boolean(secret) && verifyToken(secret, token, { window: 1 });
+    isValid = await consumeFreshTotp(user, user.mfaSecret, token);
   }
 
   if (!isValid && recoveryCode) {
-    const recovered = verifyRecoveryCode(user.recoveryCodes || [], recoveryCode);
-    if (recovered !== null) {
-      usedRecovery = true;
-      isValid = true;
-      user.recoveryCodes.splice(recovered, 1);
-    }
+    isValid = await consumeRecoveryCode(user, recoveryCode);
+    usedRecovery = isValid;
   }
 
   if (!isValid) {
-    await recordAuditLog({ actorId: user._id, actorRole: user.role || 'Admin', action: 'admin:mfa:verify', resourceType: 'User', result: 'FAILURE', reason: 'Invalid MFA code' });
+    await recordAuditLog({
+      actorId: user._id,
+      actorRole: 'Admin',
+      action: recoveryCode ? 'admin:mfa:recovery:rejected' : 'admin:mfa:verify',
+      resourceType: 'User',
+      result: 'FAILURE',
+      reason: recoveryCode ? 'Recovery code rejected' : 'Invalid or reused MFA code'
+    });
     return res.status(400).json({ success: false, message: 'Invalid or expired MFA code.' });
   }
 
-  req.session.regenerate((err) => {
-    if (err) {
-      logger.error('Session regeneration failed.', { code: err.code || 'SESSION_REGENERATION_ERROR' });
-      return res.status(500).json({ success: false, message: 'Login failed.' });
+  user.lastMfaVerifiedAt = new Date();
+  await user.save();
+  await recordAuditLog({
+    actorId: user._id,
+    actorRole: 'Admin',
+    action: usedRecovery ? 'admin:mfa:recovery:used' : 'admin:mfa:verify',
+    resourceType: 'User',
+    result: 'SUCCESS',
+    reason: usedRecovery ? 'Recovery code accepted' : 'MFA verification succeeded'
+  });
+  await createAuthenticatedAdminSession(req, user);
+  return res.status(200).json({ success: true, isAdmin: true, redirect: '/admin', message: 'MFA verification succeeded.' });
+});
+
+router.post('/mfa/cancel', (req, res) => {
+  if (!req.session?.mfaPending) {
+    return res.status(400).json({ success: false, message: 'There is no pending MFA sign-in.' });
+  }
+  req.session.destroy((error) => {
+    if (error) {
+      logger.error('MFA sign-in cancellation failed.', { code: error.code || 'MFA_CANCEL_ERROR' });
+      return res.status(500).json({ success: false, message: 'Unable to cancel sign-in.' });
     }
-
-    const authenticatedAt = Date.now();
-    const safeSessionUser = buildSessionUser(user);
-    req.session.user = {
-      ...safeSessionUser,
-      authenticatedAt,
-      lastActivityAt: authenticatedAt,
-      absoluteExpiresAt: authenticatedAt + SESSION_ABSOLUTE_TIMEOUT_MS,
-      mfaRequired: false
-    };
-    req.session.stepUp = { verifiedAt: new Date().toISOString(), method: 'mfa' };
-    req.session.mfaPending = null;
-    req.session.authenticatedAt = authenticatedAt;
-    req.session.lastActivityAt = authenticatedAt;
-    req.session.absoluteExpiresAt = authenticatedAt + SESSION_ABSOLUTE_TIMEOUT_MS;
-    req.session.cookie.maxAge = SESSION_IDLE_TIMEOUT_MS;
-
-    user.mfaVerified = true;
-    user.lastMfaVerifiedAt = new Date();
-    user.save().catch((saveError) => logger.error('MFA verification save failed.', { code: saveError.code || 'MFA_VERIFICATION_SAVE_ERROR' }));
-
-    recordAuditLog({
-      actorId: user._id,
-      actorRole: user.role || 'Admin',
-      action: usedRecovery ? 'admin:mfa:recovery:used' : 'admin:mfa:verify',
-      resourceType: 'User',
-      result: 'SUCCESS',
-      reason: usedRecovery ? 'Recovery code accepted' : 'MFA verification succeeded'
-    }).catch((auditError) => logger.error('MFA verification audit failed.', { code: auditError.code || 'MFA_AUDIT_ERROR' }));
-
-    return res.status(200).json({ success: true, isAdmin: true, redirect: '/admin', message: 'MFA verification succeeded.' });
+    res.clearCookie('connect.sid', { httpOnly: true, sameSite: 'lax', secure: process.env.NODE_ENV === 'production' });
+    return res.status(200).json({ success: true, redirect: '/' });
   });
 });
 

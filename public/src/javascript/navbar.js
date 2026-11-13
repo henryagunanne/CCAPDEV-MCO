@@ -93,11 +93,18 @@ jQuery(function() {
             },
             error: function(xhr) {
                 // Show error message on failure
-                const msg = xhr.responseText || "⚠️ Login failed. Please try again.";
+                const msg = xhr.responseJSON?.message || "Login failed. Please try again.";
                 $("#loginError").text(msg).show();
             }
         });
     });
+
+    if (new URLSearchParams(window.location.search).get('mfaExpired') === 'true') {
+        $("#loginError").text("Your administrator MFA session expired. Please sign in again.").show();
+        if ($("#loginModal").length) {
+            $("#loginModal").modal("show");
+        }
+    }
 
     // registration form submission handling
     $("#registerForm").on("submit", function(event) {

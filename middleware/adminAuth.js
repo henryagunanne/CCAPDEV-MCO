@@ -69,12 +69,12 @@ function isMfaPendingSession(req) {
 function requireAuthentication(req, res, next) {
   const user = req.session?.user;
 
-  if (!user) {
-    return denyAccess(res, 'Authentication required.', 401);
-  }
-
   if (isMfaPendingSession(req)) {
     return denyMfaRequired(req, res, 'Multi-factor authentication is required.');
+  }
+
+  if (!user) {
+    return denyAccess(res, 'Authentication required.', 401);
   }
 
   if (user.status === 'disabled' || user.status === 'suspended') {
@@ -105,7 +105,7 @@ function requireMfaVerification(req, res, next) {
     return denyMfaRequired(req, res, 'Multi-factor authentication is required.');
   }
 
-  if (user.mfaEnabled && !user.mfaVerified) {
+  if (!req.session.mfaAuthenticated || !Number(req.session.mfaAuthenticatedAt)) {
     return denyMfaRequired(req, res, 'Multi-factor authentication is required.');
   }
 
@@ -121,16 +121,16 @@ function requireMfaVerification(req, res, next) {
 async function requireAdminAccess(req, res, next) {
   const sessionUser = req.session?.user;
 
-  if (!sessionUser) {
-    return denyAccess(res, 'Authentication required.', 401);
-  }
-
   if (isMfaPendingSession(req)) {
     return denyMfaRequired(
       req,
       res,
       'Multi-factor authentication is required before accessing administrative functions.'
     );
+  }
+
+  if (!sessionUser) {
+    return denyAccess(res, 'Authentication required.', 401);
   }
 
   const account = await User.findById(sessionUser._id);
@@ -161,7 +161,11 @@ async function requireAdminAccess(req, res, next) {
     return denyAccess(res, 'Your administrative access changed. Sign in again to continue.', 403);
   }
 
-  if (account.mfaEnabled && !account.mfaVerified) {
+  const mfaAuthenticatedAt = Number(req.session.mfaAuthenticatedAt || 0);
+  if (!account.mfaEnabled || !account.mfaSecret
+    || req.session.mfaAuthenticated !== true
+    || !mfaAuthenticatedAt
+    || mfaAuthenticatedAt < Number(sessionUser.authenticatedAt || 0)) {
     return denyMfaRequired(req, res, 'Multi-factor authentication is required.');
   }
 
@@ -178,7 +182,6 @@ async function requireAdminAccess(req, res, next) {
     isProvisionedAdmin,
     isAdmin: isAdminAccount(account),
     mfaEnabled: Boolean(account.mfaEnabled),
-    mfaVerified: Boolean(account.mfaVerified),
     sessionVersion: Number(account.sessionVersion || 0)
   };
   req.session.user = freshUser;

@@ -19,6 +19,7 @@
             <input id="recoveryCode" class="form-control mt-2" placeholder="Recovery code" autocomplete="one-time-code">
             <button class="btn btn-outline-secondary w-100 mt-2" type="button" id="useRecoveryCode">Use Recovery Code</button>
           </div>
+          <button class="btn btn-link w-100 mt-2" type="button" id="cancelMfaLogin">Cancel sign-in</button>
 
           <div id="mfaVerifyMessage" class="mt-3"></div>
         </div>
@@ -27,7 +28,7 @@
   </div>
 </div>
 
-<script>
+<script nonce="{{cspNonce}}">
   document.addEventListener('DOMContentLoaded', function () {
     const verifyForm = document.getElementById('mfaVerifyForm');
     const verifyButton = document.getElementById('mfaVerifySubmit');
@@ -47,6 +48,10 @@
         });
         const result = await response.json();
         if (!response.ok || !result.success) {
+          if (result.code === 'MFA_PENDING_EXPIRED') {
+            window.location.href = '/?mfaExpired=true';
+            return;
+          }
           throw new Error(result.message || 'Unable to verify your code.');
         }
         if (result.redirect) {
@@ -85,5 +90,18 @@
         runSubmit('', recoveryValue);
       });
     }
+
+    document.getElementById('cancelMfaLogin')?.addEventListener('click', async function () {
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+      try {
+        await fetch('/users/mfa/cancel', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-csrf-token': csrfToken },
+          body: JSON.stringify({})
+        });
+      } finally {
+        window.location.href = '/';
+      }
+    });
   });
 </script>

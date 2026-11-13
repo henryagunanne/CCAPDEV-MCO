@@ -151,11 +151,12 @@ NODE_ENV=development
 MONGODB_URI=mongodb://127.0.0.1:27017/airlineDB
 SESSION_SECRET=replace-with-a-long-random-secret
 PASSPORT_ENCRYPTION_KEY=base64-encoded-32-byte-key
+MFA_ENCRYPTION_KEY=base64-encoded-32-byte-key
 ADMIN_EMAIL=admin@yourdomain.com
 DPO_CONTACT=approved-DPO-contact
 ```
 
-Generate `PASSPORT_ENCRYPTION_KEY` with `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"` and keep it outside MongoDB, source control, and backups. The application will refuse to start when required values are missing in a non-test environment. Configure the approved DPO contact and publish the versioned holiday calendars before processing privacy requests.
+Generate each encryption key independently with `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"` and keep them outside MongoDB, source control, and backups. Keep `MFA_ENCRYPTION_KEY` stable across deployments; changing it without first re-encrypting enrolled MFA secrets will prevent administrators from verifying their authenticators. The application will refuse to start when required values are missing in a non-test environment. Configure the approved DPO contact and publish the versioned holiday calendars before processing privacy requests.
 
 ### MCO2 Privacy Data Operations
 
@@ -185,6 +186,12 @@ It refuses to create another administrator if one already exists, and it does no
 The provisioned account is the protected administrator-management authority. Administrators with the existing `user_access_admin` role may manage accounts only within their own permission set; other roles do not receive account-management access. From **Admin Management**, an authorized administrator can create employed accounts, assign an available role, and activate or deactivate accounts. Role and status changes are audited and require the affected administrator to sign in again.
 
 New administrators receive a one-time setup link to choose their own password. The link expires after 24 hours and is displayed only after account creation; share it with the administrator using a secure channel. No email integration is configured by this application. For an existing installation, configure `ADMIN_EMAIL` to the original provisioned administrator's email address; that account is marked as the protected administrator the next time it accesses an admin page.
+
+### Administrator MFA
+
+Administrators enroll an authenticator on their first login and must enter a fresh authenticator code on every subsequent login. Password authentication alone creates only a five-minute MFA-pending session and does not grant administrator access. Existing `mfaVerified` database values do not bypass the challenge.
+
+After completing login MFA, an administrator with Security Center access can replace their authenticator by verifying the current authenticator or using one unused recovery code, then confirming a code from the new authenticator. The previous authenticator remains valid until replacement is confirmed. Recovery codes are shown once, stored as hashes, and invalidated when the authenticator is replaced. Keep recovery codes securely; if both the authenticator and recovery codes are lost, use the controlled administrator account recovery process.
 
 ### Preparing Flight Seat Configurations
 

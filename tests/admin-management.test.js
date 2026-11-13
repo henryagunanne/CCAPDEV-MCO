@@ -4,6 +4,8 @@ const app = require('../server');
 const User = require('../models/User');
 const AuditLog = require('../models/AuditLog');
 const { rolePermissions } = require('../config/rbac');
+const speakeasy = require('speakeasy');
+const { decryptSecret } = require('../services/mfa');
 
 describe('Administrator management', () => {
   let agent;
@@ -19,9 +21,24 @@ describe('Administrator management', () => {
 
   async function signIn(targetAgent, email, password) {
     let token = await refreshCsrfToken(targetAgent);
-    await targetAgent.post('/users/login')
+    const login = await targetAgent.post('/users/login')
+      .set('Accept', 'text/html')
       .set('x-csrf-token', token)
       .send({ email, password })
+      .expect(302);
+    const page = await targetAgent.get(login.headers.location).set('Accept', 'text/html').expect(200);
+    const account = await User.findOne({ email });
+    const secret = login.headers.location.endsWith('/enroll')
+      ? decryptSecret(account.mfaPendingSecret)
+      : decryptSecret(account.mfaSecret);
+    const otp = speakeasy.totp({ secret, encoding: 'base32', digits: 6, step: 30 });
+    const pageToken = page.text.match(/<meta name="csrf-token" content="([^"]+)"/);
+    expect(pageToken).not.toBeNull();
+    await targetAgent.post(login.headers.location.endsWith('/enroll')
+      ? '/users/mfa/setup/confirm'
+      : '/users/mfa/verify')
+      .set('x-csrf-token', pageToken[1])
+      .send({ token: otp })
       .expect(200);
     return refreshCsrfToken(targetAgent);
   }
@@ -69,12 +86,12 @@ describe('Administrator management', () => {
     expect(inviteMatch).not.toBeNull();
 
     const account = await User.findOne({ email: `employed-${suffix}@example.test` });
-    expect(account).toMatchObject({
+    expect(account.toObject()).toMatchObject({
       role: 'Admin',
       roles: ['reservation_support_admin'],
       status: 'active',
       mustSetPassword: true,
-      mfaEnabled: true,
+      mfaEnabled: false,
       mfaVerified: false
     });
     expect(response.text).not.toContain(account.password);

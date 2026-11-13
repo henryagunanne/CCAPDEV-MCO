@@ -56,30 +56,177 @@
     </div>
   </div>
 
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+      <h5 class="card-title text-danger">Multi-Factor Authentication (MFA)</h5>
+      <div class="row g-3 mt-1">
+        <div class="col-md-6">
+          <div class="border rounded p-3 h-100">
+            <div class="fw-semibold mb-2">MFA status</div>
+            <div>{{#if mfaSecurity.enabled}}Enabled{{else}}Not enrolled{{/if}}</div>
+            <small class="text-muted d-block mt-2">Enrollment date: {{#if mfaSecurity.enrolledAt}}{{formatDate mfaSecurity.enrolledAt}}{{else}}Not available{{/if}}</small>
+            <small class="text-muted d-block">Last successful MFA verification: {{#if mfaSecurity.lastVerifiedAt}}{{formatDate mfaSecurity.lastVerifiedAt}}{{else}}Not available{{/if}}</small>
+            <small class="text-muted d-block">Recovery codes: {{#if mfaSecurity.recoveryCodeCount}}{{mfaSecurity.recoveryCodeCount}} unused{{else}}None available{{/if}}</small>
+          </div>
+        </div>
+        <div class="col-md-6 d-flex align-items-center">
+          <button class="btn btn-outline-danger" id="startMfaReplacement" type="button" {{#unless mfaSecurity.enabled}}disabled{{/unless}}>Re-enroll Authenticator</button>
+        </div>
+      </div>
+
+      <div id="mfaReplacementMessage" class="mt-3" aria-live="polite"></div>
+      <div id="mfaReplacementStart" class="mt-3 d-none">
+        <div class="alert alert-warning">
+          Your current authenticator remains active until the replacement is verified. Enter a fresh code from your current authenticator, or use one unused recovery code if you have lost access to it.
+        </div>
+        <div class="row g-2">
+          <div class="col-md-6">
+            <label for="currentAuthenticatorCode" class="form-label">Current authenticator code</label>
+            <input id="currentAuthenticatorCode" class="form-control" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="\d{6}">
+          </div>
+          <div class="col-md-6">
+            <label for="replacementRecoveryCode" class="form-label">Recovery code (alternative)</label>
+            <input id="replacementRecoveryCode" class="form-control" autocomplete="off">
+          </div>
+        </div>
+        <button class="btn btn-danger mt-3" id="verifyCurrentAuthenticator" type="button">Verify and Continue</button>
+      </div>
+
+      <div id="mfaReplacementSetup" class="mt-4 d-none">
+        <p>Scan this QR code or enter the setup key in your new authenticator. The current authenticator remains valid until you complete verification.</p>
+        <div class="text-center mb-3">
+          <img id="replacementQrCode" alt="New authenticator QR code" class="img-fluid border rounded p-2 bg-white" style="max-width: 240px;">
+        </div>
+        <label for="replacementSetupKey" class="form-label">Manual setup key</label>
+        <input id="replacementSetupKey" class="form-control mb-3" readonly>
+        <label for="newAuthenticatorCode" class="form-label">Code from your new authenticator</label>
+        <input id="newAuthenticatorCode" class="form-control" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="\d{6}">
+        <button class="btn btn-danger mt-3" id="confirmMfaReplacement" type="button">Verify New Authenticator</button>
+        <button class="btn btn-link mt-3" id="cancelMfaReplacement" type="button">Cancel replacement</button>
+      </div>
+
+      <div id="mfaReplacementRecoveryCodes" class="mt-4 d-none">
+        <div class="alert alert-success">Authenticator replaced. Save these new recovery codes now; they will only be displayed once. All previous recovery codes have been invalidated.</div>
+        <ul id="newRecoveryCodes" class="list-group mb-3"></ul>
+        <button class="btn btn-outline-secondary" id="finishMfaReplacement" type="button">Done</button>
+      </div>
+    </div>
+  </div>
+
   <div class="card shadow-sm border-0">
     <div class="card-body">
       <h5 class="card-title text-danger">Security Controls</h5>
       <div class="row mt-3 g-3">
-        <div class="col-md-4">
-          <div class="border rounded p-3 h-100">
-            <div class="fw-semibold mb-2">MFA Status</div>
-            <div class="text-muted">{{#if user.mfaEnabled}}Enabled{{else}}Not enrolled{{/if}}</div>
-            <small class="text-muted d-block mt-2">{{#if user.mfaEnabled}}Last verified: {{formatDate user.lastMfaVerifiedAt}}{{else}}Complete enrollment at the next admin login.{{/if}}</small>
-          </div>
-        </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
           <div class="border rounded p-3 h-100">
             <div class="fw-semibold mb-2">Step-up Window</div>
             <div class="text-muted">5 minutes</div>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
           <div class="border rounded p-3 h-100">
             <div class="fw-semibold mb-2">Approval Window</div>
             <div class="text-muted">24 hours</div>
           </div>
         </div>
       </div>
+
+      <script nonce="{{cspNonce}}">
+        document.addEventListener('DOMContentLoaded', function () {
+          const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+          const message = document.getElementById('mfaReplacementMessage');
+          const startPanel = document.getElementById('mfaReplacementStart');
+          const setupPanel = document.getElementById('mfaReplacementSetup');
+          const recoveryPanel = document.getElementById('mfaReplacementRecoveryCodes');
+
+          const request = async function (url, body) {
+            const response = await fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'x-csrf-token': csrfToken },
+              body: JSON.stringify(body || {})
+            });
+            const result = await response.json();
+            if (!response.ok || !result.success) {
+              if (result.code === 'MFA_REENROLLMENT_EXPIRED') {
+                setupPanel.classList.add('d-none');
+                startPanel.classList.remove('d-none');
+              }
+              throw new Error(result.message || 'Unable to update MFA settings.');
+            }
+            return result;
+          };
+
+          const showMessage = function (text, isError) {
+            message.className = `alert ${isError ? 'alert-danger' : 'alert-info'} mt-3`;
+            message.textContent = text;
+          };
+
+          document.getElementById('startMfaReplacement')?.addEventListener('click', function () {
+            startPanel.classList.remove('d-none');
+            message.textContent = '';
+            document.getElementById('currentAuthenticatorCode').focus();
+          });
+
+          document.getElementById('verifyCurrentAuthenticator')?.addEventListener('click', async function () {
+            const token = document.getElementById('currentAuthenticatorCode').value.trim();
+            const recoveryCode = document.getElementById('replacementRecoveryCode').value.trim();
+            if ((!token && !recoveryCode) || (token && !/^\d{6}$/.test(token))) {
+              showMessage('Enter a valid six-digit code or one recovery code.', true);
+              return;
+            }
+            try {
+              const result = await request('/admin/security/mfa/re-enroll', { token, recoveryCode });
+              document.getElementById('replacementQrCode').src = result.qrCode;
+              document.getElementById('replacementSetupKey').value = result.secret;
+              startPanel.classList.add('d-none');
+              setupPanel.classList.remove('d-none');
+              showMessage('Your new authenticator setup is ready and expires in five minutes.', false);
+            } catch (error) {
+              showMessage(error.message, true);
+            }
+          });
+
+          document.getElementById('confirmMfaReplacement')?.addEventListener('click', async function () {
+            const token = document.getElementById('newAuthenticatorCode').value.trim();
+            if (!/^\d{6}$/.test(token)) {
+              showMessage('Enter a valid six-digit code from the new authenticator.', true);
+              return;
+            }
+            try {
+              const result = await request('/admin/security/mfa/re-enroll/confirm', { token });
+              const codes = document.getElementById('newRecoveryCodes');
+              codes.replaceChildren(...result.recoveryCodes.map(function (code) {
+                const item = document.createElement('li');
+                item.className = 'list-group-item font-monospace';
+                item.textContent = code;
+                return item;
+              }));
+              setupPanel.classList.add('d-none');
+              recoveryPanel.classList.remove('d-none');
+              message.textContent = '';
+            } catch (error) {
+              showMessage(error.message, true);
+            }
+          });
+
+          document.getElementById('cancelMfaReplacement')?.addEventListener('click', async function () {
+            try {
+              await request('/admin/security/mfa/re-enroll/cancel');
+              setupPanel.classList.add('d-none');
+              startPanel.classList.add('d-none');
+              document.getElementById('replacementQrCode').removeAttribute('src');
+              document.getElementById('replacementSetupKey').value = '';
+              showMessage('Replacement cancelled. Your existing authenticator is unchanged.', false);
+            } catch (error) {
+              showMessage(error.message, true);
+            }
+          });
+
+          document.getElementById('finishMfaReplacement')?.addEventListener('click', function () {
+            window.location.reload();
+          });
+        });
+      </script>
     </div>
   </div>
 </div>

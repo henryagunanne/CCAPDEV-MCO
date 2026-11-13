@@ -21,9 +21,50 @@ const {
 const logger = require('../logs/logger');
 const { permissions, getEffectivePermissions } = require('../config/rbac');
 const { requireAdminAccess, requirePermission, requireStepUpAuthentication } = require('../middleware/adminAuth');
-const { cancellationLimits } = require('../middleware/rateLimits');
+const { cancellationLimits, mfaVerificationLimits, recoveryCodeLimits } = require('../middleware/rateLimits');
 const { recordAuditEvent } = require('../services/auditService');
 const { getAdminNavigation } = require('../services/adminNavigation');
+const {
+  decryptSecret,
+  encryptSecret,
+  generateQrCodeDataUrl,
+  generateRecoveryCodes,
+  generateSecret,
+  hashRecoveryCode,
+  verifyTokenCounter
+} = require('../services/mfa');
+
+const MFA_REENROLLMENT_TTL_MS = 5 * 60 * 1000;
+
+/** * Hashes the provided recovery code using SHA-256.
+ * @param {string} challengeId - The challenge ID to hash.
+ * @returns {string} - The hashed challenge ID in hexadecimal format.
+ */
+function hashMfaChallenge(challengeId) {
+  return crypto.createHash('sha256').update(challengeId).digest('hex');
+}
+
+
+/** * Consumes a recovery code for the given user, removing it from their stored recovery codes.
+ * @param {Object} user - The user object.
+ * @param {string} recoveryCode - The recovery code to consume.
+ * @returns {Promise<boolean>} - A promise resolving to true if the code was consumed, false otherwise.
+ */
+function consumeRecoveryCode(user, recoveryCode) {
+  const hash = hashRecoveryCode(recoveryCode);
+  if (!Array.isArray(user.recoveryCodes) || !user.recoveryCodes.includes(hash)) {
+    return Promise.resolve(false);
+  }
+  return User.findOneAndUpdate(
+    { _id: user._id, recoveryCodes: hash },
+    { $pull: { recoveryCodes: hash } },
+    { new: true }
+  ).select('recoveryCodes').then((updatedUser) => {
+    if (!updatedUser) return false;
+    user.recoveryCodes = updatedUser.recoveryCodes;
+    return true;
+  });
+}
 
 /* ======================================================
    Admin Access Middleware
@@ -440,13 +481,26 @@ router.get('/security', requirePermission(permissions.SECURITY_REVIEW), async (r
   try {
     const approvals = await AdminApprovalRequest.find({ status: 'PENDING_APPROVAL' }).sort({ createdAt: -1 }).limit(10).lean();
     const emergency = await EmergencyAccessGrant.find({ status: 'PENDING_APPROVAL' }).sort({ createdAt: -1 }).limit(10).lean();
+    const account = await User.findById(req.authenticatedUser._id);
+    if (account?.mfaReplacementExpiresAt && account.mfaReplacementExpiresAt <= new Date()) {
+      account.mfaReplacementPendingSecret = '';
+      account.mfaReplacementExpiresAt = null;
+      account.mfaReplacementChallengeHash = '';
+      await account.save();
+    }
 
     res.render('admin/security', {
       layout: 'admin',
       title: 'Security Center',
       approvals,
       emergency,
-      user: req.session.user
+      user: req.session.user,
+      mfaSecurity: {
+        enabled: Boolean(account?.mfaEnabled && account?.mfaSecret),
+        enrolledAt: account?.mfaEnrolledAt,
+        lastVerifiedAt: account?.lastMfaVerifiedAt,
+        recoveryCodeCount: account?.recoveryCodes?.length || 0
+      }
     });
   } catch (error) {
     logger.error('Security center request failed.', { code: error.code || 'SECURITY_CENTER_ERROR' });
@@ -454,6 +508,268 @@ router.get('/security', requirePermission(permissions.SECURITY_REVIEW), async (r
   }
 });
 
+
+// POST /admin/security/mfa/re-enroll - Initiate MFA Re-enrollment
+router.post(
+  '/security/mfa/re-enroll',
+  requirePermission(permissions.SECURITY_REVIEW),
+  ...mfaVerificationLimits,
+  ...recoveryCodeLimits,
+  async (req, res) => {
+    const user = await User.findById(req.authenticatedUser._id);
+    if (!user || user.status !== 'active' || user.role !== 'Admin' && !(user.roles || []).length
+      || !user.mfaEnabled || !user.mfaSecret) {
+      return res.status(403).json({ success: false, message: 'An active, MFA-enrolled administrator account is required.' });
+    }
+
+    const token = String(req.body.token || '').trim();
+    const recoveryCode = String(req.body.recoveryCode || '').trim();
+    let verified = false;
+    let usedRecovery = false;
+
+    if (token) {
+      const currentSecret = decryptSecret(user.mfaSecret);
+      const counter = verifyTokenCounter(currentSecret, token, { window: 1 });
+      if (counter !== null) {
+        const secretHash = crypto.createHash('sha256').update(user.mfaSecret).digest('hex');
+        const result = await User.updateOne({
+          _id: user._id,
+          $or: [
+            { mfaLastUsedSecretHash: secretHash, mfaLastUsedCounter: { $lt: counter } },
+            { mfaLastUsedSecretHash: { $ne: secretHash } }
+          ]
+        }, { $set: { mfaLastUsedCounter: counter, mfaLastUsedSecretHash: secretHash } });
+        verified = result.modifiedCount === 1;
+      }
+    }
+
+    if (!verified && recoveryCode) {
+      verified = await consumeRecoveryCode(user, recoveryCode);
+      usedRecovery = verified;
+    }
+
+    if (!verified) {
+      await recordAuditEvent({
+        actorId: user._id,
+        actorRole: 'Admin',
+        action: recoveryCode ? 'admin:mfa:recovery:rejected' : 'admin:mfa:replacement:existing-verification',
+        resourceType: 'User',
+        resourceId: user._id,
+        result: 'FAILURE',
+        reason: recoveryCode ? 'Recovery code rejected during authenticator replacement' : 'Existing authenticator verification failed'
+      });
+      return res.status(400).json({ success: false, message: 'The current authenticator or recovery code was invalid.' });
+    }
+
+    if (usedRecovery) {
+      await recordAuditEvent({
+        actorId: user._id,
+        actorRole: 'Admin',
+        action: 'admin:mfa:recovery:used',
+        resourceType: 'User',
+        resourceId: user._id,
+        result: 'SUCCESS',
+        reason: 'Recovery code accepted for authenticator replacement'
+      });
+    }
+    await recordAuditEvent({
+      actorId: user._id,
+      actorRole: 'Admin',
+      action: 'admin:mfa:replacement:existing-verification',
+      resourceType: 'User',
+      resourceId: user._id,
+      result: 'SUCCESS',
+      reason: usedRecovery ? 'Recovery code verified for authenticator replacement' : 'Existing authenticator verified'
+    });
+
+    const challengeId = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + MFA_REENROLLMENT_TTL_MS);
+    const newSecret = generateSecret();
+    const qrCode = await generateQrCodeDataUrl(user.email, newSecret);
+
+    user.mfaReplacementPendingSecret = encryptSecret(newSecret);
+    user.mfaReplacementExpiresAt = expiresAt;
+    user.mfaReplacementChallengeHash = hashMfaChallenge(challengeId);
+    await user.save();
+    req.session.mfaReenrollment = {
+      userId: String(user._id),
+      challengeId,
+      expiresAt: expiresAt.getTime()
+    };
+
+    await recordAuditEvent({
+      actorId: user._id,
+      actorRole: 'Admin',
+      action: 'admin:mfa:replacement:initiated',
+      resourceType: 'User',
+      resourceId: user._id,
+      result: 'SUCCESS',
+      reason: 'Authenticator replacement challenge started'
+    });
+
+    return res.status(200).json({
+      success: true,
+      qrCode,
+      secret: newSecret,
+      expiresAt: expiresAt.toISOString()
+    });
+  }
+);
+
+
+// POST /admin/security/mfa/re-enroll/confirm - Confirm MFA Re-enrollment
+router.post(
+  '/security/mfa/re-enroll/confirm',
+  requirePermission(permissions.SECURITY_REVIEW),
+  ...mfaVerificationLimits,
+  async (req, res) => {
+    const challenge = req.session?.mfaReenrollment;
+    const sessionUserId = String(req.authenticatedUser._id);
+    if (!challenge || challenge.userId !== sessionUserId) {
+      return res.status(403).json({ success: false, message: 'Authenticator replacement verification is not active.' });
+    }
+
+    const challengeHash = hashMfaChallenge(challenge.challengeId);
+    const account = await User.findById(sessionUserId);
+    const challengeIsValid = account
+      && account.status === 'active'
+      && (account.role === 'Admin' || (account.roles || []).length > 0)
+      && Number(challenge.expiresAt) > Date.now()
+      && account.mfaReplacementExpiresAt > new Date()
+      && account.mfaReplacementChallengeHash === challengeHash
+      && Boolean(account.mfaReplacementPendingSecret);
+
+    if (!challengeIsValid) {
+      if (account && account.mfaReplacementChallengeHash === challengeHash) {
+        account.mfaReplacementPendingSecret = '';
+        account.mfaReplacementExpiresAt = null;
+        account.mfaReplacementChallengeHash = '';
+        await account.save();
+      }
+      req.session.mfaReenrollment = null;
+      return res.status(401).json({ success: false, code: 'MFA_REENROLLMENT_EXPIRED', message: 'The authenticator replacement session expired. Start again.' });
+    }
+
+    const pendingSecret = decryptSecret(account.mfaReplacementPendingSecret);
+    const newCounter = verifyTokenCounter(pendingSecret, req.body.token, { window: 1 });
+    if (!pendingSecret || newCounter === null) {
+      await recordAuditEvent({
+        actorId: account._id,
+        actorRole: 'Admin',
+        action: 'admin:mfa:replacement:new-verification',
+        resourceType: 'User',
+        resourceId: account._id,
+        result: 'FAILURE',
+        reason: 'New authenticator verification failed'
+      });
+      return res.status(400).json({ success: false, message: 'The new authenticator code was invalid.' });
+    }
+
+    const recoveryCodes = generateRecoveryCodes(10);
+    const now = new Date();
+    const replacementSecretHash = crypto.createHash('sha256')
+      .update(account.mfaReplacementPendingSecret)
+      .digest('hex');
+    const updatedAccount = await User.findOneAndUpdate({
+      _id: account._id,
+      status: 'active',
+      mfaReplacementChallengeHash: challengeHash,
+      mfaReplacementExpiresAt: { $gt: now }
+    }, {
+      $set: {
+        mfaSecret: account.mfaReplacementPendingSecret,
+        mfaEnabled: true,
+        mfaEnrolledAt: now,
+        lastMfaVerifiedAt: now,
+        mfaLastUsedCounter: newCounter,
+        mfaLastUsedSecretHash: replacementSecretHash,
+        recoveryCodes: recoveryCodes.map(hashRecoveryCode),
+        mfaReplacementPendingSecret: '',
+        mfaReplacementExpiresAt: null,
+        mfaReplacementChallengeHash: ''
+      },
+      $inc: { sessionVersion: 1 }
+    }, { new: true, runValidators: true });
+
+    if (!updatedAccount) {
+      req.session.mfaReenrollment = null;
+      return res.status(409).json({ success: false, message: 'The replacement challenge is no longer valid. Start again.' });
+    }
+
+    req.session.mfaReenrollment = null;
+    req.session.user.sessionVersion = Number(updatedAccount.sessionVersion || 0);
+    req.session.user.mfaEnabled = true;
+    req.session.mfaAuthenticated = true;
+    req.session.mfaAuthenticatedAt = Date.now();
+    req.session.stepUp = { verifiedAt: new Date().toISOString(), method: 'mfa' };
+
+    try {
+      await recordAuditEvent({
+        actorId: updatedAccount._id,
+        actorRole: 'Admin',
+        action: 'admin:mfa:replacement:new-verification',
+        resourceType: 'User',
+        resourceId: updatedAccount._id,
+        result: 'SUCCESS',
+        reason: 'New authenticator verified'
+      });
+      await recordAuditEvent({
+        actorId: updatedAccount._id,
+        actorRole: 'Admin',
+        action: 'admin:mfa:replacement:completed',
+        resourceType: 'User',
+        resourceId: updatedAccount._id,
+        result: 'SUCCESS',
+        reason: 'Authenticator replaced and prior recovery codes invalidated'
+      });
+    } catch (error) {
+      logger.error('MFA replacement audit failed.', { code: error.code || 'MFA_REPLACEMENT_AUDIT_ERROR' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Authenticator replaced. Store these recovery codes securely; they will not be shown again.',
+      recoveryCodes
+    });
+  }
+);
+
+
+// POST /admin/security/mfa/re-enroll/cancel - Cancel MFA Re-enrollment
+router.post(
+  '/security/mfa/re-enroll/cancel',
+  requirePermission(permissions.SECURITY_REVIEW),
+  async (req, res) => {
+    const challenge = req.session?.mfaReenrollment;
+    if (challenge && challenge.userId === String(req.authenticatedUser._id)) {
+      const result = await User.updateOne({
+        _id: challenge.userId,
+        mfaReplacementChallengeHash: hashMfaChallenge(challenge.challengeId)
+      }, {
+        $set: {
+          mfaReplacementPendingSecret: '',
+          mfaReplacementExpiresAt: null,
+          mfaReplacementChallengeHash: ''
+        }
+      });
+      req.session.mfaReenrollment = null;
+      if (result.modifiedCount === 1) {
+        await recordAuditEvent({
+          actorId: challenge.userId,
+          actorRole: 'Admin',
+          action: 'admin:mfa:replacement:cancelled',
+          resourceType: 'User',
+          resourceId: challenge.userId,
+          result: 'SUCCESS',
+          reason: 'Authenticator replacement cancelled; existing authenticator retained'
+        });
+      }
+    }
+    return res.status(200).json({ success: true });
+  }
+);
+
+// GET /admin/approvals - Admin Approval Queue
 router.get('/approvals', requirePermission(permissions.ADMIN_ROLE_ASSIGN), async (req, res) => {
   try {
     const approvals = await AdminApprovalRequest.find().sort({ createdAt: -1 }).lean();

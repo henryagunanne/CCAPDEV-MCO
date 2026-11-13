@@ -109,22 +109,37 @@ async function generateQrCodeDataUrl(email, secret) {
  * @returns {boolean} - Returns true if the token is valid, false otherwise.
  */
 function verifyToken(secret, token, options = {}) {
-  if (!secret || !token) return false;
+  return verifyTokenCounter(secret, token, options) !== null;
+}
+
+
+/** * Verifies the provided TOTP token against the given secret and returns the counter if valid.
+ * @param {string} secret - The MFA secret in base32 format.
+ * @param {string} token - The TOTP token provided by the user.
+ * @param {Object} options - Optional verification options (e.g., window).
+ * @returns {number|null} - Returns the counter if the token is valid, or null if invalid.
+ */
+function verifyTokenCounter(secret, token, options = {}) {
+  if (!secret || !token) return null;
   const normalizedToken = String(token).replace(/\s+/g, '').trim();
-  if (!/^\d{6}$/.test(normalizedToken)) return false;
+  if (!/^\d{6}$/.test(normalizedToken)) return null;
 
   try {
-    return speakeasy.totp.verify({
+    const now = Number(options.now || Date.now());
+    const step = 30;
+    const match = speakeasy.totp.verifyDelta({
       secret,
       encoding: 'base32',
       token: normalizedToken,
       window: Number(options.window || 1),
       digits: 6,
       algorithm: 'SHA1',
-      step: 30
+      step,
+      time: Math.floor(now / 1000)
     });
+    return match ? Math.floor(now / 1000 / step) + match.delta : null;
   } catch (error) {
-    return false;
+    return null;
   }
 }
 
@@ -173,7 +188,8 @@ function verifyRecoveryCode(recoveryCodes, inputCode) {
  * @returns {boolean} - Returns true if MFA enrollment is complete, false otherwise.
  */
 function isMfaEnrollmentComplete(user) {
-  if (!user || !user.role || user.role !== 'Admin') return false;
+  const isAdministrator = user && (user.role === 'Admin' || Array.isArray(user.roles) && user.roles.length > 0);
+  if (!isAdministrator) return false;
   return Boolean(user.mfaEnabled && user.mfaSecret && String(user.mfaSecret).trim().length > 0);
 }
 
@@ -183,6 +199,7 @@ module.exports = {
   buildOtpAuthUrl,
   generateQrCodeDataUrl,
   verifyToken,
+  verifyTokenCounter,
   encryptSecret,
   decryptSecret,
   generateRecoveryCodes,

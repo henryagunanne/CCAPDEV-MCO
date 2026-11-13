@@ -6,6 +6,8 @@ const AuditLog = require('../models/AuditLog');
 const HolidayCalendar = require('../models/HolidayCalendar');
 const PrivacyRequest = require('../models/PrivacyRequest');
 const { encryptPassport, fingerprintPassport } = require('../services/passportEncryption');
+const speakeasy = require('speakeasy');
+const { encryptSecret, generateSecret } = require('../services/mfa');
 
 describe('MCO2 privacy routes', () => {
   let agent;
@@ -22,6 +24,7 @@ describe('MCO2 privacy routes', () => {
   beforeEach(async () => {
     agent = request.agent(app);
     await refreshCsrfToken();
+    const secret = generateSecret();
     const admin = await User.create({
       firstName: 'Privacy',
       lastName: 'Officer',
@@ -31,12 +34,22 @@ describe('MCO2 privacy routes', () => {
       roles: ['data_protection_officer'],
       permissions: ['reservation:read'],
       mfaEnabled: true,
-      mfaVerified: true
+      mfaVerified: true,
+      mfaSecret: encryptSecret(secret)
     });
     userId = admin._id;
     await agent.post('/users/login')
+      .set('Accept', 'text/html')
       .set('x-csrf-token', csrfToken)
       .send({ email: admin.email, password: 'privacyOfficer123' })
+      .expect(302);
+    const verifyPage = await agent.get('/users/mfa/verify').expect(200);
+    const pageCsrf = verifyPage.text.match(/<meta name="csrf-token" content="([^"]+)"/);
+    expect(pageCsrf).not.toBeNull();
+    const token = speakeasy.totp({ secret, encoding: 'base32', digits: 6, step: 30 });
+    await agent.post('/users/mfa/verify')
+      .set('x-csrf-token', pageCsrf[1])
+      .send({ token })
       .expect(200);
     await refreshCsrfToken();
   });

@@ -13,6 +13,7 @@ const crypto = require('crypto');
 
 const SESSION_IDLE_TIMEOUT_MS = 30 * 60 * 1000;
 const SESSION_ABSOLUTE_TIMEOUT_MS = 8 * 60 * 60 * 1000;
+const isProduction = process.env.NODE_ENV === 'production';
 const seedPopularFlights = require('./seeds/seedPopularFlights'); // Seed popular flights
 const seedFlights = require('./seeds/seedFlights'); // Seed flights
 const seedUsers = require('./seeds/seedUsers'); // Seed Users
@@ -120,7 +121,9 @@ app.set('view engine', 'hbs');  // Set Handlebars as the view engine
 app.set('views', './views'); // Set views directory
 
 
-// Middleware
+// ========== Middleware ==========
+
+// Trust proxy settings for reverse proxies (e.g., Nginx, Heroku)
 const trustedProxyCidrs = String(process.env.TRUSTED_PROXY_CIDRS || '')
   .split(',')
   .map(value => value.trim())
@@ -147,6 +150,7 @@ app.use(helmet({
             imgSrc: ["'self'", 'data:'],
             fontSrc: ["'self'", 'data:', 'https://cdn.jsdelivr.net'],
             connectSrc: ["'self'"],
+            upgradeInsecureRequests: isProduction ? [] : null,
         }
     },
     crossOriginEmbedderPolicy: false,
@@ -155,10 +159,10 @@ app.use(helmet({
 
 // Enforce HTTPS in production and set HSTS header
 app.use((req, res, next) => {
-    if (process.env.NODE_ENV === 'production' && req.secure) {
+    if (isProduction && req.secure) {
         res.setHeader('Strict-Transport-Security', 'max-age=31536000');
     }
-    if (process.env.NODE_ENV === 'production' && !req.secure) {
+    if (isProduction && !req.secure) {
         return res.status(403).json({ success: false, message: 'HTTPS is required.' });
     }
     next();
@@ -179,7 +183,7 @@ app.use(session({
     store: MongoStore.create({ mongoUrl: mongoUri }),   // Store sessions in MongoDB
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // secure cookies in prod
+      secure: isProduction, // secure cookies in prod
       sameSite: 'lax',
       maxAge: SESSION_IDLE_TIMEOUT_MS
     }
@@ -187,6 +191,7 @@ app.use(session({
 
 app.use(csrfProtection);  // CSRF protection middleware
 
+// Session and user management middleware
 app.use((req, res, next) => {
   const sessionUser = req.session && req.session.user ? req.session.user : null;
 
@@ -237,21 +242,59 @@ app.use('/reservations', require('./routes/reservations'));
 app.use('/admin', require('./routes/admin'));
 
 
-// 404 handler - for unmatched routes
+app.use((req, res, next) => {
+    const error = new Error('Page Not Found');
+    error.status = 404;
+    next(error);
+});
+
+// Render errors for browser navigation and return JSON for API clients.
 app.use((err, req, res, next) => {
-    logger.error('Request processing failed.', { code: err.code || 'UNHANDLED_ERROR' });
     const statusCode = Number.isInteger(err.status) && err.status >= 400 && err.status < 600
       ? err.status
       : 500;
-    if (statusCode === 404) {
+    const acceptsHtml = !req.xhr && (req.get('accept') || '').includes('text/html');
+
+    if (statusCode >= 500) {
+      logger.error('Request processing failed.', { code: err.code || 'UNHANDLED_ERROR' });
+    } else {
+      logger.info('Request rejected.', { code: err.code || `HTTP_${statusCode}` });
+    }
+
+    if (acceptsHtml && statusCode === 404) {
       return res.status(404).render('error/404', {
         title: '404 Not Found',
         code: 404,
         message: 'Page Not Found',
-        description: 'The requested page was not found.'
+        description: 'The requested page was not found.',
+        url: req.originalUrl
       });
     }
-    return res.status(statusCode).json({ success: false, message: 'Unable to process the request.' });
+
+    if (acceptsHtml && statusCode >= 500) {
+      return res.status(statusCode).render('error/500', {
+        title: 'Server Error',
+        message: 'Unable to process your request. Please try again later.'
+      });
+    }
+
+    if (acceptsHtml) {
+      return res.status(statusCode).render('error/access-denied', {
+        title: statusCode === 401 ? 'Authentication Required' : 'Access Denied',
+        message: statusCode === 401
+          ? 'Please sign in to continue.'
+          : 'You do not have permission to access this resource.'
+      });
+    }
+
+    if (statusCode === 404) {
+      return res.status(404).json({ success: false, code: 'NOT_FOUND', message: 'Page not found.' });
+    }
+    return res.status(statusCode).json({
+      success: false,
+      code: statusCode >= 500 ? 'REQUEST_FAILED' : `HTTP_${statusCode}`,
+      message: 'Unable to process the request.'
+    });
 });
 
 

@@ -1,0 +1,33 @@
+<div class="container py-5" style="max-width: 640px;">
+  <div class="card shadow-sm">
+    <div class="card-body p-4">
+      <h1 class="h3 text-danger">Set Up Administrator Account</h1>
+      <p class="text-muted">Choose a password for your administrator account. The setup link can be used once and expires after 24 hours.</p>
+      {{#if errorMessage}}<div class="alert alert-danger" role="alert">{{errorMessage}}</div>{{/if}}
+      {{#if successMessage}}
+        <div class="alert alert-success" role="status">{{successMessage}}</div>
+        <a class="btn btn-danger" href="/">Return to sign in</a>
+      {{else}}
+        <form method="post" action="/users/admin-setup">
+          <input type="hidden" name="_csrf" value="{{csrfToken}}">
+          <input type="hidden" id="setupToken" name="token" value="{{setupToken}}">
+          <div class="mb-3">
+            <label class="form-label" for="password">New password</label>
+            <input class="form-control" id="password" name="password" type="password" minlength="12" autocomplete="new-password" required>
+            <div class="form-text">At least 12 characters with uppercase and lowercase letters, a number, and a symbol.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="confirmPassword">Confirm password</label>
+            <input class="form-control" id="confirmPassword" name="confirmPassword" type="password" minlength="12" autocomplete="new-password" required>
+          </div>
+          <button class="btn btn-danger" type="submit">Set password</button>
+        </form>
+        <script nonce="{{cspNonce}}">
+          const setupToken = document.getElementById('setupToken');
+          const inviteToken = new URLSearchParams(window.location.hash.slice(1)).get('token') || '';
+          if (inviteToken) setupToken.value = inviteToken;
+        </script>
+      {{/if}}
+    </div>
+  </div>
+</div>

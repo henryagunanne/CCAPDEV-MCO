@@ -1,6 +1,7 @@
 // routes/users.js
 const express = require('express');
 const mongoose = require('mongoose');
+const crypto = require('crypto');
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const router = express.Router();
@@ -8,7 +9,19 @@ const logger = require('../logs/logger');
 const Reservation = require('../models/Reservation');
 const PrivacyRequest = require('../models/PrivacyRequest');
 const { getEffectivePermissions, isAdminAccount } = require('../config/rbac');
-const { generateSecret, generateQrCodeDataUrl, verifyToken, buildOtpAuthUrl } = require('../services/mfa');
+const { isProvisionedAdminAccount } = require('../services/adminIdentity');
+const {
+  generateSecret,
+  generateQrCodeDataUrl,
+  verifyToken,
+  buildOtpAuthUrl,
+  encryptSecret,
+  decryptSecret,
+  generateRecoveryCodes,
+  hashRecoveryCode,
+  verifyRecoveryCode,
+  isMfaEnrollmentComplete
+} = require('../services/mfa');
 const { recordAuditEvent } = require('../services/auditService');
 const { isTodayOrFutureInManila } = require('../services/manilaDate');
 const { supportsTransactions } = require('../services/bookingService');
@@ -38,6 +51,8 @@ function buildSessionUser(user) {
     roles: Array.isArray(user.roles) ? user.roles : [],
     permissions,
     status,
+    isProvisionedAdmin: isProvisionedAdminAccount(user),
+    sessionVersion: Number(user.sessionVersion || 0),
     mfaEnabled: Boolean(user.mfaEnabled),
     mfaVerified: Boolean(user.mfaVerified),
     isAdmin
@@ -60,6 +75,43 @@ function isStrongPassword(password) {
   return typeof password === 'string' && password.trim().length >= 8;
 }
 
+
+/** * Check if a password meets the strong requirements for administrator setup.
+ * @param {string} password - The password to check.
+ * @returns {boolean} - True if the password is strong, false otherwise.
+ */
+function isStrongAdminSetupPassword(password) {
+  return typeof password === 'string' &&
+    password.length >= 12 &&
+    /[a-z]/.test(password) &&
+    /[A-Z]/.test(password) &&
+    /\d/.test(password) &&
+    /[^A-Za-z0-9]/.test(password);
+}
+
+
+/** * Build the MFA pending state for a user, including the stage and expiration time.
+ * @param {string} userId - The ID of the user.
+ * @param {string} stage - The stage of the MFA process (e.g., 'enroll', 'verify').
+ * @returns {Object} - The MFA pending state object.
+ */
+function buildMfaPendingState(userId, stage = 'enroll') {
+  return {
+    userId: String(userId),
+    stage,
+    createdAt: Date.now(),
+    expiresAt: Date.now() + 5 * 60 * 1000
+  };
+}
+
+
+/** * Normalize the OTP input by removing whitespace and trimming.
+ * @param {string} value - The OTP input to normalize.
+ * @returns {string} - The normalized OTP input.
+ */
+function normalizeOtpInput(value) {
+  return String(value || '').replace(/\s+/g, '').trim();
+}
 
 /** * Handle failed login attempts, incrementing the count and locking the account if necessary.
  * @param {Object} user - The user object from the database.
@@ -154,6 +206,78 @@ function isAdmin(req, res, next) {
     next();
 }
 
+// GET /users/admin-setup - Render the administrator setup page
+router.get('/admin-setup', (req, res) => {
+  return res.render('users/admin-setup', {
+    layout: 'main',
+    title: 'Set Up Administrator Account'
+  });
+});
+
+
+// POST /users/admin-setup - Handle administrator account setup
+router.post('/admin-setup', async (req, res) => {
+  const { token, password, confirmPassword } = req.body;
+  const renderSetup = (statusCode, errorMessage = '', successMessage = '', setupToken = '') => res.status(statusCode).render('users/admin-setup', {
+    layout: 'main',
+    title: 'Set Up Administrator Account',
+    errorMessage,
+    successMessage,
+    setupToken
+  });
+
+  if (typeof token !== 'string' || !/^[A-Za-z0-9_-]{40,60}$/.test(token)) {
+    return renderSetup(400, 'This administrator setup link is invalid or has expired.');
+  }
+  if (!isStrongAdminSetupPassword(password)) {
+    return renderSetup(400, 'Use at least 12 characters with an uppercase letter, a lowercase letter, a number, and a symbol.', '', token);
+  }
+  if (password !== confirmPassword) {
+    return renderSetup(400, 'The passwords do not match.', '', token);
+  }
+
+  try {
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    const user = await User.findOne({
+      passwordSetupTokenHash: tokenHash,
+      passwordSetupExpiresAt: { $gt: new Date() },
+      mustSetPassword: true
+    }).select('+passwordSetupTokenHash +passwordSetupExpiresAt');
+
+    if (!user || user.status === 'disabled' || user.status === 'suspended') {
+      return renderSetup(400, 'This administrator setup link is invalid, expired, or inactive.');
+    }
+
+    const passwordHash = await bcrypt.hash(password, await bcrypt.genSalt(12));
+    const updatedUser = await User.findOneAndUpdate({
+      _id: user._id,
+      passwordSetupTokenHash: tokenHash,
+      passwordSetupExpiresAt: { $gt: new Date() },
+      mustSetPassword: true,
+      status: { $nin: ['disabled', 'suspended'] }
+    }, {
+      $set: { password: passwordHash, mustSetPassword: false },
+      $unset: { passwordSetupTokenHash: 1, passwordSetupExpiresAt: 1 }
+    }, { new: true, runValidators: true }).select('_id role');
+    if (!updatedUser) {
+      return renderSetup(400, 'This administrator setup link is invalid or has already been used.');
+    }
+
+    await recordAuditEvent({
+      actorId: updatedUser._id,
+      actorRole: 'Admin',
+      action: 'admin:account:setup',
+      resourceType: 'Administrator',
+      resourceId: updatedUser._id
+    });
+
+    return renderSetup(200, '', 'Your password is set. You can now sign in with your administrator email and password.');
+  } catch (error) {
+    logger.error('Administrator password setup failed.', { code: error.code || 'ADMIN_PASSWORD_SETUP_ERROR' });
+    return renderSetup(500, 'Unable to set up this administrator account. Please try again or contact the account administrator.');
+  }
+});
+
 // POST /users/register - Handle user registration
 router.post('/register', ...authenticationLimits, async (req, res) => {
     const { firstName, lastName, email, password, isAdult, privacyNoticeAccepted } = req.body;
@@ -207,13 +331,12 @@ router.post('/login', ...authenticationLimits, async (req, res) => {
         await recordAuditLog({ actorId: user._id, actorRole: user.role || 'user', action: 'admin:login', resourceType: 'User', result: 'FAILURE', reason: 'Account disabled' });
         return res.status(403).json({ success: false, message: 'This account is not available.' });
       }
-      // Check if the account is locked due to too many failed login attempts
+
       const lockUntil = user.lockUntil ? new Date(user.lockUntil).getTime() : 0;
       if (lockUntil > Date.now()) {
         return res.status(403).json({ success: false, message: INVALID_LOGIN_MESSAGE });
       }
 
-      // Compare the provided password with the stored hashed password
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         await handleFailedLogin(user);
@@ -222,13 +345,16 @@ router.post('/login', ...authenticationLimits, async (req, res) => {
       }
 
       await clearFailedLoginState(user);
-
       user.lastLoginAt = new Date();
-      if (user.role === 'Admin' && user.mfaEnabled && !user.mfaVerified) {
-        user.mfaVerified = false;
-      }
+      await user.save();
 
-      req.session.regenerate(async (err) => {
+      const wantsHtml = req.accepts('html') && !req.xhr;
+      const isAdmin = user.role === 'Admin';
+      const hasMfaEnrollment = isMfaEnrollmentComplete(user);
+      const requiresMfaChallenge = isAdmin && !user.mfaVerified;
+      const pendingStage = hasMfaEnrollment ? 'verify' : 'enroll';
+
+      req.session.regenerate((err) => {
         if (err) {
           logger.error('Session regeneration failed.', { code: err.code || 'SESSION_REGENERATION_ERROR' });
           return res.status(500).json({ success: false, message: 'Login failed.' });
@@ -240,28 +366,38 @@ router.post('/login', ...authenticationLimits, async (req, res) => {
           ...safeSessionUser,
           authenticatedAt,
           lastActivityAt: authenticatedAt,
-          absoluteExpiresAt: authenticatedAt + SESSION_ABSOLUTE_TIMEOUT_MS
+          absoluteExpiresAt: authenticatedAt + SESSION_ABSOLUTE_TIMEOUT_MS,
+          mfaRequired: Boolean(isAdmin && requiresMfaChallenge)
         };
         req.session.stepUp = null;
+        req.session.mfaPending = isAdmin && requiresMfaChallenge ? buildMfaPendingState(user._id, pendingStage) : null;
         req.session.authenticatedAt = authenticatedAt;
         req.session.lastActivityAt = authenticatedAt;
         req.session.absoluteExpiresAt = authenticatedAt + SESSION_ABSOLUTE_TIMEOUT_MS;
         req.session.cookie.maxAge = SESSION_IDLE_TIMEOUT_MS;
 
         logger.info('User authenticated.');
-        try {
-          await recordAuditLog({ actorId: user._id, actorRole: user.role || 'user', action: 'user:login', resourceType: 'User', result: 'SUCCESS' });
-        } catch (auditError) {
-          logger.error('Login audit event failed.', { code: auditError.code });
-          return res.status(500).json({ success: false, message: 'Login failed.' });
+
+        const response = {
+          success: true,
+          isAdmin,
+          mfaRequired: Boolean(isAdmin && requiresMfaChallenge),
+          nextAction: isAdmin && requiresMfaChallenge ? pendingStage : null,
+          redirect: isAdmin && requiresMfaChallenge ? `/users/mfa/${pendingStage}` : null,
+          message: `Welcome, ${user.firstName}!`
+        };
+
+        if (wantsHtml) {
+          if (isAdmin && requiresMfaChallenge) {
+            return res.redirect(`/users/mfa/${pendingStage}`);
+          }
+          if (isAdmin) {
+            return res.redirect('/admin');
+          }
+          return res.redirect('/');
         }
 
-        return res.status(200).json({ 
-          success: true, 
-          isAdmin: req.session.user.role === 'Admin',
-          mfaRequired: Boolean(user.role === 'Admin' && user.mfaEnabled && !user.mfaVerified),
-          message: `Welcome, ${user.firstName}!` 
-        });
+        return res.status(200).json(response);
       });
 
     } catch (err) {
@@ -270,72 +406,230 @@ router.post('/login', ...authenticationLimits, async (req, res) => {
     }
 });
 
-// GET /users/mfa/setup - Initialize admin MFA enrollment
-router.get('/mfa/setup', isAuthenticated, async (req, res) => {
-  try {
-    const user = await User.findById(req.session.user._id);
-    if (!user || user.role !== 'Admin') {
-      return res.status(403).json({ success: false, message: 'Administrative access required.' });
-    }
-
-    if (!user.mfaSecret) {
-      user.mfaSecret = generateSecret();
-      user.mfaEnabled = true;
-      user.mfaVerified = false;
-      await user.save();
-    }
-
-    const qrCode = await generateQrCodeDataUrl(user.email, user.mfaSecret);
-    
-    return res.status(200).json({
-      success: true,
-      secret: user.mfaSecret,
-      otpAuthUrl: buildOtpAuthUrl(user.email, user.mfaSecret),
-      qrCode
-    });
-  } catch (error) {
-    logger.error('MFA enrollment failed.', { code: error.code || 'MFA_ENROLLMENT_ERROR' });
-    return res.status(500).json({ success: false, message: 'Unable to configure MFA.' });
+router.get('/mfa/enroll', async (req, res) => {
+  const pending = req.session && req.session.mfaPending;
+  if (!pending || pending.stage !== 'enroll') {
+    return res.redirect('/');
   }
+
+  const user = await User.findById(pending.userId);
+  if (!user || user.role !== 'Admin') {
+    return res.status(403).render('error/access-denied', { title: 'Access Denied', message: 'Administrative access required.' });
+  }
+
+  if (pending.expiresAt && Date.now() > pending.expiresAt) {
+    req.session.mfaPending = null;
+    return res.redirect('/?mfaExpired=true');
+  }
+
+  const pendingSecret = user.mfaPendingSecret ? decryptSecret(user.mfaPendingSecret) : '';
+  const secret = pendingSecret || generateSecret();
+  if (!user.mfaPendingSecret) {
+    user.mfaPendingSecret = encryptSecret(secret);
+    user.mfaEnabled = false;
+    await user.save();
+  }
+
+  const qrCode = await generateQrCodeDataUrl(user.email, secret);
+  return res.render('users/mfa-enroll', {
+    layout: 'main',
+    title: 'Secure Your Administrator Account',
+    email: user.email,
+    secret,
+    otpauthUrl: buildOtpAuthUrl(user.email, secret),
+    qrCode
+  });
 });
 
-// POST /users/mfa/verify - Verify MFA token to complete admin login
-router.post('/mfa/verify', isAuthenticated, async (req, res) => {
-  const { token } = req.body;
 
-  try {
-    const user = await User.findById(req.session.user._id);
-    if (!user || user.role !== 'Admin') {
-      return res.status(403).json({ success: false, message: 'Administrative access required.' });
+router.get('/mfa/verify', async (req, res) => {
+  const pending = req.session && req.session.mfaPending;
+  if (!pending || pending.stage !== 'verify') {
+    return res.redirect('/');
+  }
+
+  const user = await User.findById(pending.userId);
+  if (!user || user.role !== 'Admin') {
+    return res.status(403).render('error/access-denied', { title: 'Access Denied', message: 'Administrative access required.' });
+  }
+
+  if (!user.mfaEnabled || !user.mfaSecret) {
+    return res.redirect('/users/mfa/enroll');
+  }
+
+  if (pending.expiresAt && Date.now() > pending.expiresAt) {
+    req.session.mfaPending = null;
+    return res.redirect('/?mfaExpired=true');
+  }
+
+  return res.render('users/mfa-verify', {
+    layout: 'main',
+    title: 'Verify Your Identity',
+    email: user.email,
+    isAdmin: true
+  });
+});
+
+
+router.get('/mfa/setup', async (req, res) => {
+  const pending = req.session && req.session.mfaPending;
+  if (!pending || pending.stage !== 'enroll') {
+    return res.status(403).json({ success: false, message: 'MFA enrollment is required.' });
+  }
+
+  const user = await User.findById(pending.userId);
+  if (!user || user.role !== 'Admin') {
+    return res.status(403).json({ success: false, message: 'Administrative access required.' });
+  }
+
+  const pendingSecret = user.mfaPendingSecret ? decryptSecret(user.mfaPendingSecret) : '';
+  const secret = pendingSecret || generateSecret();
+  if (!user.mfaPendingSecret) {
+    user.mfaPendingSecret = encryptSecret(secret);
+    await user.save();
+  }
+
+  const qrCode = await generateQrCodeDataUrl(user.email, secret);
+  return res.status(200).json({
+    success: true,
+    secret,
+    otpauthUrl: buildOtpAuthUrl(user.email, secret),
+    qrCode,
+    nextAction: 'enroll'
+  });
+});
+
+
+
+router.post('/mfa/setup/confirm', async (req, res) => {
+  const pending = req.session && req.session.mfaPending;
+  if (!pending || pending.stage !== 'enroll') {
+    return res.status(403).json({ success: false, code: 'MFA_REQUIRED', message: 'MFA enrollment is required.' });
+  }
+
+  const token = normalizeOtpInput(req.body.token);
+  const user = await User.findById(pending.userId);
+  if (!user || user.role !== 'Admin') {
+    return res.status(403).json({ success: false, message: 'Administrative access required.' });
+  }
+
+  const pendingSecret = decryptSecret(user.mfaPendingSecret);
+  if (!pendingSecret) {
+    return res.status(400).json({ success: false, message: 'MFA enrollment secret is unavailable.' });
+  }
+
+  if (!verifyToken(pendingSecret, token, { window: 1 })) {
+    return res.status(400).json({ success: false, message: 'The verification code was invalid.' });
+  }
+
+  const recoveryCodes = generateRecoveryCodes(10);
+  user.mfaEnabled = true;
+  user.mfaVerified = true;
+  user.mfaPendingSecret = '';
+  user.mfaSecret = encryptSecret(pendingSecret);
+  user.mfaEnrolledAt = new Date();
+  user.lastMfaVerifiedAt = new Date();
+  user.recoveryCodes = recoveryCodes.map((code) => hashRecoveryCode(code));
+  await user.save();
+
+  req.session.user = {
+    ...req.session.user,
+    mfaEnabled: true,
+    mfaVerified: true,
+    isAdmin: true
+  };
+  req.session.mfaPending = null;
+  req.session.stepUp = { verifiedAt: new Date().toISOString(), method: 'mfa' };
+
+  await recordAuditLog({ actorId: user._id, actorRole: user.role || 'Admin', action: 'admin:mfa:enroll', resourceType: 'User', result: 'SUCCESS', reason: 'MFA enrollment complete' });
+
+  return res.status(200).json({
+    success: true,
+    message: 'MFA enrollment complete.',
+    recoveryCodes,
+    redirect: '/admin'
+  });
+});
+
+
+
+router.post('/mfa/verify', async (req, res) => {
+  const pending = req.session && req.session.mfaPending;
+  if (!pending || pending.stage !== 'verify') {
+    return res.status(403).json({ success: false, code: 'MFA_REQUIRED', message: 'MFA verification is required.' });
+  }
+
+  const token = normalizeOtpInput(req.body.token);
+  const recoveryCode = typeof req.body.recoveryCode === 'string' ? req.body.recoveryCode.trim() : '';
+
+  const user = await User.findById(pending.userId);
+  if (!user || user.role !== 'Admin') {
+    return res.status(403).json({ success: false, message: 'Administrative access required.' });
+  }
+
+  if (!user.mfaEnabled || !user.mfaSecret) {
+    return res.status(400).json({ success: false, code: 'MFA_REQUIRED', message: 'MFA is not configured for this account.' });
+  }
+
+  let isValid = false;
+  let usedRecovery = false;
+
+  if (token) {
+    const secret = decryptSecret(user.mfaSecret);
+    isValid = Boolean(secret) && verifyToken(secret, token, { window: 1 });
+  }
+
+  if (!isValid && recoveryCode) {
+    const recovered = verifyRecoveryCode(user.recoveryCodes || [], recoveryCode);
+    if (recovered !== null) {
+      usedRecovery = true;
+      isValid = true;
+      user.recoveryCodes.splice(recovered, 1);
+    }
+  }
+
+  if (!isValid) {
+    await recordAuditLog({ actorId: user._id, actorRole: user.role || 'Admin', action: 'admin:mfa:verify', resourceType: 'User', result: 'FAILURE', reason: 'Invalid MFA code' });
+    return res.status(400).json({ success: false, message: 'Invalid or expired MFA code.' });
+  }
+
+  req.session.regenerate((err) => {
+    if (err) {
+      logger.error('Session regeneration failed.', { code: err.code || 'SESSION_REGENERATION_ERROR' });
+      return res.status(500).json({ success: false, message: 'Login failed.' });
     }
 
-    if (!user.mfaSecret) {
-      return res.status(400).json({ success: false, message: 'MFA is not configured.' });
-    }
-
-    const isValid = verifyToken(user.mfaSecret, String(token || '').trim());
-    if (!isValid) {
-      return res.status(400).json({ success: false, message: 'Invalid MFA code.' });
-    }
+    const authenticatedAt = Date.now();
+    const safeSessionUser = buildSessionUser(user);
+    req.session.user = {
+      ...safeSessionUser,
+      authenticatedAt,
+      lastActivityAt: authenticatedAt,
+      absoluteExpiresAt: authenticatedAt + SESSION_ABSOLUTE_TIMEOUT_MS,
+      mfaRequired: false
+    };
+    req.session.stepUp = { verifiedAt: new Date().toISOString(), method: 'mfa' };
+    req.session.mfaPending = null;
+    req.session.authenticatedAt = authenticatedAt;
+    req.session.lastActivityAt = authenticatedAt;
+    req.session.absoluteExpiresAt = authenticatedAt + SESSION_ABSOLUTE_TIMEOUT_MS;
+    req.session.cookie.maxAge = SESSION_IDLE_TIMEOUT_MS;
 
     user.mfaVerified = true;
     user.lastMfaVerifiedAt = new Date();
-    await user.save();
+    user.save().catch((saveError) => logger.error('MFA verification save failed.', { code: saveError.code || 'MFA_VERIFICATION_SAVE_ERROR' }));
 
-    req.session.user.mfaVerified = true;
-    req.session.user.mfaEnabled = true;
-    req.session.stepUp = {
-      verifiedAt: new Date().toISOString(),
-      method: 'mfa'
-    };
-    logger.info('Admin MFA verification succeeded.');
-    await recordAuditLog({ actorId: user._id, actorRole: user.role || 'Admin', action: 'admin:mfa:verify', resourceType: 'User', result: 'SUCCESS', reason: 'MFA verification succeeded' });
+    recordAuditLog({
+      actorId: user._id,
+      actorRole: user.role || 'Admin',
+      action: usedRecovery ? 'admin:mfa:recovery:used' : 'admin:mfa:verify',
+      resourceType: 'User',
+      result: 'SUCCESS',
+      reason: usedRecovery ? 'Recovery code accepted' : 'MFA verification succeeded'
+    }).catch((auditError) => logger.error('MFA verification audit failed.', { code: auditError.code || 'MFA_AUDIT_ERROR' }));
 
-    return res.status(200).json({ success: true, message: 'MFA verification succeeded.' });
-  } catch (error) {
-    logger.error('MFA verification failed.', { code: error.code || 'MFA_VERIFICATION_ERROR' });
-    return res.status(500).json({ success: false, message: 'Unable to verify MFA code.' });
-  }
+    return res.status(200).json({ success: true, isAdmin: true, redirect: '/admin', message: 'MFA verification succeeded.' });
+  });
 });
 
 // POST /users/logout - Handle user logout
@@ -475,6 +769,9 @@ router.post('/delete/:userId', isAuthenticated, async (req, res) => {
 
     if (!targetUser) {
       return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    if (isProvisionedAdminAccount(targetUser)) {
+      return res.status(403).json({ success: false, message: 'The provisioned administrator account cannot be deleted.' });
     }
 
     const sessionUser = req.session.user;

@@ -28,41 +28,69 @@
               <i class="bi bi-speedometer2 me-2"></i> Dashboard
             </a>
           </li>
+          {{#if canReadFlights}}
           <li class="nav-item mb-2">
             <a href="/admin/flights" class="nav-link text-white {{#if (eq title 'All Flights')}}active{{/if}}">
               <i class="bi bi-airplane me-2"></i> Flights
             </a>
           </li>
+          {{/if}}
+          {{#if canCreateFlights}}
           <li class="nav-item mb-2">
             <a href="/admin/create" class="nav-link text-white {{#if (eq title 'Create New Flight')}}active{{/if}}">
               <i class="bi bi-plus-circle me-2"></i> Create Flight
             </a>
           </li>
+          {{/if}}
+          {{#if canReadReservations}}
           <li class="nav-item mb-2">
             <a href="/admin/reservations" class="nav-link text-white {{#if (eq title 'All Reservations')}}active{{/if}}">
               <i class="bi bi-journal-bookmark me-2"></i> Reservations
             </a>
           </li>
+          {{/if}}
+          {{#if canManageApprovals}}
           <li class="nav-item mb-2">
             <a href="/admin/approvals" class="nav-link text-white {{#if (eq title 'Approval Queue')}}active{{/if}}">
               <i class="bi bi-check2-square me-2"></i> Approvals
             </a>
           </li>
+          {{/if}}
+          {{#if canManageEmergencyAccess}}
           <li class="nav-item mb-2">
             <a href="/admin/emergency-access" class="nav-link text-white {{#if (eq title 'Emergency Access')}}active{{/if}}">
               <i class="bi bi-shield-exclamation me-2"></i> Emergency Access
             </a>
           </li>
+          {{/if}}
+          {{#if canManagePrivacy}}
           <li class="nav-item mb-2">
             <a href="/privacy/dpo/manage" class="nav-link text-white {{#if (eq title 'Privacy Requests')}}active{{/if}}">
               <i class="bi bi-person-lock me-2"></i> Privacy Requests
             </a>
           </li>
+          {{/if}}
+          {{#if canReviewSecurity}}
           <li class="nav-item mb-2">
             <a href="/admin/security" class="nav-link text-white {{#if (eq title 'Security Center')}}active{{/if}}">
               <i class="bi bi-shield-lock me-2"></i> Security Center
             </a>
           </li>
+          {{/if}}
+          {{#if canManageAdmins}}
+          <li class="nav-item mb-2">
+            <a href="/admin/management" class="nav-link text-white {{#if (eq title 'Admin Management')}}active{{/if}}">
+              <i class="bi bi-people me-2"></i> Admin Management
+            </a>
+          </li>
+          {{/if}}
+          {{#if canViewAdminProfile}}
+          <li class="nav-item mb-2">
+            <a href="/admin/profile" class="nav-link text-white {{#if (eq title 'Administrator Profile')}}active{{/if}}">
+              <i class="bi bi-person-badge me-2"></i> My Profile
+            </a>
+          </li>
+          {{/if}}
         </ul>
       </div>
       <div>

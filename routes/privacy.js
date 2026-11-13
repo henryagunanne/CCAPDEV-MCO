@@ -10,6 +10,7 @@ const { recordAuditEvent } = require('../services/auditService');
 const { requireAdminAccess, requirePermission } = require('../middleware/adminAuth');
 const { permissions } = require('../config/rbac');
 const { dpoContact } = require('../config/env');
+const { getAdminNavigation } = require('../services/adminNavigation');
 const mongoose = require('mongoose');
 const { validatePassengers, BookingInputError } = require('../services/bookingValidation');
 const { updateReservation, cancelReservation, BookingConflictError } = require('../services/bookingService');
@@ -582,7 +583,8 @@ router.get('/privacy/dpo/manage', requireAdminAccess,
     return res.render('admin/privacy-requests', {
       layout: 'admin',
       title: 'Privacy Requests',
-      admin: req.session.user,
+      admin: req.authenticatedUser,
+      ...getAdminNavigation(req.authenticatedUser),
       requests
     });
   });

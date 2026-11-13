@@ -41,6 +41,14 @@ describe('MCO2 privacy routes', () => {
     await refreshCsrfToken();
   });
 
+  test('does not request insecure-resource upgrades or HTTPS in development', async () => {
+    const response = await agent.get('/');
+    expect(response.headers['content-security-policy']).not.toContain('upgrade-insecure-requests');
+    expect(response.headers['strict-transport-security']).toBeUndefined();
+    await agent.get('/src/css/flight.css').expect(200);
+    await agent.get('/assets/Logo/logo-white.png').expect(200);
+  });
+
   test('masks passport values in Admin lists and audits authorized reveals', async () => {
     const passport = 'AB123456';
     const reservation = await Reservation.create({

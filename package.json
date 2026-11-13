@@ -5,8 +5,9 @@
   "main": "server.js",
   "scripts": {
     "test": "NODE_ENV=test jest --detectOpenHandles --runInBand",
-    "start": "node server.js",
-    "dev": "nodemon server.js",
+    "start": "node scripts/start-app.js development",
+    "dev": "nodemon --exec \"node scripts/start-app.js development\" scripts/start-app.js",
+    "start:production": "node scripts/start-app.js production",
     "provision:admin": "node scripts/provision-admin.js",
     "import:aircraft-configurations": "node scripts/import-aircraft-configurations.js",
     "migrate:booking-integrity": "node scripts/migrate-booking-integrity.js",

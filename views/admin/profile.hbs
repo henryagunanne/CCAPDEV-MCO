@@ -1,0 +1,47 @@
+<div class="container-fluid px-4 py-4">
+  <div class="mb-4">
+    <h1 class="fw-bold text-danger mb-1">Administrator Profile</h1>
+    <p class="text-muted mb-0">View your assigned role and administrative permissions.</p>
+  </div>
+
+  {{#if errorMessage}}<div class="alert alert-danger" role="alert">{{errorMessage}}</div>{{/if}}
+  {{#if successMessage}}<div class="alert alert-success" role="status">{{successMessage}}</div>{{/if}}
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <section class="card shadow-sm">
+        <div class="card-body">
+          <h2 class="h4">{{admin.firstName}} {{admin.lastName}}</h2>
+          <p><strong>Assigned role:</strong> {{#each roles}}<span class="badge text-bg-light border me-1">{{this}}</span>{{else}}No role assigned{{/each}}</p>
+          <p><strong>Status:</strong> {{statusLabel}}</p>
+          <p><strong>Created:</strong> {{formatDate admin.createdAt}}</p>
+          <p><strong>Last login:</strong> {{#if admin.lastLoginAt}}{{formatDate admin.lastLoginAt}}{{else}}Never{{/if}}</p>
+          <form method="post" action="/admin/profile">
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
+            <div class="mb-3">
+              <label class="form-label" for="firstName">First name</label>
+              <input class="form-control" id="firstName" name="firstName" value="{{admin.firstName}}" maxlength="80" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="lastName">Last name</label>
+              <input class="form-control" id="lastName" name="lastName" value="{{admin.lastName}}" maxlength="80" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="email">Email address</label>
+              <input class="form-control" id="email" name="email" type="email" value="{{admin.email}}" maxlength="254" required>
+            </div>
+            <button class="btn btn-danger" type="submit">Save profile</button>
+          </form>
+        </div>
+      </section>
+    </div>
+    <div class="col-lg-5">
+      <section class="card shadow-sm h-100">
+        <div class="card-body">
+          <h2 class="h5 text-danger">Your permissions</h2>
+          <ul class="mb-0">{{#each permissions}}<li>{{this}}</li>{{else}}<li>No administrative permissions assigned.</li>{{/each}}</ul>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

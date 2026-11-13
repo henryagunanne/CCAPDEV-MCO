@@ -41,6 +41,10 @@ const auditLogSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  details: {
+    type: mongoose.Schema.Types.Mixed,
+    default: null
+  },
   correlationId: {
     type: String,
     default: ''

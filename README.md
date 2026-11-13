@@ -182,6 +182,10 @@ The script will prompt for:
 
 It refuses to create another administrator if one already exists, and it does not print the password to the console.
 
+The provisioned account is the protected administrator-management authority. Administrators with the existing `user_access_admin` role may manage accounts only within their own permission set; other roles do not receive account-management access. From **Admin Management**, an authorized administrator can create employed accounts, assign an available role, and activate or deactivate accounts. Role and status changes are audited and require the affected administrator to sign in again.
+
+New administrators receive a one-time setup link to choose their own password. The link expires after 24 hours and is displayed only after account creation; share it with the administrator using a secure channel. No email integration is configured by this application. For an existing installation, configure `ADMIN_EMAIL` to the original provisioned administrator's email address; that account is marked as the protected administrator the next time it accesses an admin page.
+
 ### Preparing Flight Seat Configurations
 
 Before bookings are enabled, import the supplied synthetic seat configurations and reconcile existing reservations. Both commands are read-only by default and require an explicit `--apply` to write data. Configure `MONGODB_URI` in `.env` first.
@@ -205,17 +209,137 @@ The migration intentionally stops when existing reservations need reconciliation
 ### Running the Application
 
 ```bash
-npm start
+npm run dev
 ```
-or
+or to start without the file watcher:
 ```bash
-node server.js
+npm start
 ```
 
 ### The application will be available at:
 ```bash
 http://localhost:3000
 ```
+Both commands use HTTP development mode.
+
+## Local HTTPS Setup (Production Simulation)
+
+Production simulation uses a local HTTPS listener on the configured `PORT`. The default certificate paths are relative to the project root:
+
+```text
+certs/localhost.pem
+certs/localhost-key.pem
+```
+
+The certificate must cover `localhost`, `127.0.0.1`, and `::1`. Do not put generated certificates or private keys in Git.
+
+### Windows
+
+1. Install mkcert, for example with Chocolatey from an elevated PowerShell:
+
+   ```powershell
+   choco install mkcert
+   ```
+
+   Alternatively, install it with another supported Windows package manager.
+2. Verify it is installed:
+
+   ```powershell
+   mkcert -version
+   ```
+3. Install and trust the local CA:
+
+   ```powershell
+   mkcert -install
+   ```
+4. From the project root, create the certificate directory and generate the localhost certificate:
+
+   ```powershell
+   New-Item -ItemType Directory -Force certs
+   mkcert -key-file certs/localhost-key.pem -cert-file certs/localhost.pem localhost 127.0.0.1 ::1
+   ```
+5. Inspect the local CA directory:
+
+   ```powershell
+   mkcert -CAROOT
+   ```
+
+   The CA private key is stored in that CA directory. Never share it, copy it into the repository, or commit it.
+
+### macOS
+
+1. If Homebrew is not installed, install it using the instructions at [brew.sh](https://brew.sh/).
+2. Install mkcert and verify it:
+
+   ```bash
+   brew install mkcert
+   mkcert -version
+   ```
+3. Install and trust the local CA:
+
+   ```bash
+   mkcert -install
+   ```
+4. From the project root, create the certificate directory and generate the localhost certificate:
+
+   ```bash
+   mkdir -p certs
+   mkcert -key-file certs/localhost-key.pem -cert-file certs/localhost.pem localhost 127.0.0.1 ::1
+   ```
+5. Inspect the local CA directory:
+
+   ```bash
+   mkcert -CAROOT
+   ```
+
+   Keep the CA private key in that directory. Never share it, copy it into the repository, or commit it.
+
+### Run the application
+
+Development continues to use HTTP:
+
+```bash
+npm run dev
+# or
+npm start
+```
+
+Open `http://localhost:3000`.
+
+For production simulation, set `NODE_ENV=production` and use the local certificates. The npm script also selects production mode:
+
+PowerShell:
+
+```powershell
+$env:NODE_ENV = "production"
+$env:TLS_MODE = "local"
+npm run start:production
+```
+
+macOS/Linux:
+
+```bash
+export NODE_ENV=production
+export TLS_MODE=local
+npm run start:production
+```
+
+Open `https://localhost:3000`. To use different certificate locations, set `TLS_CERT_PATH` and `TLS_KEY_PATH` to paths relative to the project root. Absolute paths and paths outside the project are rejected.
+
+For an actual deployment behind a TLS-terminating reverse proxy, use `NODE_ENV=production` and `TLS_MODE=proxy`, configure `TRUSTED_PROXY_CIDRS` for the proxy, and let the proxy manage the public certificate. Do not deploy the local mkcert certificates or CA private key.
+
+### Troubleshooting and security notes
+
+- **Browser trust warning:** run `mkcert -install` for the current OS user, then restart the browser. Confirm you opened `https://localhost:3000` and generated the certificate for all three required hostnames.
+- **Missing certificate or private key:** production simulation intentionally fails instead of falling back to HTTP. Generate the files above, or set `TLS_CERT_PATH` and `TLS_KEY_PATH` to valid project-relative paths.
+- **Hostname mismatch:** regenerate the certificate with `localhost 127.0.0.1 ::1` and browse using one of those names.
+- **`mkcert` not recognized:** complete the package-manager installation and restart the terminal so its updated `PATH` is loaded.
+- **CA installation fails:** use an account with permission to add a trusted local CA, rerun `mkcert -install`, and check `mkcert -CAROOT`. Never distribute or commit the CA private key.
+- **Port already in use:** stop the other local service or set a different `PORT` before starting the app.
+- **Regenerating certificates:** rerun the certificate command from the project root. If the local CA was changed or reinstalled, trust it again with `mkcert -install` and restart the browser.
+- Local mkcert certificates are only for development and production simulation. Actual production must use a trusted CA or managed TLS infrastructure.
+- HTTPS to this app does not automatically encrypt MongoDB or third-party service connections; configure those connections separately.
+- Never commit or share the localhost private key, the local CA private key, or any production private key.
 
 ### Optional: Stopping MongoDB
 
@@ -260,10 +384,6 @@ The official MCO Project Specifications Document is included in this repository.
 ---
 
 ### 🔮 Future Improvements
-- Standardize user authentication and authorization
-- Improve database models and fields
-- Persistent database deployment
-- Enhance test coverage
 - UI/UX refinements
 - Deployment to cloud infrastructure
 

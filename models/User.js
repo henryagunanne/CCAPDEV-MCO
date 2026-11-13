@@ -53,6 +53,28 @@ const userSchema = new mongoose.Schema({
         type: [String],
         default: []
     },
+    isProvisionedAdmin: {
+        type: Boolean,
+        default: false
+    },
+    sessionVersion: {
+        type: Number,
+        default: 0
+    },
+    mustSetPassword: {
+        type: Boolean,
+        default: false
+    },
+    passwordSetupTokenHash: {
+        type: String,
+        default: '',
+        select: false
+    },
+    passwordSetupExpiresAt: {
+        type: Date,
+        default: null,
+        select: false
+    },
     status: {
         type: String,
         enum: ['active', 'disabled', 'suspended'],
@@ -60,15 +82,27 @@ const userSchema = new mongoose.Schema({
     },
     mfaEnabled: {
         type: Boolean,
-        default: true
+        default: false
     },
     mfaVerified: {
         type: Boolean,
-        default: true
+        default: false
     },
     mfaSecret: {
         type: String,
         default: ''
+    },
+    mfaPendingSecret: {
+        type: String,
+        default: ''
+    },
+    mfaEnrolledAt: {
+        type: Date,
+        default: null
+    },
+    mfaPendingExpiresAt: {
+        type: Date,
+        default: null
     },
     recoveryCodes: {
         type: [String],
@@ -121,6 +155,10 @@ userSchema.pre('save', async function (next) {
 
 userSchema.methods.comparePassword = async function (candidatePassword) {
     return bcrypt.compare(candidatePassword, this.password);
+};
+
+userSchema.methods.hasMfaEnrollment = function () {
+    return Boolean(this.mfaEnabled && this.mfaSecret && this.mfaSecret.trim().length > 0);
 };
 
 userSchema.methods.toSafeSession = function () {

@@ -5,6 +5,7 @@ const router = express.Router();
 const Flight = require('../models/Flight');
 const User = require('../models/User');
 const Reservation = require('../models/Reservation');
+const AuditLog = require('../models/AuditLog');
 const AdminApprovalRequest = require('../models/AdminApprovalRequest');
 const EmergencyAccessGrant = require('../models/EmergencyAccessGrant');
 const {
@@ -18,35 +19,59 @@ const {
   cancelReservation
 } = require('../services/bookingService');
 const logger = require('../logs/logger');
-const { permissions } = require('../config/rbac');
+const { permissions, getEffectivePermissions } = require('../config/rbac');
 const { requireAdminAccess, requirePermission, requireStepUpAuthentication } = require('../middleware/adminAuth');
 const { cancellationLimits } = require('../middleware/rateLimits');
 const { recordAuditEvent } = require('../services/auditService');
+const { getAdminNavigation } = require('../services/adminNavigation');
 
 /* ======================================================
    Admin Access Middleware
 ====================================================== */
 router.use(requireAdminAccess);
+router.use((req, res, next) => {
+  res.locals.admin = req.authenticatedUser;
+  res.locals.user = req.authenticatedUser;
+  Object.assign(res.locals, getAdminNavigation(req.authenticatedUser));
+  return next();
+});
 
 /* ======================================================
   Dashboard Route 
 ====================================================== */
-router.get('/', requirePermission(permissions.FLIGHT_READ), async (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const [totalFlights, totalUsers, totalReservations] = await Promise.all([
-      Flight.countDocuments(),
-      User.countDocuments(),
-      Reservation.countDocuments()
+    const admin = req.authenticatedUser;
+    const adminPermissions = new Set(getEffectivePermissions(admin));
+    const [totalFlights, totalUsers, totalReservations, activities] = await Promise.all([
+      adminPermissions.has(permissions.FLIGHT_READ) ? Flight.countDocuments() : null,
+      adminPermissions.has(permissions.USER_CREATE) || adminPermissions.has(permissions.USER_UPDATE)
+        ? User.countDocuments()
+        : null,
+      adminPermissions.has(permissions.RESERVATION_READ) ? Reservation.countDocuments() : null,
+      adminPermissions.has(permissions.AUDIT_READ)
+        ? AuditLog.find({ resourceType: 'Administrator' })
+          .sort({ timestamp: -1 })
+          .limit(5)
+          .select('action resourceId timestamp details')
+          .lean()
+        : []
     ]);
 
     res.render('admin/dashboard', {
       layout: 'admin',
       title: 'Admin Dashboard',
-      admin: req.session.user,
+      admin,
+      assignedRoles: (admin.roles || []).map((roleName) => roleName
+        .split('_')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')),
+      accountStatusLabel: admin.status === 'active' ? 'Active' : 'Inactive',
+      activities,
       stats: {
-        totalFlights,
-        totalUsers: totalUsers < 5 ? '<5' : totalUsers,
-        totalReservations: totalReservations < 5 ? '<5' : totalReservations
+        totalFlights: totalFlights === null ? '—' : totalFlights,
+        totalUsers: totalUsers === null ? '—' : totalUsers < 5 ? '<5' : totalUsers,
+        totalReservations: totalReservations === null ? '—' : totalReservations < 5 ? '<5' : totalReservations
       }
     });
   } catch (err) {
@@ -55,10 +80,112 @@ router.get('/', requirePermission(permissions.FLIGHT_READ), async (req, res) => 
   }
 });
 
+router.get('/profile', async (req, res) => {
+  try {
+    const account = await User.findById(req.authenticatedUser._id)
+      .select('firstName lastName email role roles permissions status createdAt lastLoginAt isProvisionedAdmin');
+    if (!account) {
+      return res.status(404).render('error/access-denied', {
+        layout: 'admin',
+        title: 'Profile Not Found',
+        message: 'Administrator account not found.'
+      });
+    }
+
+    return res.render('admin/profile', {
+      layout: 'admin',
+      title: 'Administrator Profile',
+      admin: account,
+      roles: (account.roles || []).map((roleName) => roleName
+        .split('_')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')),
+      permissions: getEffectivePermissions(account),
+      statusLabel: account.status === 'active' ? 'Active' : 'Inactive',
+      successMessage: req.query.updated === 'true' ? 'Your profile was updated.' : ''
+    });
+  } catch (error) {
+    logger.error('Administrator profile request failed.', { code: error.code || 'ADMIN_PROFILE_ERROR' });
+    return res.status(500).render('error/server-error', { layout: 'admin', title: 'Administrator Profile Error' });
+  }
+});
+
+router.post('/profile', async (req, res) => {
+  const allowedFields = new Set(['_csrf', 'firstName', 'lastName', 'email']);
+  if (Object.keys(req.body).some((field) => !allowedFields.has(field))) {
+    return res.status(400).render('error/access-denied', {
+      layout: 'admin',
+      title: 'Invalid Profile Update',
+      message: 'Only your name and email address can be updated here.'
+    });
+  }
+
+  const firstName = typeof req.body.firstName === 'string' ? req.body.firstName.trim() : '';
+  const lastName = typeof req.body.lastName === 'string' ? req.body.lastName.trim() : '';
+  const email = typeof req.body.email === 'string' ? req.body.email.trim().toLowerCase() : '';
+  if (!/^[\p{L}][\p{L}\p{M}' -]{0,79}$/u.test(firstName) ||
+      !/^[\p{L}][\p{L}\p{M}' -]{0,79}$/u.test(lastName) ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).render('admin/profile', {
+      layout: 'admin',
+      title: 'Administrator Profile',
+      admin: req.authenticatedUser,
+      roles: req.authenticatedUser.roles || [],
+      permissions: getEffectivePermissions(req.authenticatedUser),
+      statusLabel: req.authenticatedUser.status === 'active' ? 'Active' : 'Inactive',
+      errorMessage: 'Enter a valid first name, last name, and email address.'
+    });
+  }
+
+  try {
+    const account = await User.findById(req.authenticatedUser._id);
+    if (!account) return res.status(404).render('error/access-denied', { layout: 'admin', title: 'Profile Not Found' });
+    const changedFields = [];
+    if (account.firstName !== firstName) changedFields.push('firstName');
+    if (account.lastName !== lastName) changedFields.push('lastName');
+    if (account.email !== email) changedFields.push('email');
+    account.firstName = firstName;
+    account.lastName = lastName;
+    account.email = email;
+    if (req.authenticatedUser.isProvisionedAdmin) account.isProvisionedAdmin = true;
+    await account.save();
+
+    req.session.user = {
+      ...req.session.user,
+      firstName: account.firstName,
+      lastName: account.lastName,
+      email: account.email
+    };
+    await recordAuditEvent({
+      actorId: account._id,
+      actorRole: account.role,
+      action: 'admin:profile:update',
+      resourceType: 'Administrator',
+      resourceId: account._id,
+      details: { changedFields }
+    });
+    return res.redirect('/admin/profile?updated=true');
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).render('admin/profile', {
+        layout: 'admin',
+        title: 'Administrator Profile',
+        admin: req.authenticatedUser,
+        roles: req.authenticatedUser.roles || [],
+        permissions: getEffectivePermissions(req.authenticatedUser),
+        statusLabel: req.authenticatedUser.status === 'active' ? 'Active' : 'Inactive',
+        errorMessage: 'An account already uses that email address.'
+      });
+    }
+    logger.error('Administrator profile update failed.', { code: error.code || 'ADMIN_PROFILE_UPDATE_ERROR' });
+    return res.status(500).render('error/server-error', { layout: 'admin', title: 'Administrator Profile Error' });
+  }
+});
+
 /* ======================================================
    Edit Flight Page
 ====================================================== */
-router.get('/edit/:id', async (req, res) => {
+router.get('/edit/:id', requirePermission(permissions.FLIGHT_UPDATE), async (req, res) => {
   try {
     const flight = await Flight.findById(req.params.id).lean();
 
@@ -84,7 +211,7 @@ router.get('/edit/:id', async (req, res) => {
 /* ======================================================
    Create Flight Page
 ====================================================== */
-router.get('/create', (req, res) => {
+router.get('/create', requirePermission(permissions.FLIGHT_CREATE), (req, res) => {
   res.render('admin/create', {
     layout: 'admin',
     title: 'Create New Flight'
@@ -118,7 +245,7 @@ router.get('/flights', requirePermission(permissions.FLIGHT_READ), async (req, r
 /* ======================================================
    Flight Search by FlightNumber
 ====================================================== */
-router.get('/flights/:flightNumber', async (req, res) => {
+router.get('/flights/:flightNumber', requirePermission(permissions.FLIGHT_READ), async (req, res) => {
   try {
     const flight = await Flight.findOne({ flightNumber: req.params.flightNumber }).lean();
 
@@ -555,6 +682,8 @@ router.post('/emergency-access/:grantId/revoke', requirePermission(permissions.S
     res.status(500).json({ success: false, message: 'Unable to revoke emergency access.' });
   }
 });
+
+router.use('/management', require('./adminManagement'));
 
 // Export the router
 module.exports = router;

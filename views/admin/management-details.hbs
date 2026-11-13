@@ -1,0 +1,91 @@
+<div class="container-fluid px-4 py-4">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+      <h1 class="fw-bold text-danger mb-1">Administrator Details</h1>
+      <p class="text-muted mb-0">Review account access and administrative history.</p>
+    </div>
+    <a class="btn btn-outline-secondary" href="/admin/management">Back to Admin Management</a>
+  </div>
+
+  {{#if updateType}}<div class="alert alert-success" role="status">Administrator {{updateType}} updated. The administrator must sign in again for the change to take effect.</div>{{/if}}
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <section class="card shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start gap-3">
+            <div>
+              <h2 class="h4">{{administrator.fullName}}</h2>
+              <p class="mb-1"><strong>Administrator ID:</strong> <code>{{administrator._id}}</code></p>
+              <p class="mb-1"><strong>Email:</strong> {{administrator.email}}</p>
+              <p class="mb-1"><strong>Assigned role:</strong> {{#each administrator.roleNames}}<span class="badge text-bg-light border me-1">{{this}}</span>{{else}}None{{/each}}</p>
+              <p class="mb-1"><strong>Status:</strong> <span class="badge {{#if administrator.isActive}}text-bg-success{{else}}text-bg-secondary{{/if}}">{{administrator.statusLabel}}</span></p>
+              <p class="mb-1"><strong>Created:</strong> {{formatDate administrator.createdAt}}</p>
+              <p class="mb-0"><strong>Last login:</strong> {{#if administrator.lastLoginAt}}{{formatDate administrator.lastLoginAt}}{{else}}Never{{/if}}</p>
+            </div>
+            <div class="d-flex flex-column gap-2">
+              {{#if canAssignRoles}}<a class="btn btn-outline-danger" href="/admin/management/{{administrator._id}}/edit">Edit role</a>{{/if}}
+              {{#if canChangeStatus}}
+                {{#if administrator.isActive}}
+                  <form method="post" action="/admin/management/{{administrator._id}}/status">
+                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                    <input type="hidden" name="status" value="disabled">
+                    <div class="form-check">
+                      <input class="form-check-input" id="confirmDeactivate" name="confirmed" type="checkbox" value="true" required>
+                      <label class="form-check-label small" for="confirmDeactivate">Confirm</label>
+                    </div>
+                    <button class="btn btn-outline-secondary w-100" type="submit">Deactivate</button>
+                  </form>
+                {{else}}
+                  <form method="post" action="/admin/management/{{administrator._id}}/status">
+                    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+                    <input type="hidden" name="status" value="active">
+                    <div class="form-check">
+                      <input class="form-check-input" id="confirmActivate" name="confirmed" type="checkbox" value="true" required>
+                      <label class="form-check-label small" for="confirmActivate">Confirm</label>
+                    </div>
+                    <button class="btn btn-success w-100" type="submit">Activate</button>
+                  </form>
+                {{/if}}
+              {{/if}}
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="col-lg-5">
+      <section class="card shadow-sm h-100">
+        <div class="card-body">
+          <h2 class="h5 text-danger">Administrative permissions</h2>
+          <ul class="mb-0">
+            {{#each permissions}}<li>{{label}}</li>{{else}}<li>No administrative permissions</li>{{/each}}
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <div class="col-12">
+      <section class="card shadow-sm">
+        <div class="card-header bg-white"><h2 class="h5 mb-0">Account history</h2></div>
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light"><tr><th>Activity</th><th>Changed by</th><th>Details</th><th>Date</th></tr></thead>
+            <tbody>
+              {{#each history}}
+                <tr>
+                  <td>{{actionLabel}}</td>
+                  <td>{{actorName}}</td>
+                  <td><code>{{detailsText}}</code></td>
+                  <td>{{formatDate timestamp}}</td>
+                </tr>
+              {{else}}
+                <tr><td class="text-muted text-center py-3" colspan="4">No account history is available.</td></tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

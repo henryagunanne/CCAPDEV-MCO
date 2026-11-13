@@ -42,7 +42,7 @@
                   <button type="submit" id="logoutBtn" class="dropdown-item">Sign Out</button>
                 </form>
               </li>
-              {{#if (eq user.role 'Admin')}}
+              {{#if user.isAdmin}}
                 <li><hr class="dropdown-divider"></li>
                 <li class="admin-dashboard">
                   <a class="dropdown-item" href="/admin">Admin Dashboard</a>

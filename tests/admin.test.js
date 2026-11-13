@@ -108,6 +108,91 @@ describe("Admin Tasks and Privileges", () => {
     });
 
     describe('Sensitive admin actions and approvals', () => {
+        it('redirects browser page requests to the pending MFA screen', async () => {
+            const admin = new User({
+                firstName: 'MFA',
+                lastName: 'Admin',
+                password: 'mfaadmin123',
+                email: 'mfa-page@test.com',
+                dateOfBirth: new Date(),
+                role: 'Admin',
+                roles: ['flight_operations_admin'],
+                permissions: ['flight:read'],
+                mfaEnabled: true,
+                mfaVerified: false,
+                mfaSecret: 'encrypted-test-secret',
+                status: 'active'
+            });
+            await admin.save();
+
+            await agent
+                .post('/users/login')
+                .set('x-csrf-token', csrfToken)
+                .send({ email: 'mfa-page@test.com', password: 'mfaadmin123' });
+
+            const res = await agent
+                .get('/admin')
+                .set('Accept', 'text/html');
+
+            expect(res.statusCode).toBe(302);
+            expect(res.headers.location).toBe('/users/mfa/verify');
+        });
+
+        it('preserves the MFA_REQUIRED JSON response for API requests', async () => {
+            const admin = new User({
+                firstName: 'MFA',
+                lastName: 'API',
+                password: 'mfaadmin123',
+                email: 'mfa-api@test.com',
+                dateOfBirth: new Date(),
+                role: 'Admin',
+                roles: ['flight_operations_admin'],
+                permissions: ['flight:read'],
+                mfaEnabled: true,
+                mfaVerified: false,
+                mfaSecret: 'encrypted-test-secret',
+                status: 'active'
+            });
+            await admin.save();
+
+            await agent
+                .post('/users/login')
+                .set('x-csrf-token', csrfToken)
+                .send({ email: 'mfa-api@test.com', password: 'mfaadmin123' });
+
+            const res = await agent
+                .get('/admin')
+                .set('Accept', 'application/json');
+
+            expect(res.statusCode).toBe(403);
+            expect(res.body).toMatchObject({
+                success: false,
+                code: 'MFA_REQUIRED'
+            });
+        });
+
+        it('renders a not-found page for browser navigation', async () => {
+            const res = await agent
+                .get('/missing-page')
+                .set('Accept', 'text/html');
+
+            expect(res.statusCode).toBe(404);
+            expect(res.text).toMatch(/<title>404 Not Found<\/title>/);
+            expect(res.text).toContain('/missing-page');
+        });
+
+        it('returns a structured not-found response to API requests', async () => {
+            const res = await agent
+                .get('/missing-api')
+                .set('Accept', 'application/json');
+
+            expect(res.statusCode).toBe(404);
+            expect(res.body).toMatchObject({
+                success: false,
+                code: 'NOT_FOUND'
+            });
+        });
+
         it('Sensitive admin routes require step-up authentication', async () => {
             const admin = new User({
                 firstName: 'Step',

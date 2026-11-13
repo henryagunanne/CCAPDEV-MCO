@@ -1,16 +1,20 @@
 
 <div class="d-flex flex-column justify-content-center align-items-center vh-100">
   <div class="text-center">
-    <h1 class="display-4 text-danger">Access Denied</h1>
-    <p class="lead">You do not have permission to access this resource.</p>
+    <h1 class="display-4 text-danger">{{#if title}}{{title}}{{else}}Access Denied{{/if}}</h1>
+    <p class="lead">{{#if message}}{{message}}{{else}}You do not have permission to access this resource.{{/if}}</p>
+    {{#if actionUrl}}
+      <a href="{{actionUrl}}" class="btn btn-danger mt-3">{{actionLabel}}</a>
+    {{else}}
     {{#if user}}
       {{#if (not user.isAdmin)}}
         <p class="">Administrator privileges are required to access this page.</p>
-            <a href="/" class="btn btn-danger mt-3">Return to Home</a>
+        <a href="/" class="btn btn-danger mt-3">Return to Home</a>
       {{/if}}
     {{else}}
       <p class="">Please login to gain access.</p>
       <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" class="btn btn-danger mt-3">Login</a>
+    {{/if}}
     {{/if}}
   </div>
 </div>

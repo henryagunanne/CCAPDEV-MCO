@@ -1,4 +1,7 @@
-const { hasPermission, isAdminAccount } = require('../config/rbac');
+const { hasPermission, isAdminAccount, getEffectivePermissions } = require('../config/rbac');
+const User = require('../models/User');
+const { isProvisionedAdminAccount } = require('../services/adminIdentity');
+const logger = require('../logs/logger');
 
 /* ======================================================
    Admin Authentication Middleware
@@ -17,6 +20,47 @@ function denyAccess(res, message = 'Access denied.', statusCode = 403) {
   });
 }
 
+function denyMfaRequired(req, res, message) {
+  const pending = req.session?.mfaPending;
+  const isHtmlPageRequest = ['GET', 'HEAD'].includes(req.method)
+    && (req.get('accept') || '').includes('text/html')
+    && !req.xhr;
+
+  if (isHtmlPageRequest && pending && ['enroll', 'verify'].includes(pending.stage)) {
+    return res.redirect(`/users/mfa/${pending.stage}`);
+  }
+
+  if (isHtmlPageRequest) {
+    return res.status(403).render('error/access-denied', {
+      title: 'MFA Required',
+      message: `${message} Sign in again to complete MFA verification.`,
+      actionUrl: '/',
+      actionLabel: 'Return to sign in'
+    });
+  }
+
+  return res.status(403).json({
+    success: false,
+    code: 'MFA_REQUIRED',
+    message
+  });
+}
+
+
+/** * Check if the current session is pending MFA verification.
+ * @param {Object} req - Express request object.
+ * @returns {boolean} - Returns true if MFA is pending, false otherwise.
+ */
+function isMfaPendingSession(req) {
+  const pending = req.session && req.session.mfaPending;
+  if (!pending) return false;
+  if (pending.expiresAt && Date.now() > Number(pending.expiresAt)) {
+    req.session.mfaPending = null;
+    return false;
+  }
+  return true;
+}
+
 
 /** * Middleware to require authentication for admin routes.
  * Checks if the user is logged in, has admin role, and is not disabled or suspended.
@@ -27,6 +71,10 @@ function requireAuthentication(req, res, next) {
 
   if (!user) {
     return denyAccess(res, 'Authentication required.', 401);
+  }
+
+  if (isMfaPendingSession(req)) {
+    return denyMfaRequired(req, res, 'Multi-factor authentication is required.');
   }
 
   if (user.status === 'disabled' || user.status === 'suspended') {
@@ -53,12 +101,12 @@ function requireMfaVerification(req, res, next) {
     return denyAccess(res, 'Authentication required.', 401);
   }
 
+  if (isMfaPendingSession(req)) {
+    return denyMfaRequired(req, res, 'Multi-factor authentication is required.');
+  }
+
   if (user.mfaEnabled && !user.mfaVerified) {
-    return res.status(403).json({
-      success: false,
-      code: 'MFA_REQUIRED',
-      message: 'Multi-factor authentication is required.'
-    });
+    return denyMfaRequired(req, res, 'Multi-factor authentication is required.');
   }
 
   req.authenticatedUser = user;
@@ -70,30 +118,71 @@ function requireMfaVerification(req, res, next) {
  * Checks if the user is logged in, has admin role, and is not disabled or suspended.
  * If MFA is enabled, checks if it has been verified.
  */
-function requireAdminAccess(req, res, next) {
-  const user = req.session?.user;
+async function requireAdminAccess(req, res, next) {
+  const sessionUser = req.session?.user;
 
-  if (!user) {
+  if (!sessionUser) {
     return denyAccess(res, 'Authentication required.', 401);
   }
 
-  if (!isAdminAccount(user)) {
+  if (isMfaPendingSession(req)) {
+    return denyMfaRequired(
+      req,
+      res,
+      'Multi-factor authentication is required before accessing administrative functions.'
+    );
+  }
+
+  const account = await User.findById(sessionUser._id);
+  if (!account || !isAdminAccount(account)) {
+    req.session.destroy((error) => {
+      if (error) logger.error('Invalid administrator session cleanup failed.', { code: error.code || 'ADMIN_SESSION_CLEANUP_ERROR' });
+    });
     return denyAccess(res, 'Administrative access is required.', 403);
   }
 
-  if (user.status === 'disabled' || user.status === 'suspended') {
+  const isProvisionedAdmin = isProvisionedAdminAccount(account);
+  if (isProvisionedAdmin && !account.isProvisionedAdmin) {
+    account.isProvisionedAdmin = true;
+    await account.save();
+  }
+
+  if (account.status === 'disabled' || account.status === 'suspended') {
+    req.session.destroy((error) => {
+      if (error) logger.error('Disabled administrator session cleanup failed.', { code: error.code || 'ADMIN_SESSION_CLEANUP_ERROR' });
+    });
     return denyAccess(res, 'This administrator account is disabled.', 403);
   }
 
-  if (user.mfaEnabled && !user.mfaVerified) {
-    return res.status(403).json({
-      success: false,
-      code: 'MFA_REQUIRED',
-      message: 'Multi-factor authentication is required.'
+  if (Number(sessionUser.sessionVersion || 0) !== Number(account.sessionVersion || 0)) {
+    req.session.destroy((error) => {
+      if (error) logger.error('Revoked administrator session cleanup failed.', { code: error.code || 'ADMIN_SESSION_CLEANUP_ERROR' });
     });
+    return denyAccess(res, 'Your administrative access changed. Sign in again to continue.', 403);
   }
 
-  req.authenticatedUser = user;
+  if (account.mfaEnabled && !account.mfaVerified) {
+    return denyMfaRequired(req, res, 'Multi-factor authentication is required.');
+  }
+
+  const freshUser = {
+    ...sessionUser,
+    _id: account._id,
+    firstName: account.firstName,
+    lastName: account.lastName,
+    email: account.email,
+    role: account.role,
+    roles: account.roles || [],
+    permissions: getEffectivePermissions(account),
+    status: account.status || 'active',
+    isProvisionedAdmin,
+    isAdmin: isAdminAccount(account),
+    mfaEnabled: Boolean(account.mfaEnabled),
+    mfaVerified: Boolean(account.mfaVerified),
+    sessionVersion: Number(account.sessionVersion || 0)
+  };
+  req.session.user = freshUser;
+  req.authenticatedUser = freshUser;
   return next();
 }
 

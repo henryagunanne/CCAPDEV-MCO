@@ -1,0 +1,110 @@
+<div class="container-fluid px-4 py-4">
+  <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap mb-4">
+    <div>
+      <h1 class="fw-bold text-danger mb-1">Admin Management</h1>
+      <p class="text-muted mb-0">Manage employed administrator accounts and access.</p>
+    </div>
+    {{#if canAssignRoles}}
+      <a class="btn btn-danger" href="/admin/management/new"><i class="bi bi-person-plus me-1"></i> Create Administrator</a>
+    {{/if}}
+  </div>
+
+  <form class="card shadow-sm mb-4" method="get" action="/admin/management">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-lg-4">
+          <label class="form-label" for="search">Search name or email</label>
+          <input class="form-control" id="search" name="search" type="search" value="{{filters.search}}" maxlength="100">
+        </div>
+        <div class="col-sm-6 col-lg-2">
+          <label class="form-label" for="role">Role</label>
+          <select class="form-select" id="role" name="role">
+            <option value="">All roles</option>
+            {{#each allRoles}}
+              <option value="{{name}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+            {{/each}}
+          </select>
+        </div>
+        <div class="col-sm-6 col-lg-2">
+          <label class="form-label" for="status">Status</label>
+          <select class="form-select" id="status" name="status">
+            <option value="">All statuses</option>
+            <option value="active" {{#if (eq filters.status 'active')}}selected{{/if}}>Active</option>
+            <option value="disabled" {{#if (eq filters.status 'disabled')}}selected{{/if}}>Inactive</option>
+            <option value="suspended" {{#if (eq filters.status 'suspended')}}selected{{/if}}>Suspended</option>
+          </select>
+        </div>
+        <div class="col-sm-6 col-lg-2">
+          <label class="form-label" for="sort">Sort by</label>
+          <select class="form-select" id="sort" name="sort">
+            <option value="createdAt" {{#if (eq filters.sort 'createdAt')}}selected{{/if}}>Date created</option>
+            <option value="name" {{#if (eq filters.sort 'name')}}selected{{/if}}>Name</option>
+            <option value="email" {{#if (eq filters.sort 'email')}}selected{{/if}}>Email</option>
+            <option value="role" {{#if (eq filters.sort 'role')}}selected{{/if}}>Role</option>
+            <option value="status" {{#if (eq filters.sort 'status')}}selected{{/if}}>Status</option>
+            <option value="lastLoginAt" {{#if (eq filters.sort 'lastLoginAt')}}selected{{/if}}>Last login</option>
+          </select>
+        </div>
+        <div class="col-sm-6 col-lg-1">
+          <label class="form-label" for="direction">Order</label>
+          <select class="form-select" id="direction" name="direction">
+            <option value="desc" {{#if (eq filters.direction 'desc')}}selected{{/if}}>Newest</option>
+            <option value="asc" {{#if (eq filters.direction 'asc')}}selected{{/if}}>Oldest</option>
+          </select>
+        </div>
+        <div class="col-lg-1 d-grid">
+          <button class="btn btn-outline-danger" type="submit">Apply</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div class="card shadow-sm">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+      <strong>Employed administrators</strong>
+      <span class="text-muted small">{{totalAdministrators}} account(s)</span>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">Administrator ID</th>
+            <th scope="col">Full name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Assigned role</th>
+            <th scope="col">Status</th>
+            <th scope="col">Created</th>
+            <th scope="col">Last login</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each administrators}}
+            <tr>
+              <td><code>{{_id}}</code></td>
+              <td>{{fullName}}</td>
+              <td>{{email}}</td>
+              <td>{{#each roleNames}}<span class="badge text-bg-light border me-1">{{this}}</span>{{else}}<span class="text-muted">None</span>{{/each}}</td>
+              <td><span class="badge {{statusClass}}">{{statusLabel}}</span></td>
+              <td>{{formatDate createdAt}}</td>
+              <td>{{#if lastLoginAt}}{{formatDate lastLoginAt}}{{else}}<span class="text-muted">Never</span>{{/if}}</td>
+              <td class="text-nowrap">
+                <a class="btn btn-sm btn-outline-secondary" href="/admin/management/{{_id}}">Details</a>
+                {{#if ../canAssignRoles}}<a class="btn btn-sm btn-outline-danger" href="/admin/management/{{_id}}/edit">Edit role</a>{{/if}}
+              </td>
+            </tr>
+          {{else}}
+            <tr><td class="text-center text-muted py-4" colspan="8">No administrator accounts match these filters.</td></tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+      <span class="small text-muted">Page {{currentPage}} of {{totalPages}}</span>
+      <div class="btn-group">
+        {{#if previousUrl}}<a class="btn btn-outline-secondary btn-sm" href="{{previousUrl}}">Previous</a>{{else}}<button class="btn btn-outline-secondary btn-sm" disabled>Previous</button>{{/if}}
+        {{#if nextUrl}}<a class="btn btn-outline-secondary btn-sm" href="{{nextUrl}}">Next</a>{{else}}<button class="btn btn-outline-secondary btn-sm" disabled>Next</button>{{/if}}
+      </div>
+    </div>
+  </div>
+</div>

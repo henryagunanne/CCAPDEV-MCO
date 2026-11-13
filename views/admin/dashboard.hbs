@@ -1,73 +1,72 @@
-<div class="container my-5 fullHeight d-flex flex-column align-items-center justify-content-start">
-
-  <!-- Header -->
-  <div class="d-flex justify-content-between align-items-center w-100 mb-3">
-    <div class="d-flex align-items-center gap-2">
-      <!-- Back to Homepage Button -->
-      <a href="/" class="btn btn-outline-danger btn-sm shadow-sm">
-        <i class="bi bi-house-door me-1"></i> Home
-      </a>
+<div class="container-fluid px-4 py-4 fullHeight">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+      <h1 class="fw-bold text-danger mb-1">Admin Dashboard</h1>
+      <p class="fw-semibold fs-5 mb-0">Welcome, {{admin.firstName}} {{admin.lastName}}.</p>
     </div>
-    <h1 class="text-center flex-grow-1 fw-bold text-danger">Admin Dashboard</h1>
-    <a href="#" class="btn btn-outline-danger btn-sm shadow-sm logoutButton">Logout</a>
+    <a href="/" class="btn btn-outline-danger"><i class="bi bi-house-door me-1"></i> Home</a>
   </div>
 
-  <!-- Welcome Section -->
-  <div class="dashboard-overview text-center mb-4 w-100" style="max-width: 700px;">
-    <p class="fw-semibold fs-5">Welcome, {{admin.firstName}} {{admin.lastName}}!</p>
-    <p class="text-muted">Here you can manage users, view reports, and configure system settings.</p>
-  </div>
-
-  <!-- Summary Cards -->
-  <div class="row text-center justify-content-center w-100" style="max-width:900px;margin:0 auto;">
-    <div class="col-md-4 mb-3">
-      <div class="card stat-card shadow-sm border-0">
-        <div class="card-body">
-          <h5 class="card-title">Total Flights</h5>
-          <h3 id="totalFlights">{{stats.totalFlights}}</h3>
-        </div>
+  <div class="dashboard-overview mb-4">
+    <div class="row g-3">
+      <div class="col-md-4">
+        <strong>Assigned role</strong>
+        <div>{{#each assignedRoles}}<span class="badge text-bg-light border me-1">{{this}}</span>{{else}}Administrator{{/each}}</div>
       </div>
+      <div class="col-md-4">
+        <strong>Account status</strong>
+        <div><span class="badge {{#if (eq admin.status 'active')}}text-bg-success{{else}}text-bg-secondary{{/if}}">{{accountStatusLabel}}</span></div>
+      </div>
+      <div class="col-md-4"><strong>Email</strong><div>{{admin.email}}</div></div>
+    </div>
+  </div>
+
+  <div class="row text-center justify-content-center">
+    <div class="col-md-4 mb-3">
+      <div class="card stat-card shadow-sm border-0"><div class="card-body"><h5 class="card-title">Total Flights</h5><h3 id="totalFlights">{{stats.totalFlights}}</h3></div></div>
     </div>
     <div class="col-md-4 mb-3">
-      <div class="card stat-card shadow-sm border-0">
-        <div class="card-body">
-          <h5 class="card-title">Total Reservations</h5>
-          <h3 id="totalReservations">{{stats.totalReservations}}</h3>
-        </div>
-      </div>
+      <div class="card stat-card shadow-sm border-0"><div class="card-body"><h5 class="card-title">Total Reservations</h5><h3 id="totalReservations">{{stats.totalReservations}}</h3></div></div>
     </div>
     <div class="col-md-4 mb-3">
-      <div class="card stat-card shadow-sm border-0">
-        <div class="card-body">
-          <h5 class="card-title">Active Users</h5>
-          <h3 id="totalUsers">{{stats.totalUsers}}</h3>
-        </div>
-      </div>
+      <div class="card stat-card shadow-sm border-0"><div class="card-body"><h5 class="card-title">Active Users</h5><h3 id="totalUsers">{{stats.totalUsers}}</h3></div></div>
     </div>
 
-    <!-- Dashboard Actions -->
-    <div class="dashboard-actions mt-4 text-center">
-      <form id="searchFlightForm">
-        <div class="input-group mt-3">
-          <input type="text" class="form-control" placeholder="Search Flights by Flight Number" aria-label="Search Flights" aria-describedby="searchFlightButton" id="searchFlightInput">
-          <button class="btn btn-danger" type="submit" id="searchFlightButton">Search</button>
-        </div>
-      </form>
-      <br>
-      <a href="/admin/flights" class="btn btn-danger mx-2">View all Flights</a>
-      <a href="/admin/reservations" class="btn btn-danger mx-2">View all Reservations</a>
-      <a href="/admin/create" class="btn btn-danger mx-2">Create Flight</a>
+    <div class="dashboard-actions mt-4">
+      {{#if canReadFlights}}
+        <form id="searchFlightForm">
+          <div class="input-group mt-3">
+            <input type="text" class="form-control" placeholder="Search Flights by Flight Number" aria-label="Search Flights" aria-describedby="searchFlightButton" id="searchFlightInput">
+            <button class="btn btn-danger" type="submit" id="searchFlightButton">Search</button>
+          </div>
+        </form>
+      {{/if}}
+      <div class="d-flex justify-content-center flex-wrap gap-2 mt-3">
+        {{#if canReadFlights}}<a href="/admin/flights" class="btn btn-danger">View all Flights</a>{{/if}}
+        {{#if canReadReservations}}<a href="/admin/reservations" class="btn btn-danger">View all Reservations</a>{{/if}}
+        {{#if canCreateFlights}}<a href="/admin/create" class="btn btn-outline-danger">Create Flight</a>{{/if}}
+        {{#if canManageAdmins}}<a href="/admin/management" class="btn btn-outline-dark">Manage Administrators</a>{{/if}}
+        <a href="/admin/profile" class="btn btn-outline-secondary">My Profile</a>
+      </div>
     </div>
   </div>
 
-  <!-- Search Results -->
-  <br>
-  <div id="flightResults" class="mt-4 text-center w-100" style="max-width:700px;">
-    <div id="loadingSpinner" class="text-center my-3" style="display:none;">
-      <div class="spinner-border text-danger" role="status">
-        <span class="visually-hidden">Loading...</span>
+  {{#if canReadFlights}}
+    <div id="flightResults" class="mt-3 text-center">
+      <div id="loadingSpinner" class="text-center my-3" style="display:none;">
+        <div class="spinner-border text-danger" role="status"><span class="visually-hidden">Loading...</span></div>
       </div>
     </div>
-    {{!-- Flight search results will be displayed here using AJAX --}}
-  </div>
+  {{/if}}
+
+  {{#if activities}}
+    <section class="card shadow-sm mt-4">
+      <div class="card-header bg-white"><h2 class="h5 mb-0">Recent administrator activity</h2></div>
+      <ul class="list-group list-group-flush">
+        {{#each activities}}
+          <li class="list-group-item d-flex justify-content-between gap-3"><span>{{action}} <code>{{resourceId}}</code></span><span class="text-muted">{{formatDate timestamp}}</span></li>
+        {{/each}}
+      </ul>
+    </section>
+  {{/if}}
 </div>

@@ -63,7 +63,8 @@
         <div class="col-md-4">
           <div class="border rounded p-3 h-100">
             <div class="fw-semibold mb-2">MFA Status</div>
-            <div class="text-muted">{{#if user.mfaVerified}}Verified{{else}}Pending{{/if}}</div>
+            <div class="text-muted">{{#if user.mfaEnabled}}Enabled{{else}}Not enrolled{{/if}}</div>
+            <small class="text-muted d-block mt-2">{{#if user.mfaEnabled}}Last verified: {{formatDate user.lastMfaVerifiedAt}}{{else}}Complete enrollment at the next admin login.{{/if}}</small>
           </div>
         </div>
         <div class="col-md-4">

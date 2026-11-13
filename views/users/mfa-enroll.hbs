@@ -1,0 +1,92 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+          <h2 class="fw-bold text-danger mb-3">Secure Your Administrator Account</h2>
+          <p class="text-muted">Your administrator account requires a one-time passcode before access is granted.</p>
+
+          <div class="text-center mb-3">
+            <img src="{{qrCode}}" alt="MFA QR code" class="img-fluid border rounded p-2 bg-white" style="max-width: 240px;">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Manual setup key</label>
+            <div class="input-group">
+              <input id="setupKey" class="form-control" value="{{secret}}" readonly>
+              <button class="btn btn-outline-secondary" type="button" id="copySetupKey">Copy</button>
+            </div>
+          </div>
+
+          <form id="mfaEnrollForm">
+            <div class="mb-3">
+              <label for="mfaCode" class="form-label">Enter the 6-digit code from your authenticator</label>
+              <input id="mfaCode" name="token" class="form-control" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="\d{6}" required>
+            </div>
+            <button type="submit" class="btn btn-danger w-100" id="mfaEnrollSubmit">Confirm and Enable MFA</button>
+          </form>
+
+          <div id="mfaEnrollMessage" class="mt-3"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const copyBtn = document.getElementById('copySetupKey');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', async function () {
+        const value = document.getElementById('setupKey').value;
+        try {
+          await navigator.clipboard.writeText(value);
+          copyBtn.textContent = 'Copied';
+        } catch (error) {
+          copyBtn.textContent = 'Copy failed';
+        }
+      });
+    }
+
+    const form = document.getElementById('mfaEnrollForm');
+    if (form) {
+      form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const codeInput = document.getElementById('mfaCode');
+        const submitButton = document.getElementById('mfaEnrollSubmit');
+        const messageBox = document.getElementById('mfaEnrollMessage');
+
+        if (!codeInput.value || !/^\d{6}$/.test(codeInput.value)) {
+          messageBox.className = 'alert alert-danger mt-3';
+          messageBox.textContent = 'Enter a valid 6-digit authenticator code.';
+          return;
+        }
+
+        submitButton.disabled = true;
+        submitButton.textContent = 'Verifying...';
+        messageBox.className = '';
+        messageBox.textContent = '';
+
+        try {
+          const response = await fetch('/users/mfa/setup/confirm', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: codeInput.value })
+          });
+          const result = await response.json();
+          if (!response.ok || !result.success) {
+            throw new Error(result.message || 'Unable to verify MFA code.');
+          }
+          if (result.redirect) {
+            window.location.href = result.redirect;
+          }
+        } catch (error) {
+          messageBox.className = 'alert alert-danger mt-3';
+          messageBox.textContent = error.message || 'Unable to verify MFA code.';
+          submitButton.disabled = false;
+          submitButton.textContent = 'Confirm and Enable MFA';
+        }
+      });
+    }
+  });
+</script>

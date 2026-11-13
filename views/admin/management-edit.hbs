@@ -1,0 +1,54 @@
+<div class="container-fluid px-4 py-4">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+      <h1 class="fw-bold text-danger mb-1">Edit Administrator Role</h1>
+      <p class="text-muted mb-0">{{administrator.fullName}} · {{administrator.email}}</p>
+    </div>
+    <a class="btn btn-outline-secondary" href="/admin/management/{{administrator._id}}">Back to Details</a>
+  </div>
+
+  <div class="alert alert-warning" role="alert">
+    Changing a role replaces the administrator's current role permissions and requires them to sign in again. Review the permission changes below before saving.
+  </div>
+
+  <section class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h2 class="h5">Current role: {{administrator.currentRole}}</h2>
+      <h3 class="h6 mt-3">Current permissions</h3>
+      <ul class="mb-0">{{#each currentPermissions}}<li>{{label}}</li>{{else}}<li>No administrative permissions</li>{{/each}}</ul>
+    </div>
+  </section>
+
+  <form method="post" action="/admin/management/{{administrator._id}}/role">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <div class="row g-3">
+      {{#each roles}}
+        <div class="col-lg-6">
+          <section class="card h-100">
+            <div class="card-body">
+              <div class="form-check">
+                <input class="form-check-input" id="role-{{name}}" type="radio" name="assignedRole" value="{{name}}" {{#if selected}}checked{{/if}} required>
+                <label class="form-check-label fw-semibold" for="role-{{name}}">{{label}}</label>
+              </div>
+              <div class="form-check mt-3">
+                <input class="form-check-input" id="confirmRoleChange" name="confirmed" type="checkbox" value="true" required>
+                <label class="form-check-label" for="confirmRoleChange">I reviewed the permissions added and removed and confirm this role change.</label>
+              </div>
+              <h3 class="h6 mt-3">Permissions in this role</h3>
+              <ul>{{#each permissions}}<li>{{label}}</li>{{else}}<li>No administrative permissions</li>{{/each}}</ul>
+              <h3 class="h6">Permissions added</h3>
+              <ul>{{#each addedPermissions}}<li>{{label}}</li>{{else}}<li>None</li>{{/each}}</ul>
+              <h3 class="h6">Permissions removed</h3>
+              <ul class="mb-0">{{#each removedPermissions}}<li>{{label}}</li>{{else}}<li>None</li>{{/each}}</ul>
+            </div>
+          </section>
+        </div>
+      {{else}}
+        <div class="col-12"><p class="text-muted">No alternative role is available within your current authority.</p></div>
+      {{/each}}
+    </div>
+    <div class="d-flex justify-content-end mt-4">
+      <button class="btn btn-danger" type="submit">Confirm role change</button>
+    </div>
+  </form>
+</div>

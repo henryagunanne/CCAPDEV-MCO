@@ -25,6 +25,7 @@ async function recordAuditEvent({
   result = 'SUCCESS',
   reason = '',
   reasonCode = '',
+  details = null,
   correlationId = '',
   ipAddress = '',
   session = null
@@ -40,6 +41,7 @@ async function recordAuditEvent({
     result,
     reason: typeof reason === 'string' ? reason.trim().slice(0, 500) : '',
     reasonCode: safeReasonCode,
+    details,
     correlationId: correlationId || crypto.randomUUID(),
   });
   await event.save(session ? { session } : undefined);

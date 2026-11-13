@@ -1,0 +1,83 @@
+<div class="container-fluid px-4 py-4">
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+      <h1 class="fw-bold text-danger mb-1">Create Administrator</h1>
+      <p class="text-muted mb-0">Create an employed administrator with only the permissions of an existing role.</p>
+    </div>
+    <a class="btn btn-outline-secondary" href="/admin/management">Back to Admin Management</a>
+  </div>
+
+  {{#if errorMessage}}<div class="alert alert-danger" role="alert">{{errorMessage}}</div>{{/if}}
+  {{#if successMessage}}
+    <div class="alert alert-success" role="status">
+      <p class="fw-semibold mb-2">{{successMessage}}</p>
+      <label class="form-label" for="administratorInvite">One-time setup link (expires in 24 hours)</label>
+      <input class="form-control" id="administratorInvite" type="text" value="{{inviteUrl}}" readonly>
+      <small class="d-block mt-2">Send this link directly to the administrator using a secure channel. It is shown only once. The administrator will also need to enroll in multi-factor authentication on first sign-in.</small>
+    </div>
+    <a href="/admin/management" class="btn btn-danger">Return to Admin Management</a>
+  {{else if canAssignRoles}}
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <form method="post" action="/admin/management">
+          <input type="hidden" name="_csrf" value="{{csrfToken}}">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="firstName">First name</label>
+              <input class="form-control" id="firstName" name="firstName" type="text" maxlength="80" autocomplete="given-name" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="lastName">Last name</label>
+              <input class="form-control" id="lastName" name="lastName" type="text" maxlength="80" autocomplete="family-name" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="email">Email address</label>
+              <input class="form-control" id="email" name="email" type="email" maxlength="254" autocomplete="email" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="assignedRole">Assigned role</label>
+              <select class="form-select" id="assignedRole" name="assignedRole" required>
+                <option value="" selected disabled>Choose an existing role</option>
+                {{#each roles}}<option value="{{name}}">{{label}}</option>{{/each}}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="status">Account status</label>
+              <select class="form-select" id="status" name="status">
+                <option value="active" selected>Active</option>
+                <option value="disabled">Inactive</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-check mt-3">
+            <input class="form-check-input" id="confirmCreate" name="confirmed" type="checkbox" value="true" required>
+            <label class="form-check-label" for="confirmCreate">I confirm this administrator's details, assigned role, and account status.</label>
+          </div>
+          <div class="d-flex justify-content-end mt-4">
+            <button class="btn btn-danger" type="submit">Create administrator</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <h2 class="h4 text-danger">Available role permissions</h2>
+    <div class="row g-3">
+      {{#each roles}}
+        <div class="col-lg-6">
+          <section class="card h-100">
+            <div class="card-body">
+              <h3 class="h5">{{label}}</h3>
+              <ul class="mb-0">
+                {{#each permissions}}<li>{{label}}</li>{{else}}<li>No administrative permissions</li>{{/each}}
+              </ul>
+            </div>
+          </section>
+        </div>
+      {{else}}
+        <div class="col-12"><p class="text-muted">No role is available within your current authority.</p></div>
+      {{/each}}
+    </div>
+  {{else}}
+    <div class="alert alert-info" role="status">Your current permissions allow you to view administrator accounts, but no existing role can be assigned within your authority.</div>
+  {{/if}}
+</div>

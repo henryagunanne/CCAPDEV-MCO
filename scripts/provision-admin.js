@@ -16,7 +16,8 @@
 
 const mongoose = require('mongoose');
 const User = require('../models/User');
-const { mongoUri } = require('../config/env');
+const { mongoUri, adminEmail } = require('../config/env');
+const { rolePermissions } = require('../config/rbac');
 
 /**
  * Prompt the user for input in the command line.
@@ -116,6 +117,9 @@ async function main() {
   if (!validateEmail(email)) {
     throw new Error('A valid administrator email address is required.');
   }
+  if (adminEmail && email !== adminEmail.trim().toLowerCase()) {
+    throw new Error('The administrator email must match the configured ADMIN_EMAIL.');
+  }
 
   const password = await askHidden('Enter initial administrator password: ');
 
@@ -140,17 +144,19 @@ async function main() {
     password,
     dateOfBirth: new Date('2000-01-01'),
     role: 'Admin',
-    roles: ['flight_operations_admin', 'reservation_support_admin', 'finance_admin', 'user_access_admin', 'security_audit_admin'],
+    roles: Object.keys(rolePermissions).filter((roleName) => roleName !== 'user'),
     permissions: [
       'flight:read', 'flight:create', 'flight:update', 'flight:delete',
       'reservation:read', 'reservation:update', 'reservation:cancel',
       'finance:read', 'refund:create', 'refund:approve',
       'user:create', 'user:update', 'user:disable', 'user:reactivate',
       'admin:role:assign', 'admin:access:revoke', 'audit:read', 'security:review',
-      'passenger:edit', 'operational:flight:update', 'aircraft:assign'
+      'passenger:edit', 'operational:flight:update', 'aircraft:assign',
+      'privacy:request:manage'
     ],
-    mfaEnabled: true,
-    mfaVerified: true,
+    isProvisionedAdmin: true,
+    mfaEnabled: false,
+    mfaVerified: false,
     status: 'active'
   });
 
@@ -158,6 +164,9 @@ async function main() {
   console.log(`Administrator account created for ${email}.`);
 }
 
+
+/** * Run the provisioning script, connecting to the database and handling errors.
+ */
 async function run() {
   await mongoose.connect(mongoUri);
 

@@ -74,16 +74,19 @@ jQuery(function() {
             contentType: "application/json",
             success: function(res) {
                 if (res.success) {
+                    if (res.mfaRequired && res.redirect) {
+                        $('#loginModal').modal('hide');
+                        window.location.href = res.redirect;
+                        return;
+                    }
+
                     $('#loginModal').modal('hide');
                     alert("Login successful!");
-            
-                    // redirect based on role
                     if (res.isAdmin) {
                         window.location.href = "/admin";
                     } else {
                         location.reload();
                     }
-                    
                 } else {
                     $('#loginError').text(res.message).show();
                 }

@@ -1,0 +1,89 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-5">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+          <h2 class="fw-bold text-danger mb-3">Verify Your Identity</h2>
+          <p class="text-muted">Enter the current 6-digit code from your authenticator app.</p>
+
+          <form id="mfaVerifyForm">
+            <div class="mb-3">
+              <label for="mfaVerifyCode" class="form-label">Authentication code</label>
+              <input id="mfaVerifyCode" name="token" class="form-control" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="\d{6}" required>
+            </div>
+            <button type="submit" class="btn btn-danger w-100" id="mfaVerifySubmit">Verify</button>
+          </form>
+
+          <div class="mt-3">
+            <div class="small text-muted">Need a backup option?</div>
+            <input id="recoveryCode" class="form-control mt-2" placeholder="Recovery code" autocomplete="one-time-code">
+            <button class="btn btn-outline-secondary w-100 mt-2" type="button" id="useRecoveryCode">Use Recovery Code</button>
+          </div>
+
+          <div id="mfaVerifyMessage" class="mt-3"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const verifyForm = document.getElementById('mfaVerifyForm');
+    const verifyButton = document.getElementById('mfaVerifySubmit');
+    const messageBox = document.getElementById('mfaVerifyMessage');
+
+    const runSubmit = async function (tokenValue, recoveryValue) {
+      verifyButton.disabled = true;
+      verifyButton.textContent = 'Verifying...';
+      messageBox.className = '';
+      messageBox.textContent = '';
+
+      try {
+        const response = await fetch('/users/mfa/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: tokenValue, recoveryCode: recoveryValue })
+        });
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+          throw new Error(result.message || 'Unable to verify your code.');
+        }
+        if (result.redirect) {
+          window.location.href = result.redirect;
+        }
+      } catch (error) {
+        messageBox.className = 'alert alert-danger mt-3';
+        messageBox.textContent = error.message || 'Unable to verify your code.';
+        verifyButton.disabled = false;
+        verifyButton.textContent = 'Verify';
+      }
+    };
+
+    if (verifyForm) {
+      verifyForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const tokenValue = document.getElementById('mfaVerifyCode').value;
+        if (!/^\d{6}$/.test(tokenValue)) {
+          messageBox.className = 'alert alert-danger mt-3';
+          messageBox.textContent = 'Enter a valid 6-digit authentication code.';
+          return;
+        }
+        runSubmit(tokenValue, '');
+      });
+    }
+
+    const recoveryButton = document.getElementById('useRecoveryCode');
+    if (recoveryButton) {
+      recoveryButton.addEventListener('click', function () {
+        const recoveryValue = document.getElementById('recoveryCode').value;
+        if (!recoveryValue) {
+          messageBox.className = 'alert alert-danger mt-3';
+          messageBox.textContent = 'Enter a recovery code.';
+          return;
+        }
+        runSubmit('', recoveryValue);
+      });
+    }
+  });
+</script>

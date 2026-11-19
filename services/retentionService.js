@@ -1,4 +1,7 @@
 const Reservation = require('../models/Reservation');
+// MCO4: register the Flight model before reservations are populated with their flights; without it
+// `npm run retention:c18` stopped with MissingSchemaError before applying any rule (C-18).
+require('../models/Flight');
 const User = require('../models/User');
 const AuditLog = require('../models/AuditLog');
 

@@ -17,6 +17,7 @@ const { updateReservation, cancelReservation, BookingConflictError } = require('
 const { encryptPassport, fingerprintPassport } = require('../services/passportEncryption');
 const { isTodayOrFutureInManila } = require('../services/manilaDate');
 const logger = require('../logs/logger');
+const { requireActiveUser } = require('../middleware/userSession');
 
 const router = express.Router();
 const requestTypes = new Set(['access', 'correction', 'deletion', 'consent-withdrawal']);
@@ -26,8 +27,9 @@ const requestTypes = new Set(['access', 'correction', 'deletion', 'consent-withd
  * If the user is not authenticated, respond with a 401 Unauthorized status.
  */
 function requireUser(req, res, next) {
-  if (!req.session?.user) return res.status(401).json({ success: false, message: 'Authentication required.' });
-  return next();
+  // MCO4: same freshness check as other customer routes (deleted/disabled account or changed
+  // sessionVersion ends the session).
+  return requireActiveUser(req, res, next);
 }
 
 
@@ -56,7 +58,18 @@ async function activeCalendarsByYear() {
  * */
 async function createRequest({ type, subjectType, requesterId = null, reservationId = null, passengerId = null, req }) {
   const receivedAt = new Date();
-  const deadlines = calculatePrivacyDeadlines(receivedAt, await activeCalendarsByYear());
+  let deadlines;
+  try {
+    deadlines = calculatePrivacyDeadlines(receivedAt, await activeCalendarsByYear());
+  } catch (error) {
+    // MCO4: fail closed with a clear, handled answer instead of an unhandled 500 when the DPO has
+    // not yet published the holiday calendar the statutory deadlines depend on.
+    logger.error('Privacy deadline calculation failed.', { code: 'PRIVACY_CALENDAR_MISSING' });
+    const unavailable = new Error('Privacy requests are temporarily unavailable. Please contact the Data Protection Officer.');
+    unavailable.status = 503;
+    unavailable.publicMessage = unavailable.message;
+    throw unavailable;
+  }
   const request = await PrivacyRequest.create({
     type,
     subjectType,
@@ -119,7 +132,9 @@ router.get('/privacy-policy', (req, res) => res.render('privacy-policy', {
 }));
 
 /// Terms of Service Route
-router.post('/privacy/passports/reveal', requireAdminAccess, async (req, res) => {
+// MCO4: full passport values are revealed only to roles holding passport:reveal (granted to the
+// Data Protection Officer role in config/rbac.js); other administrators get 403 (PD-05, C-06, C-12).
+router.post('/privacy/passports/reveal', requireAdminAccess, requirePermission(permissions.PASSPORT_REVEAL), async (req, res) => {
   const { reservationId, passengerId, reason, confirmed } = req.body;
   if (!mongoose.isValidObjectId(reservationId) || !mongoose.isValidObjectId(passengerId) ||
       typeof reason !== 'string' || reason.trim().length < 20 || reason.trim().length > 500 ||

@@ -374,6 +374,16 @@ Automated tests are implemented using Jest to ensure correctness and stability.
 ```bash
 npm test
 ```
+The tests read `SESSION_SECRET`, `PASSPORT_ENCRYPTION_KEY` and `MFA_ENCRYPTION_KEY` from `.env` (use throw-away test values). Without `MFA_ENCRYPTION_KEY` the MFA tests fail by design: MFA encryption no longer falls back to a random key.
+
+### 🔐 MCO4 security fixes (summary)
+- Full passport numbers can be revealed only by roles holding `passport:reveal` (granted to the Data Protection Officer role).
+- `/users/delete/:id` deletes only the signed-in customer's own account; administrators manage administrator accounts in Admin Management.
+- Customer-facing routes re-check the account on every request: signed-out requests get 401, and a deleted or disabled account, a password change or an administrator status change ends existing sessions.
+- Login gives the same reply and timing for unknown, wrong-password, disabled and locked accounts; check-in uses one generic failure message.
+- Only `/assets`, `/src/css` and `/src/javascript` are served from `public/`; CDN scripts are pinned by exact URL in the CSP and by Subresource Integrity.
+- Flight deletion is audited and refused while a flight still has bookings; successful logins and ownership denials are audited.
+- `node_modules/`, log files, `.DS_Store` files, the source-code ZIP (which contained a TLS private key) and the legacy demo seeds were removed from the repository. Regenerate any mkcert certificates that were shared.
 
 ---
 

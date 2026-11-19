@@ -92,6 +92,8 @@ router.get('/search', ...flightSearchLimits, async (req, res) => {
 // GET /flights/:id/book - Display booking form for a specific flight
 router.get('/:id/book', async (req, res) => {
   try {
+    // MCO4: a malformed id is a 404, not an unhandled CastError (500).
+    if (!require('mongoose').isValidObjectId(req.params.id)) return res.status(404).send('Flight not found');
     const flight = await Flight.findById(req.params.id).lean();
 
     if (!flight) {

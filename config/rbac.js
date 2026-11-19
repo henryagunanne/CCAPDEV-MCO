@@ -56,7 +56,8 @@ const rolePermissions = {
     permissions.SECURITY_REVIEW
   ],
   data_protection_officer: [
-    permissions.PRIVACY_REQUEST_MANAGE
+    permissions.PRIVACY_REQUEST_MANAGE,
+    permissions.PASSPORT_REVEAL
   ],
   user: []
 };

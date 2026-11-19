@@ -38,6 +38,15 @@ const {
 
 const MFA_REENROLLMENT_TTL_MS = 5 * 60 * 1000;
 
+// MCO4: flight text fields are rendered on public and admin pages (admin.js builds the admin
+// flight-lookup card), so accept only the characters real flight data needs (C-09, C-10).
+function hasSafeFlightText(values) {
+  return /^[A-Za-z0-9]{2,10}$/.test(values.flightNumber) &&
+    /^[\p{L}\p{M} .'()-]{2,80}$/u.test(values.origin) &&
+    /^[\p{L}\p{M} .'()-]{2,80}$/u.test(values.destination) &&
+    /^[\p{L}\p{N} .-]{1,40}$/u.test(values.aircraft);
+}
+
 function isValidFlightDate(value) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
   const parsed = new Date(`${value}T00:00:00.000Z`);
@@ -342,6 +351,7 @@ router.post('/create', requirePermission(permissions.FLIGHT_CREATE), async (req,
       status: req.body.status || 'Scheduled'
     };
     if (!values.flightNumber || !values.origin || !values.destination ||
+        !hasSafeFlightText(values) ||
         values.origin === values.destination ||
         !isValidFlightDate(values.departureDate) ||
         !/^([01]\d|2[0-3]):[0-5]\d$/.test(values.departureTime) ||
@@ -404,6 +414,7 @@ router.put('/update/:id', requirePermission(permissions.FLIGHT_UPDATE), async (r
       status: req.body.status || 'Scheduled'
     };
     if (!values.flightNumber || !values.origin || !values.destination ||
+        !hasSafeFlightText(values) ||
         values.origin === values.destination ||
         !isValidFlightDate(values.departureDate) ||
         !/^([01]\d|2[0-3]):[0-5]\d$/.test(values.departureTime) ||
@@ -457,16 +468,35 @@ router.put('/update/:id', requirePermission(permissions.FLIGHT_UPDATE), async (r
 ====================================================== */
 router.delete('/delete/:id', requirePermission(permissions.FLIGHT_DELETE), async (req, res) => {
   try {
-    const deletedFlight = await Flight.findByIdAndDelete(req.params.id).lean();
+    const flightId = validateObjectId(req.params.id, 'Flight ID');
+    // MCO4: a flight that still has seat claims or active reservations cannot be deleted, otherwise
+    // customers' bookings would point at a missing flight (REQ-I-02 integrity).
+    const [allocationCount, activeReservations] = await Promise.all([
+      SeatAllocation.countDocuments({ flightId }),
+      Reservation.countDocuments({ flight: flightId, status: { $ne: 'Cancelled' } })
+    ]);
+    if (allocationCount > 0 || activeReservations > 0) {
+      return res.status(409).json({ success: false, message: 'Flights with active reservations cannot be deleted. Cancel or move the reservations first.' });
+    }
+    const deletedFlight = await Flight.findByIdAndDelete(flightId).lean();
 
     if (!deletedFlight) {
       return res.status(404).json({ message: 'Flight not found.' });
     }
 
+    // MCO4: flight deletion is now an attributed audit event like create and update (REQ-N-02, C-16).
+    await recordAuditEvent({
+      actorId: req.session.user._id,
+      actorRole: req.session.user.role || 'Admin',
+      action: 'flight:delete',
+      resourceType: 'Flight',
+      resourceId: deletedFlight._id
+    });
     res.json({ message: 'Flight deleted successfully.' });
     logger.info('Flight deleted successfully.');
 
   } catch (err) {
+    if (err instanceof BookingInputError) return res.status(err.statusCode).json({ success: false, message: err.message });
     logger.error('Flight deletion failed.', { code: err.code || 'FLIGHT_DELETE_ERROR' });
     res.status(500).json({ message: 'Error deleting flight.' });
   }
@@ -904,10 +934,6 @@ router.get('/emergency-access', requirePermission(permissions.SECURITY_REVIEW), 
   }
 });
 
-// POST /admin/sensitive-test - Test Step-Up Authentication
-router.post('/sensitive-test', requirePermission(permissions.FLIGHT_UPDATE), requireStepUpAuthentication([permissions.FLIGHT_UPDATE], 5 * 60 * 1000), async (req, res) => {
-  res.status(200).json({ success: true, message: 'Step-up authentication verified.' });
-});
 
 
 // POST /admin/approvals - Create Approval Request
@@ -1024,17 +1050,23 @@ router.post('/approvals/:approvalId/approve', requirePermission(permissions.ADMI
 router.post('/emergency-access', requirePermission(permissions.SECURITY_REVIEW), async (req, res) => {
   try {
     const { reason = '', permissions: grantedPermissions = [], durationMinutes = 60 } = req.body;
-
-    if (!reason || grantedPermissions.length === 0) {
-      return res.status(400).json({ success: false, message: 'Emergency access reason and permissions are required.' });
+    // MCO4: bound the request - a reason of 20-500 characters, only known permissions, and a
+    // duration between 15 minutes and 4 hours (previously any value, e.g. 190 years, was stored).
+    const knownPermissions = new Set(Object.values(permissions));
+    const duration = Number(durationMinutes);
+    if (typeof reason !== 'string' || reason.trim().length < 20 || reason.trim().length > 500 ||
+        !Array.isArray(grantedPermissions) || grantedPermissions.length === 0 ||
+        grantedPermissions.some(permission => !knownPermissions.has(permission)) ||
+        !Number.isInteger(duration) || duration < 15 || duration > 240) {
+      return res.status(400).json({ success: false, message: 'Give a reason (20-500 characters), known permissions only, and a duration of 15-240 minutes.' });
     }
 
     const request = await EmergencyAccessGrant.create({
       requestedBy: req.session.user._id,
-      reason,
-      permissions: grantedPermissions,
+      reason: reason.trim(),
+      permissions: [...new Set(grantedPermissions)],
       requiredApprovals: 2,
-      expiresAt: new Date(Date.now() + Number(durationMinutes || 60) * 60 * 1000),
+      expiresAt: new Date(Date.now() + duration * 60 * 1000),
       status: 'PENDING_APPROVAL'
     });
 

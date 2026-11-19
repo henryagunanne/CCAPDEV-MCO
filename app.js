@@ -14,6 +14,10 @@ const crypto = require('crypto');
 const SESSION_IDLE_TIMEOUT_MS = 30 * 60 * 1000;
 const SESSION_ABSOLUTE_TIMEOUT_MS = 8 * 60 * 60 * 1000;
 const isProduction = process.env.NODE_ENV === 'production';
+// Optional public HTTPS origin used for HTTP->HTTPS redirects, e.g. https://archers-airline.example
+const publicOrigin = /^https:\/\/[A-Za-z0-9.-]+(:\d+)?$/.test(String(process.env.PUBLIC_ORIGIN || ''))
+  ? String(process.env.PUBLIC_ORIGIN).replace(/\/$/, '')
+  : '';
 
 // System logging
 const httpLogger = require('./logs/httpLogger');
@@ -173,6 +177,13 @@ app.use((req, res, next) => {
         res.setHeader('Strict-Transport-Security', 'max-age=31536000');
     }
     if (isProduction && !req.secure) {
+        // MCO4 / REQ-C-02: behind a TLS-terminating proxy, plain-HTTP page requests are redirected to
+        // the configured public HTTPS origin. The target comes from PUBLIC_ORIGIN, never from the
+        // request's Host header, so the redirect cannot be pointed at another site. Other methods
+        // (and deployments without PUBLIC_ORIGIN) are still refused.
+        if (publicOrigin && ['GET', 'HEAD'].includes(req.method)) {
+            return res.redirect(308, `${publicOrigin}${req.originalUrl}`);
+        }
         return res.status(403).json({ success: false, message: 'HTTPS is required.' });
     }
     next();

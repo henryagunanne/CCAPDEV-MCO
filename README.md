@@ -339,7 +339,7 @@ npm run start:production
 
 Open `https://localhost:3000`. To use different certificate locations, set `TLS_CERT_PATH` and `TLS_KEY_PATH` to paths relative to the project root. Absolute paths and paths outside the project are rejected.
 
-For an actual deployment behind a TLS-terminating reverse proxy, use `NODE_ENV=production` and `TLS_MODE=proxy`, configure `TRUSTED_PROXY_CIDRS` for the proxy, and let the proxy manage the public certificate. Do not deploy the local mkcert certificates or CA private key.
+For an actual deployment behind a TLS-terminating reverse proxy, use `NODE_ENV=production` and `TLS_MODE=proxy`, configure `TRUSTED_PROXY_CIDRS` for the proxy, and let the proxy manage the public certificate. Set `PUBLIC_ORIGIN` (for example `https://archers-airline.example`) so plain-HTTP page requests are redirected to HTTPS (REQ-C-02); without it they are refused with 403. Do not deploy the local mkcert certificates or CA private key.
 
 ### Troubleshooting and security notes
 

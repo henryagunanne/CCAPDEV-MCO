@@ -26,7 +26,7 @@ const { recordAuditEvent } = require('../services/auditService');
 const { isTodayOrFutureInManila } = require('../services/manilaDate');
 const { supportsTransactions } = require('../services/bookingService');
 const { authenticationLimits } = require('../middleware/rateLimits');
-const { requireActiveUser } = require('../middleware/userSession');
+const { requireActiveUser, invalidateAccount } = require('../middleware/userSession');
 
 // MCO4: a bcrypt hash of a random value, compared when the email is unknown so that unknown and
 // existing accounts take the same time to answer (C-02 hook: no account-existence oracle).
@@ -910,6 +910,7 @@ router.post('/change-password/:userId', isAuthenticated, async (req, res) => {
       // request (requireActiveUser); the current session is updated and stays signed in.
       user.sessionVersion = Number(user.sessionVersion || 0) + 1;
       await user.save();
+      invalidateAccount(user._id);
       req.session.user = { ...req.session.user, sessionVersion: user.sessionVersion };
 
       await recordAuditEvent({
@@ -1038,6 +1039,7 @@ router.post('/delete/:userId', isAuthenticated, async (req, res) => {
           session
         });
         await User.deleteOne({ _id: userId }, options);
+        invalidateAccount(userId);
       };
       if (supportsTransactions()) {
         const session = await mongoose.startSession();

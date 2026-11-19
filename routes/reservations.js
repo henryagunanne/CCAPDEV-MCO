@@ -50,20 +50,28 @@ function isAuthenticated(req, res, next) {
 
 // Record an attempt to reach a reservation that exists but belongs to someone else (C-05, C-16).
 // The caller still answers 404, so the response does not confirm that the reservation exists.
-async function recordOwnershipDenial(req, reservationId, operation) {
+// The write runs in the background (MCO2 C-16: prefer bounded/asynchronous audit writes), so an
+// attacker's request is not slowed and a failed audit write is logged rather than surfaced.
+function recordOwnershipDenial(req, reservationId, operation) {
+  const actor = { id: req.session.user._id, role: req.session.user.role || 'user', ip: req.ip };
+  setImmediate(() => writeOwnershipDenial(actor, reservationId, operation));
+  return Promise.resolve();
+}
+
+async function writeOwnershipDenial(actor, reservationId, operation) {
   try {
     const exists = await Reservation.exists({ _id: reservationId });
     if (!exists) return;
     await recordAuditEvent({
-      actorId: req.session.user._id,
-      actorRole: req.session.user.role || 'user',
+      actorId: actor.id,
+      actorRole: actor.role,
       action: 'authz:denied',
       resourceType: 'Reservation',
       resourceId: reservationId,
       result: 'FAILURE',
       reasonCode: 'NOT_RESERVATION_OWNER',
       reason: operation,
-      ipAddress: req.ip
+      ipAddress: actor.ip
     });
   } catch (error) {
     logger.error('Authorization denial audit failed.', { code: error.code || 'AUTHZ_AUDIT_ERROR' });

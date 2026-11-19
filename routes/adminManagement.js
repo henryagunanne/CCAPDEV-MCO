@@ -183,6 +183,7 @@ function buildManagementUrl(query, page) {
   return `/admin/management?${params.toString()}`;
 }
 
+const { invalidateAccount } = require('../middleware/userSession');
 router.use(requireAdminManagement);
 
 router.get('/', async (req, res) => {
@@ -427,6 +428,7 @@ router.post('/:id/role', async (req, res) => {
       { new: true, runValidators: true }
     ).select('roles');
     if (!updated) return res.status(409).redirect('/admin/management');
+    invalidateAccount(administrator._id);
 
     await recordAuditEvent({
       actorId: req.authenticatedUser._id,
@@ -481,6 +483,7 @@ router.post('/:id/status', requireAdminStatusPermission, async (req, res) => {
       { new: true, runValidators: true }
     ).select('status');
     if (!updated) return res.status(409).redirect('/admin/management');
+    invalidateAccount(administrator._id);
 
     await recordAuditEvent({
       actorId: req.authenticatedUser._id,

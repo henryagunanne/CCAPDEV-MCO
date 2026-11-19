@@ -10,6 +10,29 @@ const logger = require('../logs/logger');
    This is the same freshness check requireAdminAccess applies to admin routes (C-04, C-06).
 ====================================================== */
 
+// Short-lived per-process cache of account state, so the freshness check costs at most one
+// indexed read per account every few seconds instead of one per request (load test, NFR-02).
+// Password changes, self-deletion and administrator status changes call invalidateAccount()
+// so revocation is immediate in this process; other instances pick it up within ACCOUNT_CACHE_TTL_MS.
+const ACCOUNT_CACHE_TTL_MS = 5000;
+const ACCOUNT_CACHE_MAX = 10000;
+const accountCache = new Map();
+
+function invalidateAccount(userId) {
+  accountCache.delete(String(userId));
+}
+
+async function loadAccountState(userId) {
+  const key = String(userId);
+  const now = Date.now();
+  const cached = accountCache.get(key);
+  if (cached && now - cached.loadedAt < ACCOUNT_CACHE_TTL_MS) return cached.account;
+  const account = await User.findById(userId).select('status sessionVersion').lean();
+  if (accountCache.size >= ACCOUNT_CACHE_MAX) accountCache.delete(accountCache.keys().next().value);
+  accountCache.set(key, { account, loadedAt: now });
+  return account;
+}
+
 function wantsHtml(req) {
   return !req.xhr && String(req.get('accept') || '').includes('text/html');
 }
@@ -37,11 +60,12 @@ async function requireActiveUser(req, res, next) {
     return respond(req, res, 401, 'Please sign in to continue.');
   }
   try {
-    const account = await User.findById(sessionUser._id).select('status sessionVersion').lean();
+    const account = await loadAccountState(sessionUser._id);
     if (!account ||
         account.status === 'disabled' ||
         account.status === 'suspended' ||
         Number(account.sessionVersion || 0) !== Number(sessionUser.sessionVersion || 0)) {
+      invalidateAccount(sessionUser._id);
       return rejectStaleSession(req, res, 'Your session is no longer valid. Please sign in again.');
     }
     return next();
@@ -50,4 +74,4 @@ async function requireActiveUser(req, res, next) {
   }
 }
 
-module.exports = { requireActiveUser };
+module.exports = { requireActiveUser, invalidateAccount };

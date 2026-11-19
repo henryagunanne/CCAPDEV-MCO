@@ -118,7 +118,7 @@ router.get('/privacy-policy', (req, res) => res.render('privacy-policy', {
   dpoContact
 }));
 
-/// Terms of Service Route
+/// POST /privacy/passports/reveal - Reveal a passenger's passport to an authorized admin
 router.post('/privacy/passports/reveal', requireAdminAccess, async (req, res) => {
   const { reservationId, passengerId, reason, confirmed } = req.body;
   if (!mongoose.isValidObjectId(reservationId) || !mongoose.isValidObjectId(passengerId) ||
@@ -266,6 +266,7 @@ router.post('/privacy/export', requireUser, async (req, res) => {
 });
 
 
+/// POST /privacy/withdraw-meal-consent - Withdraw meal consent for a specific passenger in a reservation
 router.post('/privacy/withdraw-meal-consent', requireUser, async (req, res) => {
   const { reservationId, passengerId } = req.body;
   if (!/^[a-f\d]{24}$/i.test(String(reservationId || '')) ||
@@ -379,6 +380,9 @@ router.post('/privacy/dpo/co-passenger-access', requireAdminAccess,
     });
   });
 
+
+
+/// POST /privacy/dpo/co-passenger-correction - Handle a co-passenger correction request by a DPO
 router.post('/privacy/dpo/co-passenger-correction', requireAdminAccess,
   requirePermission(permissions.PRIVACY_REQUEST_MANAGE), async (req, res) => {
     const allowed = new Set([
@@ -470,6 +474,9 @@ router.post('/privacy/dpo/co-passenger-correction', requireAdminAccess,
     }
   });
 
+
+
+/// POST /privacy/dpo/co-passenger-deletion - Handle a co-passenger deletion request by a DPO
 router.post('/privacy/dpo/co-passenger-deletion', requireAdminAccess,
   requirePermission(permissions.PRIVACY_REQUEST_MANAGE), async (req, res) => {
     const verified = await findVerifiedCoPassenger(
@@ -607,6 +614,9 @@ router.post('/privacy/dpo/requests/:id/acknowledge', requireAdminAccess,
     return res.json({ success: true, acknowledgedAt: request.acknowledgedAt });
   });
 
+
+
+/// POST /privacy/dpo/requests/:id/complete - Complete or refuse a privacy request
 router.post('/privacy/dpo/requests/:id/complete', requireAdminAccess,
   requirePermission(permissions.PRIVACY_REQUEST_MANAGE), async (req, res) => {
     const outcome = req.body.outcome;
@@ -640,6 +650,9 @@ router.post('/privacy/dpo/requests/:id/complete', requireAdminAccess,
     });
   });
 
+
+
+/// POST /privacy/dpo/requests/:id/recalculate - Recalculate deadlines for a privacy request
 router.post('/privacy/dpo/requests/:id/recalculate', requireAdminAccess,
   requirePermission(permissions.PRIVACY_REQUEST_MANAGE), async (req, res) => {
     const reason = String(req.body.reason || '').trim();
@@ -688,6 +701,9 @@ router.post('/privacy/dpo/requests/:id/recalculate', requireAdminAccess,
     });
   });
 
+
+
+/// POST /privacy/dpo/calendars/:year - Publish a new holiday calendar for a specific year
 router.post('/privacy/dpo/calendars/:year', requireAdminAccess,
   requirePermission(permissions.PRIVACY_REQUEST_MANAGE), async (req, res) => {
     const year = Number(req.params.year);

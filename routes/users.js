@@ -470,7 +470,7 @@ router.post('/login', ...authenticationLimits, async (req, res) => {
 
       if (user.status === 'disabled' || user.status === 'suspended') {
         await recordAuditLog({ actorId: user._id, actorRole: user.role || 'user', action: 'admin:login', resourceType: 'User', result: 'FAILURE', reason: 'Account disabled' });
-        return res.status(403).json({ success: false, message: 'This account is not available.' });
+        return res.status(403).json({ success: false, message: INVALID_LOGIN_MESSAGE });
       }
 
       const lockUntil = user.lockUntil ? new Date(user.lockUntil).getTime() : 0;

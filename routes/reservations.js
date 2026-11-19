@@ -46,6 +46,33 @@ function isAdmin(req, res, next) {
   return next();
 }
 
+
+/** Normalizes a booking date value
+ * @param {string} value - The date value to normalize
+ * @param {string} fallback - The fallback date value if the input is invalid
+ * @param {string} fieldName - The name of the field for error messages
+ * @returns {string} - The normalized date in YYYY-MM-DD format
+ * @throws {BookingInputError} - If the input value is not a valid date
+ */
+function normalizeBookingDate(value, fallback, fieldName) {
+  if (value === undefined || value === null || value === '') {
+    return fallback;
+  }
+
+  if (typeof value !== 'string') {
+    throw new BookingInputError(`${fieldName} must be a valid date.`);
+  }
+
+  const parsed = new Date(value);
+
+  if (Number.isNaN(parsed.getTime())) {
+    throw new BookingInputError(`${fieldName} must be a valid date.`);
+  }
+
+  return parsed.toISOString().slice(0, 10);
+}
+
+
 /* =============================
    CREATE — WITH CHECK-IN READY PASSENGERS
 ============================= */
@@ -107,8 +134,11 @@ router.get('/book/:flightId', isAuthenticated, isAdmin, async (req, res) => {
     if (typeof tripType !== 'string' || !['One-Way', 'Round-Trip'].includes(tripType)) {
       throw new BookingInputError('Select a valid trip type.');
     }
-    const departDate = req.query.departDate || flight.departureDate;
-    const returnDate = req.query.returnDate || null;
+    // const departDate = req.query.departDate || flight.departureDate;
+    // const returnDate = req.query.returnDate || null;
+
+    const departDate = normalizeBookingDate(req.query.departDate ?? req.query.depart, flight.departureDate, 'Departure date');
+    const returnDate = tripType === 'Round-Trip' ? normalizeBookingDate(req.query.returnDate ?? req.query.return, null, 'Return date') : null;
 
     const allocations = await SeatAllocation.find({ flightId }).select('seatNumber').lean();
     const occupiedSeats = allocations.map(allocation => allocation.seatNumber);

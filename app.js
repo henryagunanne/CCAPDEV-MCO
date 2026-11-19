@@ -168,7 +168,7 @@ app.use(helmet({
 // Enforce HTTPS in production and set HSTS header
 app.use((req, res, next) => {
     if (isProduction && req.secure) {
-        res.setHeader('Strict-Transport-Security', 'max-age=31536000');
+        res.setHeader('Strict-Transport-Security', 'max-age=31536000', 'includeSubDomains');
     }
     if (isProduction && !req.secure) {
         return res.status(403).json({ success: false, message: 'HTTPS is required.' });
@@ -264,7 +264,13 @@ app.use((err, req, res, next) => {
     const acceptsHtml = !req.xhr && (req.get('accept') || '').includes('text/html');
 
     if (statusCode >= 500) {
-      logger.error('Request processing failed.', { code: err.code || 'UNHANDLED_ERROR' });
+      logger.error('Request processing failed.', { 
+        code: err.code || 'UNHANDLED_ERROR',
+        message: err.message,
+        stack: err.stack,
+        method: req.method,
+        path: req.originalUrl
+       });
     } else {
       logger.info('Request rejected.', { code: err.code || `HTTP_${statusCode}` });
     }

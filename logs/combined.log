@@ -7254,3 +7254,41 @@
 {"level":"info","message":"GET / 200 60457 - 2240.325 ms","timestamp":"2026-11-14 00:44:02"}
 {"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-14 00:44:07"}
 {"level":"info","message":"GET /reservations/book/6af6a2c6165621fb525dd780?tripType=One-Way&travelClass=Business&departDate=Nov%2002,%202026&returnDate=Dec%2002,%202026 500 15740 - 437.096 ms","timestamp":"2026-11-14 00:44:07"}
+{"level":"info","message":"Server running at http://localhost:3000","timestamp":"2026-11-16 13:56:31"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-16 13:56:31"}
+{"code":"HTTP_404","level":"info","message":"Request rejected.","timestamp":"2026-11-16 13:56:39"}
+{"code":"HTTP_404","level":"info","message":"Request rejected.","timestamp":"2026-11-16 13:56:39"}
+{"code":"HTTP_404","level":"info","message":"Request rejected.","timestamp":"2026-11-16 13:56:39"}
+{"level":"info","message":"GET /apple-touch-icon.png 404 64 - 0.791 ms","timestamp":"2026-11-16 13:56:40"}
+{"level":"info","message":"GET /favicon.ico 404 64 - 0.492 ms","timestamp":"2026-11-16 13:56:40"}
+{"level":"info","message":"GET /apple-touch-icon-precomposed.png 404 64 - 27.021 ms","timestamp":"2026-11-16 13:56:40"}
+{"level":"info","message":"GET / 200 60352 - 310.409 ms","timestamp":"2026-11-16 13:56:40"}
+{"level":"info","message":"Server running at http://localhost:3000","timestamp":"2026-11-16 13:59:19"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-16 13:59:20"}
+{"level":"info","message":"GET / 200 60352 - 1448.973 ms","timestamp":"2026-11-16 13:59:25"}
+{"level":"info","message":"GET /reservations/book/6af6a2c6165621fb525dd780?tripType=One-Way&travelClass=Business&departDate=2026-11-01&returnDate=2026-12-01 403 15682 - 592.766 ms","timestamp":"2026-11-16 13:59:30"}
+{"level":"info","message":"User authenticated.","timestamp":"2026-11-16 13:59:45"}
+{"level":"info","message":"POST /users/login 200 95 - 235.759 ms","timestamp":"2026-11-16 13:59:45"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed.","timestamp":"2026-11-16 13:59:47"}
+{"level":"info","message":"GET /reservations/book/6af6a2c6165621fb525dd780?tripType=One-Way&travelClass=Business&departDate=2026-11-01&returnDate=2026-12-01 500 15740 - 52.092 ms","timestamp":"2026-11-16 13:59:47"}
+{"level":"info","message":"GET / 200 60397 - 107.944 ms","timestamp":"2026-11-16 14:00:03"}
+{"level":"info","message":"Server running at https://localhost:3000","timestamp":"2026-11-16 14:00:11"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-16 14:00:11"}
+{"level":"info","message":"GET / 200 60352 - 4042.390 ms","timestamp":"2026-11-16 14:00:33"}
+{"level":"info","message":"GET / 304 - - 138.566 ms","timestamp":"2026-11-16 14:01:02"}
+{"level":"info","message":"Server running at https://localhost:3000","timestamp":"2026-11-16 14:04:06"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-16 14:04:06"}
+{"level":"info","message":"User authenticated.","timestamp":"2026-11-16 14:04:39"}
+{"level":"info","message":"User authenticated.","timestamp":"2026-11-16 14:04:39"}
+{"level":"info","message":"POST /users/login 200 95 - 1693.731 ms","timestamp":"2026-11-16 14:04:39"}
+{"level":"info","message":"POST /users/login 200 95 - 1008.343 ms","timestamp":"2026-11-16 14:04:39"}
+{"level":"info","message":"GET / 200 60397 - 186.719 ms","timestamp":"2026-11-16 14:04:42"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed. The \"path\" argument must be of type string. Received an instance of Object","method":"GET","path":"/reservations/book/6af6a2c6165621fb525dd769?tripType=One-Way&travelClass=Premium%20Economy&departDate=2026-12-16&returnDate=2027-01-15","stack":"TypeError [ERR_INVALID_ARG_TYPE]: The \"path\" argument must be of type string. Received an instance of Object\n    at Object.extname (node:path:1567:5)\n    at ExpressHandlebars._resolveLayoutPath (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/node_modules/express-handlebars/dist/express-handlebars.js:338:19)\n    at ExpressHandlebars.<anonymous> (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/node_modules/express-handlebars/dist/express-handlebars.js:214:41)\n    at Generator.next (<anonymous>)\n    at fulfilled (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/node_modules/express-handlebars/dist/express-handlebars.js:10:58)","timestamp":"2026-11-16 14:04:49"}
+{"level":"info","message":"GET /reservations/book/6af6a2c6165621fb525dd769?tripType=One-Way&travelClass=Premium%20Economy&departDate=2026-12-16&returnDate=2027-01-15 500 15740 - 51.296 ms","timestamp":"2026-11-16 14:04:49"}
+{"level":"info","message":"GET / 304 - - 68.787 ms","timestamp":"2026-11-16 14:04:51"}
+{"level":"info","message":"Server running at https://localhost:3000","timestamp":"2026-11-16 14:07:07"}
+{"level":"info","message":"✅ MongoDB connected.","timestamp":"2026-11-16 14:07:08"}
+{"level":"info","message":"GET / 200 60397 - 2339.328 ms","timestamp":"2026-11-16 14:07:13"}
+{"code":"ERR_INVALID_ARG_TYPE","level":"error","message":"Request processing failed. The \"path\" argument must be of type string. Received an instance of Object","method":"GET","stack":"TypeError [ERR_INVALID_ARG_TYPE]: The \"path\" argument must be of type string. Received an instance of Object\n    at Object.extname (node:path:1567:5)\n    at ExpressHandlebars._resolveLayoutPath (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/node_modules/express-handlebars/dist/express-handlebars.js:338:19)\n    at ExpressHandlebars.<anonymous> (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/node_modules/express-handlebars/dist/express-handlebars.js:214:41)\n    at Generator.next (<anonymous>)\n    at fulfilled (/Users/agunnaya/Downloads/Programs/CCAPDEV/MCO/CCAPDEV-MCO/node_modules/express-handlebars/dist/express-handlebars.js:10:58)","timestamp":"2026-11-16 14:07:17"}
+{"level":"info","message":"GET /reservations/book/6af6a2c6165621fb525dd769?tripType=One-Way&travelClass=Premium%20Economy&departDate=2026-12-16&returnDate=2027-01-15 500 15740 - 367.214 ms","timestamp":"2026-11-16 14:07:17"}
+{"level":"info","message":"GET / 304 - - 17.010 ms","timestamp":"2026-11-16 14:07:18"}

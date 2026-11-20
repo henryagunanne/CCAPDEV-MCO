@@ -10,6 +10,20 @@ permissions:
 jobs:
   security:
     runs-on: ubuntu-latest
+    # The session store connects to MONGODB_URI, which under test defaults to
+    # mongodb://127.0.0.1:27017/airlineDB (config/env.js), while the models use
+    # mongodb-memory-server (tests/setup.js). Without a database on 27017 every
+    # request that loads a session fails with HTTP 500.
+    services:
+      mongodb:
+        image: mongo:8.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok'"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

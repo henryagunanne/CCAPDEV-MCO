@@ -4,11 +4,13 @@ const QRCode = require('qrcode');
 
 const MFA_ISSUER = 'Archers Airline Admin';
 const MFA_ALGORITHM = 'aes-256-gcm';
+const MFA_TAG_BYTES = 16;   // MCO4: GCM tag length pinned; truncated tags are rejected
 
 function getEncryptionKey() {
-  const configuredKey = process.env.MFA_ENCRYPTION_KEY || '';
-  const key = configuredKey && String(configuredKey).trim() ? configuredKey : crypto.randomBytes(32).toString('base64');
-  if (!key || !String(key).trim()) {
+  // MCO4: no silent random-key fallback - without a configured key, encryption fails closed
+  // instead of producing secrets that can never be decrypted again.
+  const key = String(process.env.MFA_ENCRYPTION_KEY || '').trim();
+  if (!key) {
     throw new Error('MFA_ENCRYPTION_KEY is required for MFA secret encryption.');
   }
   const buffer = Buffer.from(key, 'base64');
@@ -31,7 +33,7 @@ function encryptSecret(secret) {
   try {
     const key = getEncryptionKey();
     const iv = crypto.randomBytes(12);
-    const cipher = crypto.createCipheriv(MFA_ALGORITHM, key, iv);
+    const cipher = crypto.createCipheriv(MFA_ALGORITHM, key, iv, { authTagLength: MFA_TAG_BYTES });
     const encrypted = Buffer.concat([cipher.update(String(secret), 'utf8'), cipher.final()]);
     const tag = cipher.getAuthTag();
     return `${iv.toString('hex')}:${tag.toString('hex')}:${encrypted.toString('hex')}`;
@@ -56,7 +58,8 @@ function decryptSecret(secretValue) {
     const iv = Buffer.from(ivHex, 'hex');
     const tag = Buffer.from(tagHex, 'hex');
     const encrypted = Buffer.from(encryptedHex, 'hex');
-    const decipher = crypto.createDecipheriv(MFA_ALGORITHM, key, iv);
+    if (tag.length !== MFA_TAG_BYTES || iv.length !== 12) return '';
+    const decipher = crypto.createDecipheriv(MFA_ALGORITHM, key, iv, { authTagLength: MFA_TAG_BYTES });
     decipher.setAuthTag(tag);
     const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()]);
     return decrypted.toString('utf8');

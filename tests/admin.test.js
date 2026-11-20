@@ -529,7 +529,7 @@ describe("Admin Tasks and Privileges", () => {
                 dateOfBirth: new Date(),
                 role: 'Admin',
                 roles: ['flight_operations_admin'],
-                permissions: ['flight:read', 'flight:update'],
+                permissions: ['flight:read', 'flight:update', 'admin:role:assign'],
                 mfaEnabled: true,
                 mfaVerified: true,
                 mfaSecret: encryptSecret(generateSecret()),
@@ -539,13 +539,16 @@ describe("Admin Tasks and Privileges", () => {
 
             await signInAdmin('stepup@test.com', 'stepupadmin123');
 
+            // MCO4: the /admin/sensitive-test debug endpoint was removed from production code, so the
+            // step-up window is verified on a real step-up-protected route instead. Passing step-up
+            // reaches the handler, which answers 404 for an unknown approval (not 403 STEP_UP_REQUIRED).
             const res = await agent
-                .post('/admin/sensitive-test')
+                .post('/admin/approvals/507f1f77bcf86cd799439099/approve')
                 .set('x-csrf-token', csrfToken)
                 .send({});
 
-            expect(res.statusCode).toBe(200);
-            expect(res.body.success).toBe(true);
+            expect(res.statusCode).toBe(404);
+            expect(res.body.code).not.toBe('STEP_UP_REQUIRED');
         });
     });
 

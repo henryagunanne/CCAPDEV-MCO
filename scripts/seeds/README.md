@@ -53,7 +53,7 @@ Configure the same required variables used by the application in `.env`, includi
 
 `npm run seed` is non-destructive and is not a database reset command. No automatic reset command is provided. For legacy flights without an `aircraftLayoutId`, first inspect the existing configuration import in dry-run mode:
 
-To get legacy flights, reservations, popularFlights, and users seed, uncomment lines 17-20 and 30-36 lines in `app.js`
+The legacy start-up seed scripts (which created demo users with a shared password) were removed in MCO4; use this runner only.
 
 ```bash
 npm run import:aircraft-configurations

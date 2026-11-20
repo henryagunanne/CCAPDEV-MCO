@@ -14,10 +14,10 @@ const crypto = require('crypto');
 const SESSION_IDLE_TIMEOUT_MS = 30 * 60 * 1000;
 const SESSION_ABSOLUTE_TIMEOUT_MS = 8 * 60 * 60 * 1000;
 const isProduction = process.env.NODE_ENV === 'production';
-// const seedPopularFlights = require('./seeds/seedPopularFlights'); // Seed popular flights
-// const seedFlights = require('./seeds/seedFlights'); // Seed flights
-// const seedUsers = require('./seeds/seedUsers'); // Seed Users
-// const seedReservations = require('./seeds/seedReservations'); // Seed Reservations
+// Optional public HTTPS origin used for HTTP->HTTPS redirects, e.g. https://archers-airline.example
+const publicOrigin = /^https:\/\/[A-Za-z0-9.-]+(:\d+)?$/.test(String(process.env.PUBLIC_ORIGIN || ''))
+  ? String(process.env.PUBLIC_ORIGIN).replace(/\/$/, '')
+  : '';
 
 // System logging
 const httpLogger = require('./logs/httpLogger');
@@ -30,10 +30,6 @@ if (!isTestEnvironment) {
     mongoose.connect(mongoUri)
     .then(async () => {
         logger.info('✅ MongoDB connected.');
-        // await seedFlights(); // seeds flights if empty
-        // await seedPopularFlights(); // seed popular flights if empty
-        // await seedUsers(); // seed users if empty
-        // await seedReservations(); // seed reservations if empty
     })
     .catch(err => logger.error('MongoDB connection failed.', { code: err.code || 'DATABASE_CONNECTION_ERROR' }));
 }
@@ -153,7 +149,11 @@ app.use(helmet({
             objectSrc: ["'none'"],
             frameAncestors: ["'none'"],
             formAction: ["'self'"],
-            scriptSrc: ["'self'", (req, res) => `'nonce-${res.locals.cspNonce}'`, 'https://code.jquery.com', 'https://cdn.jsdelivr.net'],
+            // MCO4: allow only the two exact CDN files the layouts load (each also pinned with SRI),
+            // not every file on code.jquery.com / cdn.jsdelivr.net.
+            scriptSrc: ["'self'", (req, res) => `'nonce-${res.locals.cspNonce}'`,
+              'https://code.jquery.com/jquery-3.7.1.min.js',
+              'https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js'],
             styleSrc: ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net'],
             imgSrc: ["'self'", 'data:'],
             fontSrc: ["'self'", 'data:', 'https://cdn.jsdelivr.net'],
@@ -165,20 +165,39 @@ app.use(helmet({
     hsts: false
 }));
 
+// MCO4: browser features the site never uses are switched off (Nikto/DAST hardening finding).
+app.use((req, res, next) => {
+    res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()');
+    next();
+});
+
 // Enforce HTTPS in production and set HSTS header
 app.use((req, res, next) => {
     if (isProduction && req.secure) {
         res.setHeader('Strict-Transport-Security', 'max-age=31536000');
     }
     if (isProduction && !req.secure) {
+        // MCO4 / REQ-C-02: behind a TLS-terminating proxy, plain-HTTP page requests are redirected to
+        // the configured public HTTPS origin. The target comes from PUBLIC_ORIGIN, never from the
+        // request's Host header, so the redirect cannot be pointed at another site. Other methods
+        // (and deployments without PUBLIC_ORIGIN) are still refused.
+        if (publicOrigin && ['GET', 'HEAD'].includes(req.method)) {
+            return res.redirect(308, `${publicOrigin}${req.originalUrl}`);
+        }
         return res.status(403).json({ success: false, message: 'HTTPS is required.' });
     }
     next();
 });
 
-app.use(express.urlencoded({ extended: true }));    // Parse URL-encoded bodies
-app.use(express.json());    // Parse JSON bodies
-app.use(express.static(path.join(__dirname, 'public')));  // Serve static files
+app.use(express.urlencoded({ extended: true, limit: '100kb', parameterLimit: 200 }));    // Parse URL-encoded bodies (explicit limits, MCO4 / C-23)
+app.use(express.json({ limit: '100kb' }));    // Parse JSON bodies (explicit limit, MCO4 / C-23)
+
+// Serve only the allow-listed public asset folders (C-25 / REQ-C-06). Prototype pages under
+// public/src/html and any stray files elsewhere in public/ are no longer reachable.
+const staticOptions = { dotfiles: 'deny', index: false, redirect: false };
+app.use('/assets', express.static(path.join(__dirname, 'public', 'assets'), staticOptions));
+app.use('/src/css', express.static(path.join(__dirname, 'public', 'src', 'css'), staticOptions));
+app.use('/src/javascript', express.static(path.join(__dirname, 'public', 'src', 'javascript'), staticOptions));
 app.use(httpLogger);    // HTTP Request Logging 
 
 
@@ -262,6 +281,11 @@ app.use((err, req, res, next) => {
       ? err.status
       : 500;
     const acceptsHtml = !req.xhr && (req.get('accept') || '').includes('text/html');
+
+    if (statusCode === 503 && err.publicMessage) {
+      logger.error('Service temporarily unavailable.', { code: err.code || 'SERVICE_UNAVAILABLE' });
+      return res.status(503).json({ success: false, code: 'SERVICE_UNAVAILABLE', message: err.publicMessage });
+    }
 
     if (statusCode >= 500) {
       logger.error('Request processing failed.', { code: err.code || 'UNHANDLED_ERROR' });

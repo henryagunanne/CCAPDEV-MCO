@@ -26,6 +26,21 @@ const { recordAuditEvent } = require('../services/auditService');
 const { isTodayOrFutureInManila } = require('../services/manilaDate');
 const { supportsTransactions } = require('../services/bookingService');
 const { authenticationLimits } = require('../middleware/rateLimits');
+const { requireActiveUser, invalidateAccount } = require('../middleware/userSession');
+
+// MCO4: a bcrypt hash of a random value, compared when the email is unknown so that unknown and
+// existing accounts take the same time to answer (C-02 hook: no account-existence oracle).
+const TIMING_EQUALIZER_HASH = bcrypt.hashSync(crypto.randomBytes(24).toString('hex'), 12);
+const NAME_PATTERN = /^[\p{L}][\p{L}\p{M}' -]{0,79}$/u;
+const EMAIL_PATTERN = /^[^\s@]{1,64}@[^\s@]+\.[^\s@]{2,}$/;
+
+// Server-side validation for account fields (C-09): letters, spaces, apostrophes and hyphens, 1-80 characters.
+function isValidPersonName(value) {
+  return typeof value === 'string' && NAME_PATTERN.test(value.trim());
+}
+function isValidEmail(value) {
+  return typeof value === 'string' && value.length <= 254 && EMAIL_PATTERN.test(value.trim());
+}
 
 const INVALID_LOGIN_MESSAGE = 'Invalid email or password.';
 const SESSION_IDLE_TIMEOUT_MS = 30 * 60 * 1000;
@@ -320,20 +335,9 @@ async function recordAuditLog({ actorId, actorRole, action, resourceType = 'syst
 
 // Middleware to check if user is authenticated
 function isAuthenticated(req, res, next) {
-    if (req.session.user) {
-      if (req.session.user.status === 'disabled' || req.session.user.status === 'suspended') {
-        return res.status(403).render('error/access-denied', {
-          title: 'Access Denied',
-          message: 'This account is disabled.'
-        });
-      }
-      return next();
-    }else {
-      res.status(403).render('error/access-denied', { 
-        title: 'Access Denied',
-        isAdmin: req.session.user?.role === 'Admin'
-      });  
-    } 
+    // MCO4: 401 when signed out (REQ-AA-01); stale sessions (deleted/disabled account, changed
+    // sessionVersion) are destroyed instead of trusting the copy of the user stored in the session.
+    return requireActiveUser(req, res, next);
 }
 
 // Middleware to ensure admin cannot access user routes
@@ -425,8 +429,8 @@ router.post('/register', ...authenticationLimits, async (req, res) => {
 
     const normalizedEmail = normalizeEmail(email);
 
-    if (!firstName || !lastName || !normalizedEmail || isAdult !== true ||
-        privacyNoticeAccepted !== true || !isStrongPassword(password)) {
+    if (!isValidPersonName(firstName) || !isValidPersonName(lastName) || !isValidEmail(normalizedEmail) ||
+        isAdult !== true || privacyNoticeAccepted !== true || !isStrongPassword(password)) {
       return res.status(400).json({ success: false, message: 'Please provide valid registration details. Passwords must be at least 8 characters long.' });
     }
 
@@ -450,8 +454,8 @@ router.post('/register', ...authenticationLimits, async (req, res) => {
       logger.info('User registered.');
     } catch (err) {
       logger.error('Registration failed.', { code: err.code || 'REGISTRATION_ERROR' });
-      const message = err && err.message ? err.message : 'Server error during registration';
-      res.status(400).json({ success: false, message });
+      // MCO4: never echo internal validation/database messages to the client (C-23).
+      res.status(400).json({ success: false, message: 'Registration could not be completed. Check your details and try again.' });
     }
 });
 
@@ -463,25 +467,32 @@ router.post('/login', ...authenticationLimits, async (req, res) => {
     try {
       const user = await User.findOne({ email });
 
+      // MCO4: every failure path performs one bcrypt comparison and answers 401 with the same
+      // message, so response time and status no longer reveal whether an account exists,
+      // is disabled or is locked (C-02 verification hook).
       if (!user) {
-        await recordAuditLog({ actorRole: 'anonymous', action: 'admin:login', resourceType: 'User', result: 'FAILURE', reason: 'User not found' });
+        await bcrypt.compare(password, TIMING_EQUALIZER_HASH);
+        await recordAuditLog({ actorRole: 'anonymous', action: 'user:login', resourceType: 'User', result: 'FAILURE', reason: 'Unknown account' });
         return res.status(401).json({ success: false, message: INVALID_LOGIN_MESSAGE });
       }
 
+      const loginAction = isAdminAccount(user) ? 'admin:login' : 'user:login';
+      const isMatch = await bcrypt.compare(password, user.password);
+
       if (user.status === 'disabled' || user.status === 'suspended') {
-        await recordAuditLog({ actorId: user._id, actorRole: user.role || 'user', action: 'admin:login', resourceType: 'User', result: 'FAILURE', reason: 'Account disabled' });
-        return res.status(403).json({ success: false, message: 'This account is not available.' });
+        await recordAuditLog({ actorId: user._id, actorRole: user.role || 'user', action: loginAction, resourceType: 'User', result: 'FAILURE', reason: 'Account disabled' });
+        return res.status(401).json({ success: false, message: INVALID_LOGIN_MESSAGE });
       }
 
       const lockUntil = user.lockUntil ? new Date(user.lockUntil).getTime() : 0;
       if (lockUntil > Date.now()) {
-        return res.status(403).json({ success: false, message: INVALID_LOGIN_MESSAGE });
+        await recordAuditLog({ actorId: user._id, actorRole: user.role || 'user', action: loginAction, resourceType: 'User', result: 'FAILURE', reason: 'Account locked' });
+        return res.status(401).json({ success: false, message: INVALID_LOGIN_MESSAGE });
       }
 
-      const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         await handleFailedLogin(user);
-        await recordAuditLog({ actorId: user._id, actorRole: user.role || 'user', action: 'admin:login', resourceType: 'User', result: 'FAILURE', reason: 'Invalid password' });
+        await recordAuditLog({ actorId: user._id, actorRole: user.role || 'user', action: loginAction, resourceType: 'User', result: 'FAILURE', reason: 'Invalid password' });
         return res.status(401).json({ success: false, message: INVALID_LOGIN_MESSAGE });
       }
 
@@ -508,6 +519,7 @@ router.post('/login', ...authenticationLimits, async (req, res) => {
           req.session.save((error) => error ? reject(error) : resolve());
         });
         const redirect = `/users/mfa/${pendingStage}`;
+        await recordAuditLog({ actorId: user._id, actorRole: 'Admin', action: 'admin:login', resourceType: 'User', result: 'SUCCESS', reason: 'Password step complete; MFA pending' });
         logger.info('Administrator password authentication completed; MFA is pending.');
         if (wantsHtml) return res.redirect(redirect);
         return res.status(200).json({
@@ -524,6 +536,7 @@ router.post('/login', ...authenticationLimits, async (req, res) => {
       await new Promise((resolve, reject) => {
         req.session.save((error) => error ? reject(error) : resolve());
       });
+      await recordAuditLog({ actorId: user._id, actorRole: user.role || 'user', action: 'user:login', resourceType: 'User', result: 'SUCCESS', reason: 'Password authentication succeeded' });
       logger.info('User authenticated.');
 
       if (wantsHtml) return res.redirect('/');
@@ -803,15 +816,22 @@ router.post('/edit/:userId', isAuthenticated, async (req, res) => {
     const sessionUserId = req.session.user && req.session.user._id ? req.session.user._id.toString() : null;
 
     if (sessionUserId !== userId) {
+      await recordAuditEvent({ actorId: sessionUserId, actorRole: req.session.user.role || 'user', action: 'authz:denied', resourceType: 'User', resourceId: userId, result: 'FAILURE', reasonCode: 'NOT_ACCOUNT_OWNER', reason: 'profile-edit', ipAddress: req.ip });
       return res.status(403).json({ success: false, message: 'You can only edit your own profile.' });
     }
 
     const { firstName, lastName, email } = req.body;
     const allowedUpdates = {};
 
+    // MCO4: validate every supplied field on the server (C-09) instead of storing any string.
+    if ((firstName !== undefined && !isValidPersonName(firstName)) ||
+        (lastName !== undefined && !isValidPersonName(lastName)) ||
+        (email !== undefined && !isValidEmail(normalizeEmail(email)))) {
+      return res.status(400).json({ success: false, message: 'Names may contain letters, spaces, apostrophes and hyphens (up to 80 characters); the email must be valid.' });
+    }
     if (firstName) allowedUpdates.firstName = String(firstName).trim();
     if (lastName) allowedUpdates.lastName = String(lastName).trim();
-    if (email) allowedUpdates.email = String(email).trim().toLowerCase();
+    if (email) allowedUpdates.email = normalizeEmail(email);
 
     if (Object.keys(allowedUpdates).length === 0) {
       return res.status(400).json({ success: false, message: 'No valid profile changes supplied.' });
@@ -859,6 +879,7 @@ router.post('/change-password/:userId', isAuthenticated, async (req, res) => {
     const sessionUserId = req.session.user && req.session.user._id ? req.session.user._id.toString() : null;
 
     if (sessionUserId !== userId) {
+      await recordAuditEvent({ actorId: sessionUserId, actorRole: req.session.user.role || 'user', action: 'authz:denied', resourceType: 'User', resourceId: userId, result: 'FAILURE', reasonCode: 'NOT_ACCOUNT_OWNER', reason: 'password-change', ipAddress: req.ip });
       return res.status(403).json({ success: false, message: 'You can only change your own password.' });
     }
 
@@ -885,7 +906,12 @@ router.post('/change-password/:userId', isAuthenticated, async (req, res) => {
       }
 
       user.password = newPassword;
+      // MCO4: bump sessionVersion so every other session for this account is rejected on its next
+      // request (requireActiveUser); the current session is updated and stays signed in.
+      user.sessionVersion = Number(user.sessionVersion || 0) + 1;
       await user.save();
+      invalidateAccount(user._id);
+      req.session.user = { ...req.session.user, sessionVersion: user.sessionVersion };
 
       await recordAuditEvent({
         actorId: user._id,
@@ -905,6 +931,9 @@ router.post('/change-password/:userId', isAuthenticated, async (req, res) => {
 // POST /users/delete/:userId - Delete user account
 router.post('/delete/:userId', isAuthenticated, async (req, res) => {
     const { userId } = req.params;
+    if (!mongoose.isValidObjectId(userId)) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
     const targetUser = await User.findById(userId);
 
     if (!targetUser) {
@@ -917,25 +946,21 @@ router.post('/delete/:userId', isAuthenticated, async (req, res) => {
     const sessionUser = req.session.user;
     const sessionUserId = sessionUser && sessionUser._id ? sessionUser._id.toString() : null;
     const isOwnAccount = sessionUserId === userId;
-    const isAdmin = sessionUser && (sessionUser.role === 'Admin' || (Array.isArray(sessionUser.roles) && sessionUser.roles.length > 0));
 
-    if (!isOwnAccount && !isAdmin) {
+    // MCO4: this route deletes only the caller's own customer account. Administrator roles have no
+    // customer-deletion permission (config/rbac.js), and administrator accounts are managed in
+    // Admin Management, so any other target is refused and recorded (REQ-AA-02, C-06, C-16).
+    if (!isOwnAccount) {
+      await recordAuditEvent({ actorId: sessionUserId, actorRole: sessionUser.role || 'user', action: 'authz:denied', resourceType: 'User', resourceId: userId, result: 'FAILURE', reasonCode: 'NOT_ACCOUNT_OWNER', reason: 'account-delete', ipAddress: req.ip });
       return res.status(403).json({ success: false, message: 'You are not authorized to delete this account.' });
     }
-
-    if (!isOwnAccount && targetUser.role === 'Admin') {
-      return res.status(403).json({ success: false, message: 'Administrators cannot be deleted by ordinary users.' });
+    if (targetUser.role === 'Admin') {
+      return res.status(403).json({ success: false, message: 'Administrator accounts are managed in Admin Management.' });
     }
 
-    if (isOwnAccount) {
-      const passwordMatches = await bcrypt.compare(String(req.body.currentPassword || ''), targetUser.password);
-      if (!passwordMatches) {
-        return res.status(400).json({ success: false, message: 'Current password is incorrect.' });
-      }
-    }
-
-    if (isAdmin && !isOwnAccount && targetUser.role === 'Admin' && sessionUserId !== targetUser._id.toString()) {
-      return res.status(403).json({ success: false, message: 'Administrative deletion requires explicit authorization.' });
+    const passwordMatches = await bcrypt.compare(String(req.body.currentPassword || ''), targetUser.password);
+    if (!passwordMatches) {
+      return res.status(400).json({ success: false, message: 'Current password is incorrect.' });
     }
 
     try {
@@ -1014,6 +1039,7 @@ router.post('/delete/:userId', isAuthenticated, async (req, res) => {
           session
         });
         await User.deleteOne({ _id: userId }, options);
+        invalidateAccount(userId);
       };
       if (supportsTransactions()) {
         const session = await mongoose.startSession();
@@ -1037,7 +1063,6 @@ router.post('/delete/:userId', isAuthenticated, async (req, res) => {
         return;
       }
 
-      logger.info('Admin deleted a user account.');
       res.json({ success: true });
     } catch (err) {
       logger.error('Account deletion failed.', { code: err.code || 'ACCOUNT_DELETE_ERROR' });

@@ -21,19 +21,61 @@ const { calculateReservationPrice } = require('../services/bookingPricing');
 const { bookingLimits, cancellationLimits, checkInLimits, flightSearchLimits } = require('../middleware/rateLimits');
 const { recordAuditEvent } = require('../services/auditService');
 const { getStoredPassport } = require('../services/passportEncryption');
-const router = express.Router();
-const logger = require('../logs/logger'); 
 
-
-// Helper middleware to check if user is authenticated
-function isAuthenticated(req, res, next) {
-  if (!req.session || !req.session.user) {
-    return res.status(403).render('error/access-denied', { 
-      title: 'Access Denied',
-      isAdmin: false
-    });
+// Decrypt a passport for the owner's edit page; a damaged or tampered value fails closed (no value shown).
+function safeStoredPassport(passenger) {
+  try {
+    return getStoredPassport(passenger);
+  } catch (error) {
+    logger.error('Stored passport could not be decrypted.', { code: 'PASSPORT_DECRYPT_ERROR' });
+    return undefined;
   }
-  return next();
+}
+const router = express.Router();
+const logger = require('../logs/logger');
+const crypto = require('crypto');
+const { requireActiveUser } = require('../middleware/userSession');
+
+// Generic check-in failure reply: the same text for every failure, so a PNR or passenger name
+// cannot be probed (PD-12, MCO4 finding on check-in enumeration).
+const CHECK_IN_FAILURE = 'Check-in could not be completed. Check your booking reference and passenger name, or contact support if you have already checked in.';
+
+
+// Helper middleware to check if user is authenticated.
+// MCO4: returns 401 when signed out (REQ-AA-01) and rejects sessions whose account was deleted,
+// disabled or whose sessionVersion changed (password change, admin status change).
+function isAuthenticated(req, res, next) {
+  return requireActiveUser(req, res, next);
+}
+
+// Record an attempt to reach a reservation that exists but belongs to someone else (C-05, C-16).
+// The caller still answers 404, so the response does not confirm that the reservation exists.
+// The write runs in the background (MCO2 C-16: prefer bounded/asynchronous audit writes), so an
+// attacker's request is not slowed and a failed audit write is logged rather than surfaced.
+function recordOwnershipDenial(req, reservationId, operation) {
+  const actor = { id: req.session.user._id, role: req.session.user.role || 'user', ip: req.ip };
+  setImmediate(() => writeOwnershipDenial(actor, reservationId, operation));
+  return Promise.resolve();
+}
+
+async function writeOwnershipDenial(actor, reservationId, operation) {
+  try {
+    const exists = await Reservation.exists({ _id: reservationId });
+    if (!exists) return;
+    await recordAuditEvent({
+      actorId: actor.id,
+      actorRole: actor.role,
+      action: 'authz:denied',
+      resourceType: 'Reservation',
+      resourceId: reservationId,
+      result: 'FAILURE',
+      reasonCode: 'NOT_RESERVATION_OWNER',
+      reason: operation,
+      ipAddress: actor.ip
+    });
+  } catch (error) {
+    logger.error('Authorization denial audit failed.', { code: error.code || 'AUTHZ_AUDIT_ERROR' });
+  }
 }
 
 // Middleware to ensure admin cannot access user routes
@@ -131,7 +173,7 @@ router.get('/book/:flightId', isAuthenticated, isAdmin, async (req, res) => {
     res.render("reservations/reservation", {
       title: "Book Your Flight",
       flight,
-      layout,
+      seatLayout: layout,   // MCO4: 'layout' is reserved by express-handlebars for the layout file name
       travelClass,
       tripType,
       departDate,
@@ -213,7 +255,10 @@ router.get("/:id/confirmation", isAuthenticated, isAdmin, async (req, res) => {
       .populate("flight")
       .populate("userId");
 
-    if (!reservationDoc) return res.status(404).send("Reservation not found");
+    if (!reservationDoc) {
+      await recordOwnershipDenial(req, reservationId, 'view-confirmation');
+      return res.status(404).send("Reservation not found");
+    }
 
     // convert to plain object early
     const reservation = reservationDoc.toObject();
@@ -276,7 +321,7 @@ router.post("/check-in", ...checkInLimits, async (req,res)=>{
         pnr = pnr.trim().toUpperCase();
         fullName = fullName.trim();
         if (!/^[A-Z0-9]{6,12}$/.test(pnr)) {
-            return res.json({ success:false, message:"Invalid PNR or Name" });
+            return res.json({ success:false, message: CHECK_IN_FAILURE });
         }
 
         const reservation = await Reservation.findOne({
@@ -284,14 +329,14 @@ router.post("/check-in", ...checkInLimits, async (req,res)=>{
         }).populate("flight");
 
         if(!reservation)
-            return res.json({ success:false, message:"Invalid PNR or Name" });
+            return res.json({ success:false, message: CHECK_IN_FAILURE });
 
         
         const idx = reservation.passengers.findIndex(
             p => p.fullName.trim().toLowerCase() === fullName.toLowerCase()
         );
 
-        if(idx === -1) return res.json({ success:false, message:"Invalid PNR or Name" });
+        if(idx === -1) return res.json({ success:false, message: CHECK_IN_FAILURE });
         const passenger = reservation.passengers[idx];
 
 
@@ -301,15 +346,12 @@ router.post("/check-in", ...checkInLimits, async (req,res)=>{
         }
 
         if(passenger.checkedIn)
-            return res.json({
-                success:false,
-                message:'Passenger is already checked in.'
-            });
+            return res.json({ success:false, message: CHECK_IN_FAILURE });
 
 
-        let outboundBP = "BP-" + Math.floor(100000 + Math.random()*900000);
+        let outboundBP = "BP-" + crypto.randomInt(100000, 1000000);
         let returnBP = reservation.flight.length > 1
-            ? "BP-" + Math.floor(100000 + Math.random()*900000)
+            ? "BP-" + crypto.randomInt(100000, 1000000)
             : outboundBP;
 
 
@@ -391,7 +433,10 @@ router.post('/cancel/:reservationId', ...cancellationLimits, isAuthenticated, is
       _id: reservationId,
       userId: req.session.user._id
     }).select('+passengers.passportEncrypted +passengers.passportFingerprint');
-    if (!reservation) return res.status(404).send('Reservation not found');
+    if (!reservation) {
+      await recordOwnershipDenial(req, reservationId, 'cancel');
+      return res.status(404).send('Reservation not found');
+    }
     const cancelledReservation = await cancelReservation(reservation);
     if (!cancelledReservation) {
       return res.status(404).send('Reservation not found');
@@ -428,7 +473,10 @@ router.get('/:id/edit', isAuthenticated, isAdmin, async (req, res) => {
       .select('+passengers.passport +passengers.passportEncrypted +passengers.passportFingerprint')
       .lean();
 
-    if (!reservation) return res.status(404).send('Reservation not found');
+    if (!reservation) {
+      await recordOwnershipDenial(req, reservationId, 'view-edit');
+      return res.status(404).send('Reservation not found');
+    }
     if (reservation.status === 'Cancelled') return res.status(409).send('Cancelled reservations cannot be edited.');
 
     const [outboundFlight, returnFlight] = reservation.flight;
@@ -453,7 +501,7 @@ router.get('/:id/edit', isAuthenticated, isAdmin, async (req, res) => {
     reservation.passengers = reservation.passengers.map(passenger => ({
       ...passenger,
       requiresMealConsent: passenger.meal !== 'None',
-      passportForOwner: passenger.checkedIn ? undefined : getStoredPassport(passenger),
+      passportForOwner: passenger.checkedIn ? undefined : safeStoredPassport(passenger),
       passport: undefined,
       passportEncrypted: undefined,
       passportFingerprint: undefined
@@ -483,7 +531,10 @@ router.post('/:id/edit', isAuthenticated, isAdmin, async (req, res) => {
     const reservationId = validateObjectId(req.params.id, 'Reservation ID');
     const existingReservation = await Reservation.findOne({ _id: reservationId, userId: req.session.user._id })
       .select('+passengers.passportEncrypted +passengers.passportFingerprint');
-    if (!existingReservation) return res.status(404).send('Reservation not found');
+    if (!existingReservation) {
+      await recordOwnershipDenial(req, reservationId, 'edit');
+      return res.status(404).send('Reservation not found');
+    }
     const passengers = validateEditBody(req.body, existingReservation.tripType);
     const expectedFlightIds = existingReservation.flight.map(id => String(id));
     if (req.body.flight && String(req.body.flight) !== expectedFlightIds[0]) {
@@ -595,7 +646,10 @@ router.get('/:id', isAuthenticated, isAdmin, async (req, res) => {
       .populate('flight')
       .lean();
 
-    if (!reservation) return res.status(404).send('Reservation not found');
+    if (!reservation) {
+      await recordOwnershipDenial(req, reservationId, 'view-details');
+      return res.status(404).send('Reservation not found');
+    }
     reservation.passengers = reservation.passengers.map(passenger => ({
       fullName: passenger.fullName,
       ageCategory: passenger.ageCategory,
@@ -621,6 +675,7 @@ router.post('/update/:id', isAuthenticated, isAdmin, async (req, res) => {
       userId: req.session.user._id
     }).select('+passengers.passportEncrypted +passengers.passportFingerprint');
     if (!reservation) {
+      await recordOwnershipDenial(req, reservationId, 'update');
       return res.status(404).json({ success: false, message: 'Reservation not found.' });
     }
     const passengers = validateEditBody(req.body, reservation.tripType);

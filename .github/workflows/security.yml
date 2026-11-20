@@ -1,0 +1,31 @@
+# MCO4 / C-21 and REQ-I-05: dependency gate, static-file allowlist check and test suite.
+name: security-checks
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 1 1 * *'   # monthly audit (REQ-I-05), 09:00 Manila on the 1st
+permissions:
+  contents: read
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Block High/Critical advisories in production dependencies
+        run: npm audit --omit=dev --audit-level=high
+      - name: Static-file allowlist (C-25)
+        run: node scripts/check-static-allowlist.js
+      - name: Test suite with throw-away keys
+        run: |
+          {
+            echo "SESSION_SECRET=$(openssl rand -base64 48)"
+            echo "PASSPORT_ENCRYPTION_KEY=$(openssl rand -base64 32)"
+            echo "MFA_ENCRYPTION_KEY=$(openssl rand -base64 32)"
+          } > .env
+          npm test -- --forceExit

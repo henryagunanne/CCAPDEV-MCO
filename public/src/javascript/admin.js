@@ -21,25 +21,23 @@ jQuery (function() {
       success: function(data) {
         $spinner.hide();
         if (data.success) {
-          $results.html(`
-          <div class="card mx-auto mt-4 shadow-sm" style="max-width: 600px; border-radius:12px;">
-            <div class="card-body text-start">
-              <h5 class="card-title">Flight ${data.flightNumber}</h5>
-              <p><strong>From:</strong> ${data.origin} → <strong>To:</strong> ${data.destination}</p>
-              <p><strong>Date:</strong> ${new Date(data.date).toLocaleDateString()}</p>
-              <p><strong>Price:</strong> ₱${data.price}</p>
-            </div>
-          </div>
-        `);
+          // MCO4: build the card with text nodes so flight data is never parsed as HTML.
+          const $body = $('<div class="card-body text-start"></div>');
+          $body.append($('<h5 class="card-title"></h5>').text(`Flight ${data.flightNumber}`));
+          $body.append($('<p></p>').append($('<strong></strong>').text('From: ')).append(document.createTextNode(`${data.origin} → `))
+            .append($('<strong></strong>').text('To: ')).append(document.createTextNode(String(data.destination))));
+          $body.append($('<p></p>').append($('<strong></strong>').text('Date: ')).append(document.createTextNode(new Date(data.date).toLocaleDateString())));
+          $body.append($('<p></p>').append($('<strong></strong>').text('Price: ')).append(document.createTextNode(`₱${data.price}`)));
+          $results.empty().append($('<div class="card mx-auto mt-4 shadow-sm" style="max-width: 600px; border-radius:12px;"></div>').append($body));
         }else {
-          $results.html(`<p class="text-danger mt-3">${data.message}</p>`);
+          $results.empty().append($('<p class="text-danger mt-3"></p>').text(String(data.message || '')));
         }
 
       },
       error: function(xhr) {
         $spinner.hide();
         const errorMsg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'An error occurred while searching for the flight.';
-        $results.html(`<p class="text-danger mt-3">${errorMsg}</p>`);
+        $results.empty().append($('<p class="text-danger mt-3"></p>').text(String(errorMsg)));
       }
     });
   });

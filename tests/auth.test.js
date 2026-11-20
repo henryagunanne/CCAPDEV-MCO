@@ -143,10 +143,12 @@ describe('Authentication Tests', () => {
     describe('GET /users/profile', () => {
         it('should prevent access to this page', async () => {
             const res = await agent 
-                .get('/users/profile');
+                .get('/users/profile')
+                .set('Accept', 'text/html');
 
-            expect(res.statusCode).toEqual(403);
-            expect(res.text).toMatch(/<title>Access Denied<\/title>/);
+            // MCO4: REQ-AA-01 requires 401 (or a login redirect) for unauthenticated requests.
+            expect(res.statusCode).toEqual(401);
+            expect(res.text).toMatch(/<title>Authentication Required<\/title>/);
         });
     });
 

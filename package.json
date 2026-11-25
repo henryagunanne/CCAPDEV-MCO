@@ -1,7 +1,7 @@
 {
   "name": "ccapdev-mco",
-  "version": "1.0.0",
-  "description": "In compliance with the course requirements for CCAPDEV",
+  "version": "2.0.0",
+  "description": "In compliance with the course requirements for CCAPDEV and ITSSDLC. This project is a web application for managing airline reservations, including features such as user authentication, reservation management, and administrative functionalities.",
   "main": "server.js",
   "scripts": {
     "test": "NODE_ENV=test jest --detectOpenHandles --runInBand",

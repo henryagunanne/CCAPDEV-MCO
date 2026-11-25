@@ -124,8 +124,8 @@ function validatePassengers(raw, tripType, { requirePassport = true } = {}) {
       throw new BookingInputError('Separate consent is required for a special-meal preference.');
     }
     const baggage = passenger.baggageAllowance === undefined ? 0 : passenger.baggageAllowance;
-    if (!Number.isInteger(baggage) || baggage < 0 || baggage > 40) {
-      throw new BookingInputError('Baggage allowance must be a whole number from 0 to 40 kg.');
+    if (!Number.isInteger(baggage) || baggage < 0 || baggage > 100) {
+      throw new BookingInputError('Baggage allowance must be a whole number from 0 to 100 kg.');
     }
     const seatNumber = validateSeatNumber(passenger.seatNumber);
     const returnSeatNumber = tripType === 'Round-Trip'
